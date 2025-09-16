@@ -94,7 +94,7 @@ def resources_section():
         "- [Wellness Tips for Students (PDF)](https://www.montgomeryschoolsmd.org/siteassets/schools/elementary-schools/h-o/barnsleyes/uploadedfiles/mentalhealth2.pdf)"
     )
     st.markdown(
-        "- [Managing Stress (CDC)](https://www.cdc.gov/mental-health/learn/index.htm)"
+        "- [Managing Stress (IND)](https://www.artofliving.org/in-en/lifestyle/reads/guide-to-stress-management)"
     )
     st.markdown(
         "- [Stress Overview (MedlinePlus)](https://medlineplus.gov/stress.html)"
@@ -151,3 +151,4 @@ elif page == "Booking":
 elif page == "Dashboard":
     st.title("📊 Admin Dashboard")
     admin_section()
+
