@@ -4,6 +4,7 @@ sqlalchemy>=2.0,<3.0
 psycopg[binary]>=3.2,<4.0
 pydantic>=2.7,<3.0
 pydantic-settings>=2.2,<3.0
+python-dotenv>=1.0
 alembic>=1.13,<2.0
 
 pytest>=8.0

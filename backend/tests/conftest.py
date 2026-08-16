@@ -1,29 +1,35 @@
 """Pytest setup.
 
-Creates a dedicated `mental_health_test` PostgreSQL database (never the dev
-database), points the app at it via DATABASE_URL, applies Alembic migrations,
-and exposes the TestClient and a DB session fixture.
+Resolves the base DATABASE_URL through the same mechanism the app uses
+(python-dotenv loading backend/.env into the environment), provisions a
+dedicated `mental_health_test` database, points the app at it, applies Alembic
+migrations, and exposes the TestClient and a DB session fixture.
+
+Cleanup truncates every table known to ORM metadata (CASCADE), so the strategy
+keeps working as child tables and foreign keys are added.
 """
 
 import os
 from pathlib import Path
 
 import pytest
+from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 TEST_DB_NAME = "mental_health_test"
 
+load_dotenv(BACKEND_DIR / ".env", override=False)
 
-def _read_dev_database_url() -> str:
-    env_file = BACKEND_DIR / ".env"
-    if env_file.exists():
-        for line in env_file.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
-            if line.startswith("DATABASE_URL=") and not line.startswith("#"):
-                return line.split("=", 1)[1].strip()
-    return os.environ.get("DATABASE_URL", "")
+
+def _resolve_base_database_url() -> str:
+    url = os.environ.get("DATABASE_URL", "").strip()
+    if not url:
+        raise RuntimeError(
+            "DATABASE_URL is not configured. Create backend/.env from "
+            "backend/.env.example so tests can provision the test database."
+        )
+    return url
 
 
 def _ensure_test_database(url: str) -> str:
@@ -52,14 +58,8 @@ def _run_migrations(url: str) -> None:
     command.upgrade(cfg, "head")
 
 
-_DEV_URL = _read_dev_database_url()
-if not _DEV_URL:
-    raise RuntimeError(
-        "DATABASE_URL is not configured. Create backend/.env from backend/.env.example "
-        "so tests can provision the test database."
-    )
-
-_TEST_URL = _ensure_test_database(_DEV_URL)
+_BASE_URL = _resolve_base_database_url()
+_TEST_URL = _ensure_test_database(_BASE_URL)
 os.environ["DATABASE_URL"] = _TEST_URL
 _run_migrations(_TEST_URL)
 
@@ -86,7 +86,10 @@ def db_session():
 
 
 @pytest.fixture(autouse=True)
-def _clean_sessions(db_session):
+def _clean_tables(db_session):
     yield
-    db_session.execute(text("DELETE FROM sessions"))
+    from app.core.db import Base
+
+    for table in Base.metadata.sorted_tables:
+        db_session.execute(text(f'TRUNCATE TABLE "{table.name}" CASCADE'))
     db_session.commit()

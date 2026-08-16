@@ -1,0 +1,7 @@
+Hindi: 'मैं तनाव में हूँ'
+Assamese: 'মই মানসিক চাপত আছোঁ'
+Mixed: 'i am तनाव में हूँ'
+Punctuation: 'hello... world--how are you?'
+Contractions: "i don't know, self-harm"
+Empty: ''
+Whitespace: ' '

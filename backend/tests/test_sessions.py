@@ -2,8 +2,11 @@
 
 import uuid
 
+import pytest
+
 from app.models.session import Session as SessionModel
 from app.repositories.sessions import SessionRepository
+from app.services.sessions import SessionService
 
 
 def test_create_session_returns_201_with_fields(client):
@@ -68,11 +71,42 @@ def test_session_is_persisted_in_database(client, db_session):
     assert row.updated_at is not None
 
 
-def test_repository_create_and_get(client, db_session):
+def test_repository_does_not_commit_transaction(client, db_session):
+    from app.core.db import SessionLocal
+
     repo = SessionRepository(db_session)
     created = repo.create("en")
-    fetched = repo.get_by_id(created.id)
-    assert fetched is not None
-    assert fetched.id == created.id
-    assert fetched.language == "en"
-    assert repo.get_by_id(uuid.uuid4()) is None
+    db_session.flush()
+    assert created.id is not None
+
+    observer = SessionLocal()
+    try:
+        assert observer.get(SessionModel, created.id) is None
+    finally:
+        observer.close()
+
+    db_session.commit()
+
+    observer = SessionLocal()
+    try:
+        assert observer.get(SessionModel, created.id) is not None
+    finally:
+        observer.close()
+
+
+def test_service_owns_transaction_boundary(client, db_session):
+    service = SessionService(db_session)
+    created = service.create("hi")
+    assert service.get(created.id) is not None
+    assert created.language == "hi"
+
+
+def test_service_normalizes_language(client, db_session):
+    service = SessionService(db_session)
+    assert service.create(" AS ").language == "as"
+
+
+def test_service_rejects_unsupported_language(client, db_session):
+    service = SessionService(db_session)
+    with pytest.raises(ValueError):
+        service.create("xx")
