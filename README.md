@@ -1,50 +1,68 @@
-# mental-health-app
-🧠 Digital Mental Health and Psychological Support System
-📌 Problem Statement
+# Mental Health Support for Students
 
-Problem Statement ID: 25092
-Mental health issues like anxiety, stress, burnout, and depression are rapidly rising among students in higher education. Many students avoid counseling due to stigma or lack of awareness. Institutions also lack centralized systems to track student well-being.
+Privacy-first student support pathway: anonymous entry, AI-supported emotional
+support, deterministic safety engine, PHQ-9/GAD-7 screening, resource
+navigation, counselor booking, and admin dashboard.
 
-💡 Our Solution
+## Repository layout
 
-We built a beginner-friendly, web-based platform using Streamlit that provides:
+```
+v0/            Streamlit prototype — preserved reference implementation
+frontend/      Next.js 16 + TypeScript + Tailwind CSS (App Router)
+backend/       FastAPI modular monolith (Python)
+database/      PostgreSQL local setup
+docker/        docker-compose (PostgreSQL)
+docs/          Architecture and milestone notes
+```
 
-🤖 Rule-based Chatbot – Quick first-aid support for stress, anxiety, burnout, etc.
+## Status
 
-📚 Resource Hub – Videos, audio guides (including Hindi), and articles for self-help.
+Milestone 1 complete: foundation. Backend (FastAPI + `/health`), PostgreSQL
+connectivity, Alembic scaffold, Next.js scaffold, config/secrets hygiene.
+Product features begin in Milestone 2.
 
-📅 Confidential Booking System – Students can schedule counseling sessions securely.
+## Quick start
 
-📊 Admin Dashboard – Visual insights on student issues (trends, frequency, recent bookings).
+### 1. PostgreSQL
 
-🏗️ Architecture / Flow
+See `database/README.md` (Docker or portable binaries).
 
-Student interacts with Chatbot → gets coping strategies.
+### 2. Backend
 
-Student explores Resources (video/audio/PDF).
+```powershell
+cd backend
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+Copy-Item .env.example .env        # then fill in DATABASE_URL
+uvicorn app.main:app --reload --port 8000
+```
 
-Student fills Booking Form → data stored in bookings.csv.
+Verify: http://localhost:8000/health
 
-Admin uses Dashboard → see analytics + recent submissions.
+Run tests: `pytest`
 
-🖥️ Technologies Used
+### 3. Frontend
 
-Language: Python
+```powershell
+cd frontend
+npm install
+npm run dev
+```
 
-Framework: Streamlit (for UI and app structure)
+Open http://localhost:3000
 
-Libraries: Pandas, Matplotlib
+### 4. v0 (reference prototype)
 
-Storage: CSV (prototype), scalable to cloud DB in future
+```powershell
+cd v0
+streamlit run app.py
+```
 
-🚀 Future Scope
+## Migrations
 
-AI-powered chatbot with sentiment analysis (using Hugging Face).
-
-Integration of screening tools like PHQ-9, GAD-7.
-
-Secure cloud database with authentication.
-
-Multi-language support across India.
-
-Mobile app (Flutter/React Native) with offline-first features.
+```powershell
+cd backend
+alembic revision --autogenerate -m "message"
+alembic upgrade head
+```

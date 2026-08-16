@@ -1,0 +1,25 @@
+# Local development services.
+
+# Milestone 1: PostgreSQL only. Redis will be added in a later milestone
+# only if a concrete requirement appears (e.g. rate limiting / caching).
+
+services:
+  db:
+    image: postgres:17
+    container_name: mental-health-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-mental_health}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:?} -d ${POSTGRES_DB:-mental_health}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
