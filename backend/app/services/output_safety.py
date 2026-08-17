@@ -1,7 +1,7 @@
 """Output safety check for chat responses.
 
 Ensures that generated responses don't contain unsafe content before
-returning them to the student.
+returning them to the student. This is a defense-in-depth layer.
 """
 
 import re
@@ -13,7 +13,7 @@ class OutputSafetyCheck:
     """Deterministic output safety check for generated responses.
 
     This is a defense-in-depth layer that catches any unsafe content
-    that might slip through the fallback provider (defense in depth).
+    that might slip through the AI provider or fallback provider.
     """
 
     # Patterns that should NEVER appear in a response to a student
@@ -27,6 +27,28 @@ class OutputSafetyCheck:
         re.compile(r"\b(take|prescribe|dosage|mg|medication)\b.*\b(antidepressant|anxiolytic|benzodiazepine|ssri|snri)\b", re.I),
         # Dismissing professional help
         re.compile(r"\b(don'?t\s+(need|bother)\s+(seeing|going\s+to)\s+(a\s+)?(therapist|counselor|doctor|professional))\b", re.I),
+        # Medical diagnosis claims
+        re.compile(r"\b(you have|you are diagnosed with|you suffer from)\s+(depression|anxiety|bipolar|schizophrenia|ptsd|ocd|gad|mdd)\b", re.I),
+        # Prompt injection / roleplay attempts
+        re.compile(r"\b(ignore\s+(previous|above|all)\s+(instructions|rules|prompts?))\b", re.I),
+        re.compile(r"\b(act\s+as\s+(a\s+)?(doctor|therapist|psychiatrist|physician|clinician))\b", re.I),
+        re.compile(r"\b(pretend\s+to\s+be\s+(a\s+)?(doctor|therapist|psychiatrist|human|friend))\b", re.I),
+        re.compile(r"\b(bypass\s+(safety|security|guardrail|filter))\b", re.I),
+        re.compile(r"\b(system\s+prompt|developer\s+mode|administrator\s+mode)\b", re.I),
+    ]
+
+    # Patterns that indicate hallucinated phone numbers / helplines
+    # These should NOT appear in AI responses - crisis numbers are system-controlled
+    _PHONE_NUMBER_PATTERNS = [
+        # Indian phone numbers (10 digits, various formats)
+        re.compile(r"\b(?:\+91[\s-]?)?[6-9]\d{9}\b"),
+        # International format
+        re.compile(r"\b\+\d{1,3}[\s-]?\d{3,4}[\s-]?\d{4}\b"),
+        # Common helpline patterns (3-5 digits)
+        re.compile(r"\b\d{3,5}\b"),
+        # Toll-free patterns
+        re.compile(r"\b1800[\s-]?\d{3}[\s-]?\d{3,4}\b"),
+        re.compile(r"\b1860[\s-]?\d{3}[\s-]?\d{3,4}\b"),
     ]
 
     # Patterns that indicate the response is a crisis response (should be allowed)
@@ -43,6 +65,18 @@ class OutputSafetyCheck:
         "helpline",
         "crisis",
     ]
+
+    # Authoritative crisis numbers that ARE allowed in system responses
+    _AUTHORIZED_CRISIS_NUMBERS = {
+        "112",
+        "14416",
+        "1800-599-0019",
+        "98204",
+        "1860-2662-345",
+        "1098",
+        "181",
+        "9820466726",  # AASRA without formatting
+    }
 
     @classmethod
     def check(cls, response_text: str, risk_level: str) -> tuple[bool, str]:
@@ -62,6 +96,11 @@ class OutputSafetyCheck:
 
         text_lower = response_text.lower()
 
+        # Check for hallucinated phone numbers / helplines
+        # Crisis numbers are SYSTEM-CONTROLLED - AI must never output them
+        if cls._contains_unauthorized_phone_number(response_text):
+            return False, "Unauthorized phone number/helpline detected in AI response"
+
         # Check for crisis indicators - if present, might be a crisis response that leaked through
         crisis_indicator_count = sum(1 for indicator in cls._CRISIS_INDICATORS if indicator in response_text.lower())
         if crisis_indicator_count >= 2:
@@ -75,6 +114,29 @@ class OutputSafetyCheck:
                 return False, f"Unsafe pattern detected: {pattern.pattern}"
 
         return True, "Safe"
+
+    @classmethod
+    def _contains_unauthorized_phone_number(cls, text: str) -> bool:
+        """Check if text contains unauthorized phone numbers.
+
+        Authorized numbers (from crisis module) are allowed.
+        Any other phone-like pattern is rejected.
+        """
+        for pattern in cls._PHONE_NUMBER_PATTERNS:
+            matches = pattern.findall(text)
+            for match in matches:
+                # Normalize the match for comparison
+                normalized = re.sub(r"[\s\-+]", "", match)
+                # Check if it's an authorized crisis number
+                is_authorized = False
+                for auth_num in cls._AUTHORIZED_CRISIS_NUMBERS:
+                    auth_normalized = re.sub(r"[\s\-+]", "", auth_num)
+                    if normalized == auth_normalized or normalized.endswith(auth_normalized):
+                        is_authorized = True
+                        break
+                if not is_authorized:
+                    return True
+        return False
 
     @classmethod
     def get_safe_fallback(cls, risk_level: str, language: str = "en") -> str:

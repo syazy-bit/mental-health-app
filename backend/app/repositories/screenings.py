@@ -52,6 +52,14 @@ class ScreeningRepository:
             ).scalars()
         )
 
+    def get_latest_by_session(self, session_id: uuid.UUID) -> Optional[ScreeningModel]:
+        """Get the most recent screening for a session (any instrument)."""
+        return self.db.execute(
+            select(ScreeningModel)
+            .where(ScreeningModel.session_id == session_id)
+            .order_by(ScreeningModel.created_at.desc())
+        ).scalar_one_or_none()
+
     def get_latest_by_session_and_instrument(
         self, session_id: uuid.UUID, instrument: str
     ) -> Optional[ScreeningModel]:
