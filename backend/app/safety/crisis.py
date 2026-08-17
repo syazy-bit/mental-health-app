@@ -62,7 +62,8 @@ _CRISIS_CONTENT: dict[RiskCategory, dict[str, str | tuple[str, ...]]] = {
             "What you shared is serious, and it is not your fault. You deserve to be safe and "
             "supported. If you are in immediate danger, call 112 or move to a safe place. "
             "Confidential help is available: you can speak with a trusted adult, a counselor, "
-            "or the helplines below. You are not alone, and help exists."
+            "or call these helplines: Childline 1098 (if under 18), Women's Helpline 181, "
+            "Tele-MANAS 14416, Emergency 112. You are not alone, and help exists."
         ),
         "helplines": _ABUSE_HELPLINES,
     },

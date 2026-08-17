@@ -2,5 +2,6 @@
 
 from app.core.db import Base
 from app.models.session import Session
+from app.models.safety_evaluation import SafetyEvaluation
 
-__all__ = ["Base", "Session"]
+__all__ = ["Base", "Session", "SafetyEvaluation"]

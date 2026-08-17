@@ -8,7 +8,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import DateTime, String, func, text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import Uuid
 
 from app.core.db import Base
@@ -38,4 +38,11 @@ class Session(Base):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now(),
+    )
+
+    # Relationship to safety evaluations
+    safety_evaluations: Mapped[list["SafetyEvaluation"]] = relationship(
+        back_populates="session",
+        cascade="all, delete-orphan",
+        order_by="SafetyEvaluation.message_index",
     )
