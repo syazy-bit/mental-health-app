@@ -8,7 +8,7 @@ milestones and will be mounted here as routers.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import health, sessions, chat
+from app.api.routes import health, sessions, chat, screenings
 from app.core.config import settings
 
 
@@ -30,6 +30,7 @@ def create_app() -> FastAPI:
     app.include_router(health.router)
     app.include_router(sessions.router)
     app.include_router(chat.router)
+    app.include_router(screenings.router)
 
     return app
 
