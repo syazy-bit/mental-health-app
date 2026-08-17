@@ -1,26 +1,99 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FAF8F5;
+  --foreground: #1E293B;
+  --card-bg: #FFFFFF;
+  --card-border: #E2E8F0;
+  
+  /* Brand Structural - Muted Teal */
+  --color-brand: #0F766E;
+  --color-brand-hover: #115E59;
+  --color-brand-light: #F0FDFA;
+  --color-brand-subtle: #CCFBF1;
+
+  /* Primary CTA - Soft Coral / Terracotta */
+  --color-cta: #E07A5F;
+  --color-cta-hover: #CE6549;
+  --color-cta-light: #FFF5F2;
+
+  /* Safety / Screening - Sage Green */
+  --color-sage: #52796F;
+  --color-sage-light: #F4F7F5;
+  --color-sage-border: #CBD5E1;
+
+  /* Crisis / Safety Check-in - Warm Amber (Never alarming red) */
+  --color-amber-crisis: #D97706;
+  --color-amber-crisis-dark: #B45309;
+  --color-amber-crisis-bg: #FFFBEB;
+  --color-amber-crisis-border: #FDE68A;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-card: var(--card-bg);
+  --color-card-border: var(--card-border);
+  
+  --color-brand: var(--color-brand);
+  --color-brand-hover: var(--color-brand-hover);
+  --color-brand-light: var(--color-brand-light);
+  --color-brand-subtle: var(--color-brand-subtle);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-cta: var(--color-cta);
+  --color-cta-hover: var(--color-cta-hover);
+  --color-cta-light: var(--color-cta-light);
+
+  --color-sage: var(--color-sage);
+  --color-sage-light: var(--color-sage-light);
+
+  --color-crisis-amber: var(--color-amber-crisis);
+  --color-crisis-bg: var(--color-amber-crisis-bg);
+  --color-crisis-border: var(--color-amber-crisis-border);
+
+  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Accessibility: Skip to main content */
+.skip-link {
+  position: absolute;
+  top: -999px;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.75rem 1.25rem;
+  background-color: #0F766E;
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  transition: top 0.15s ease-in-out;
+}
+
+.skip-link:focus {
+  top: 1rem;
+  outline: 3px solid #E07A5F;
+  outline-offset: 2px;
+}
+
+/* Accessible focus ring style helper */
+.focus-accessible:focus-visible {
+  outline: 2px solid #0F766E;
+  outline-offset: 2px;
+}
+
+/* Minimum 44px touch target utility */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
 }
