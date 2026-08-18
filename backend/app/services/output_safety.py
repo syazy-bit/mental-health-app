@@ -73,6 +73,7 @@ class OutputSafetyCheck:
         "1800-599-0019",
         "98204",
         "1860-2662-345",
+        "1800-2333-330",  # Vandrevala Foundation second toll-free line
         "1098",
         "181",
         "9820466726",  # AASRA without formatting
