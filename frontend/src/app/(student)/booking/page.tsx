@@ -185,6 +185,24 @@ export default function BookingPage() {
           screening data.
         </p>
       </Card>
+
+      {/* Status lookup link */}
+      <Card variant="subtle" padding="md" className="space-y-2">
+        <h2 className="text-sm font-bold text-slate-800">
+          Already requested an appointment?
+        </h2>
+        <p className="text-xs text-slate-600 leading-relaxed">
+          Use your confirmation code to check the latest status of your
+          appointment anytime, without an account.
+        </p>
+        <div className="pt-1">
+          <Link href="/booking/status">
+            <Button variant="secondary" size="sm">
+              Check appointment status
+            </Button>
+          </Link>
+        </div>
+      </Card>
     </div>
   );
 }

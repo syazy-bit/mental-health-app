@@ -6,6 +6,7 @@
 import {
   Booking,
   BookingCreateRequest,
+  BookingStatus,
   ChatMessageRequest,
   ChatMessageResponse,
   Counselor,
@@ -189,4 +190,16 @@ export async function cancelBooking(
   return request<Booking>(`/api/bookings/${bookingId}/cancel${qs ? `?${qs}` : ''}`, {
     method: 'PATCH',
   });
+}
+
+/**
+ * Looks up the latest appointment status using only the confirmation code
+ * (anonymous; no account, no booking id). The backend returns only the status
+ * and appointment identity — never student contact or internal data.
+ */
+export async function getBookingStatus(
+  confirmationCode: string
+): Promise<BookingStatus> {
+  const code = encodeURIComponent(confirmationCode.trim().toUpperCase());
+  return request<BookingStatus>(`/api/bookings/status/${code}`);
 }

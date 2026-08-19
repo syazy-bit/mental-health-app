@@ -546,6 +546,162 @@ class TestAdminList:
             assert forbidden not in blob, f"leaked {forbidden}: {resp.json()}"
 
 
+# --- Anonymous appointment-status lookup (M7.x) ---
+
+
+class TestBookingStatusLookup:
+    """Public confirmation-code status lookup: minimal, privacy-safe response."""
+
+    def _setup(self, client, db_session, **booking_overrides):
+        token = admin_token(client, db_session)
+        counselor = create_counselor(client, token).json()
+        slot = create_slot(client, token, counselor["id"]).json()
+        booking = make_booking(client, slot["id"], **booking_overrides).json()
+        return token, booking
+
+    def _set_status(self, client, token, booking, status):
+        return client.patch(
+            f"/api/admin/bookings/{booking['id']}/status",
+            json={"status": status},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+    def _status(self, client, code):
+        return client.get(f"/api/bookings/status/{code}")
+
+    def test_valid_lookup_returns_minimal_fields(self, client, db_session):
+        _, booking = self._setup(client, db_session)
+        resp = self._status(client, booking["confirmation_code"])
+        assert resp.status_code == 200
+        body = resp.json()
+        assert set(body.keys()) == {
+            "confirmation_code",
+            "status",
+            "counselor_name",
+            "starts_at",
+            "ends_at",
+        }
+        assert body["confirmation_code"] == booking["confirmation_code"]
+        assert body["status"] == "PENDING"
+        assert body["counselor_name"] == "Dr. Priya Sharma"
+
+    def test_lookup_is_case_insensitive(self, client, db_session):
+        _, booking = self._setup(client, db_session)
+        resp = self._status(client, booking["confirmation_code"].lower())
+        assert resp.status_code == 200
+        assert resp.json()["confirmation_code"] == booking["confirmation_code"]
+
+    def test_unknown_code_404(self, client, db_session):
+        self._setup(client, db_session)
+        resp = self._status(client, "ZZZZZZZZ")
+        assert resp.status_code == 404
+
+    def test_malformed_code_404(self, client, db_session):
+        self._setup(client, db_session)
+        for bad in ["abc!@#$", "12 34 56 78", "----", "................"]:
+            resp = self._status(client, bad)
+            assert resp.status_code == 404, f"expected 404 for {bad!r}"
+
+    def test_blank_code_404(self, client, db_session):
+        self._setup(client, db_session)
+        resp = client.get("/api/bookings/status/%20%20")
+        assert resp.status_code == 404
+
+    def test_booking_id_not_accepted_as_code(self, client, db_session):
+        """A booking's internal UUID must never be accepted as a lookup code."""
+        _, booking = self._setup(client, db_session)
+        resp = self._status(client, booking["id"])
+        assert resp.status_code == 404
+
+    def test_pending_response(self, client, db_session):
+        _, booking = self._setup(client, db_session)
+        resp = self._status(client, booking["confirmation_code"])
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "PENDING"
+
+    def test_confirmed_response(self, client, db_session):
+        token, booking = self._setup(client, db_session)
+        assert self._set_status(client, token, booking, "CONFIRMED").status_code == 200
+        resp = self._status(client, booking["confirmation_code"])
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "CONFIRMED"
+
+    def test_cancelled_response(self, client, db_session):
+        token, booking = self._setup(client, db_session)
+        assert self._set_status(client, token, booking, "CANCELLED").status_code == 200
+        resp = self._status(client, booking["confirmation_code"])
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "CANCELLED"
+
+    def test_completed_response(self, client, db_session):
+        token, booking = self._setup(client, db_session)
+        assert self._set_status(client, token, booking, "CONFIRMED").status_code == 200
+        assert self._set_status(client, token, booking, "COMPLETED").status_code == 200
+        resp = self._status(client, booking["confirmation_code"])
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "COMPLETED"
+
+    def test_response_omits_private_fields(self, client, db_session):
+        _, booking = self._setup(
+            client,
+            db_session,
+            student_name="A Student",
+            contact_email="student@university.edu",
+            contact_phone="555-0100",
+            reason="Feeling anxious about exams",
+        )
+        resp = self._status(client, booking["confirmation_code"])
+        body = resp.json()
+        for forbidden in [
+            "session_id",
+            "admin_notes",
+            "student_name",
+            "contact_email",
+            "contact_phone",
+            "reason",
+            "id",
+        ]:
+            assert forbidden not in body, f"leaked {forbidden}: {body}"
+
+    def test_response_omits_session_content(self, client, db_session):
+        """Privacy regression: even with chat + screening data on the linked
+        session, the status response must never expose it."""
+        token = admin_token(client, db_session)
+        counselor = create_counselor(client, token).json()
+        slot = create_slot(client, token, counselor["id"]).json()
+        session_id = client.post("/api/sessions", json={"language": "en"}).json()["id"]
+        client.post(
+            "/api/chat/message",
+            json={"session_id": session_id, "message": "I want to end my life"},
+        )
+        client.post(
+            "/api/screenings",
+            json={
+                "session_id": session_id,
+                "instrument": "GAD7",
+                "responses": [3, 3, 3, 3, 3, 3, 3],
+            },
+        )
+        booking = make_booking(client, slot["id"], session_id=session_id).json()
+        resp = self._status(client, booking["confirmation_code"])
+        assert resp.status_code == 200
+        blob = str(resp.json()).lower()
+        for forbidden in [
+            "session_id",
+            "message_index",
+            "risk_level",
+            "category",
+            "matched_patterns",
+            "total_score",
+            "severity",
+            "safety_flag",
+            "item9_score",
+            "response",
+            "crisis",
+        ]:
+            assert forbidden not in blob, f"leaked {forbidden}: {resp.json()}"
+
+
 # --- Concurrency ---
 
 

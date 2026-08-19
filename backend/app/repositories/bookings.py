@@ -42,6 +42,14 @@ class BookingRepository:
     def get_by_id(self, booking_id: uuid.UUID) -> BookingModel | None:
         return self.db.get(BookingModel, booking_id)
 
+    def get_by_confirmation_code(self, confirmation_code: str) -> BookingModel | None:
+        """Look up a booking by its (stored, uppercase) confirmation code."""
+        return self.db.execute(
+            select(BookingModel).where(
+                BookingModel.confirmation_code == confirmation_code
+            )
+        ).scalars().first()
+
     def get_active_by_slot(self, slot_id: uuid.UUID) -> BookingModel | None:
         """Any PENDING/CONFIRMED booking for a slot (fast 409 path)."""
         return self.db.execute(

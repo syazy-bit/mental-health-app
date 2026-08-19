@@ -153,6 +153,18 @@ function BookingDetailContent() {
         </div>
       </Card>
 
+      {/* Check status CTA */}
+      <Card variant="default" padding="md" className="space-y-3">
+        <p className="text-sm text-slate-700">
+          Save this code to check your appointment status later.
+        </p>
+        <Link href="/booking/status">
+          <Button variant="secondary" size="md">
+            Check appointment status
+          </Button>
+        </Link>
+      </Card>
+
       {/* Appointment details */}
       <Card variant="default" padding="lg" className="space-y-4">
         <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">

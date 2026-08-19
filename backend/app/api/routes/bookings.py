@@ -12,7 +12,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
-from app.schemas.booking import BookingCreate, BookingResponse
+from app.schemas.booking import (
+    BookingCreate,
+    BookingResponse,
+    BookingStatusResponse,
+)
 from app.services.booking import BookingService
 
 router = APIRouter(prefix="/api/bookings", tags=["bookings"])
@@ -28,6 +32,21 @@ def create_booking(
     booking_service: BookingService = Depends(get_booking_service),
 ):
     return booking_service.create_booking(payload)
+
+
+@router.get("/status/{confirmation_code}", response_model=BookingStatusResponse)
+def get_booking_status(
+    confirmation_code: str,
+    booking_service: BookingService = Depends(get_booking_service),
+):
+    """Minimal, public appointment-status lookup by confirmation code.
+
+    Deliberately separate from GET /{booking_id}: it requires only the
+    confirmation code (no booking id, no session) and returns only the status
+    and appointment identity the student needs, never student contact data or
+    internal identifiers. Unknown codes return 404.
+    """
+    return booking_service.get_status_by_confirmation_code(confirmation_code)
 
 
 @router.get("/{booking_id}", response_model=BookingResponse)

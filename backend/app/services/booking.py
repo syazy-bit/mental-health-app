@@ -31,6 +31,7 @@ from app.repositories.sessions import SessionRepository
 from app.schemas.booking import (
     AdminCounselorSlotResponse,
     BookingCreate,
+    BookingStatusResponse,
     BookingStatusUpdate,
     CounselorCreate,
     CounselorSlotCreate,
@@ -320,6 +321,34 @@ class BookingService:
 
         self.db.refresh(booking)
         return booking
+
+    def get_status_by_confirmation_code(
+        self, confirmation_code: str
+    ) -> BookingStatusResponse:
+        """Minimal, public appointment-status lookup by confirmation code.
+
+        Returns only the appointment identity + status needed by the student
+        (confirmation code, counselor name, slot window, status). Never returns
+        booking id, student contact fields, reason, admin_notes, or session_id.
+
+        The code is normalized (trimmed, uppercased) and matched exactly against
+        the stored uppercase code. Any code that does not match returns 404 so
+        booking existence is never revealed.
+        """
+        normalized = confirmation_code.strip().upper()
+        booking = self.booking_repo.get_by_confirmation_code(normalized)
+        if booking is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Appointment not found",
+            )
+        return BookingStatusResponse(
+            confirmation_code=booking.confirmation_code,
+            status=booking.status,
+            counselor_name=booking.slot.counselor.name,
+            starts_at=booking.slot.starts_at,
+            ends_at=booking.slot.ends_at,
+        )
 
     def get_booking(
         self,

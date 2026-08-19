@@ -138,6 +138,14 @@ export interface Booking {
   counselor: BookingCounselorInfo;
 }
 
+export interface BookingStatus {
+  confirmation_code: string;
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+  counselor_name: string;
+  starts_at: string;
+  ends_at: string;
+}
+
 export interface BookingCreateRequest {
   slot_id: string;
   session_id?: string;

@@ -235,6 +235,23 @@ class AdminBookingResponse(BookingResponse):
     admin_notes: Optional[str] = None
 
 
+class BookingStatusResponse(BaseModel):
+    """Minimal public appointment-status lookup (anonymous, no account).
+
+    Contains ONLY what a student needs to identify their appointment:
+    confirmation code, status, counselor name, and the slot window.
+
+    Deliberately omits booking id, student contact fields, reason, created
+    timestamps, admin_notes, and session_id.
+    """
+
+    confirmation_code: str
+    status: str
+    counselor_name: str
+    starts_at: datetime
+    ends_at: datetime
+
+
 class BookingStatusUpdate(BaseModel):
     """Update a booking status (admin only).
 

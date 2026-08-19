@@ -167,6 +167,14 @@ function BookingSlotsContent() {
           Times are shown in your local time. You can cancel or change your
           appointment anytime using the confirmation code shown after booking.
         </p>
+        <div className="pt-1">
+          <Link
+            href="/booking/status"
+            className="text-xs font-semibold text-[#0F766E] hover:underline focus-accessible"
+          >
+            Check appointment status &rarr;
+          </Link>
+        </div>
       </Card>
     </div>
   );
