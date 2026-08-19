@@ -93,3 +93,16 @@ def _clean_tables(db_session):
     for table in Base.metadata.sorted_tables:
         db_session.execute(text(f'TRUNCATE TABLE "{table.name}" CASCADE'))
     db_session.commit()
+
+
+@pytest.fixture(autouse=True)
+def _reset_login_throttle():
+    """Reset the in-memory admin login throttle between tests.
+
+    The throttle is a process-wide singleton; without a reset, failed-login
+    tests would accumulate counters and trip the lockout for unrelated tests.
+    """
+    from app.api.rate_limit import login_throttle
+
+    login_throttle.reset()
+    yield

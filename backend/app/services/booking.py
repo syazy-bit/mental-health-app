@@ -285,6 +285,14 @@ class BookingService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Slot not found",
             )
+        # The backend remains authoritative: a deactivated counselor's slots are
+        # not bookable even if the student already knows the slot_id. The public
+        # listing already hides them; this closes the direct-booking path.
+        if slot.counselor is None or not slot.counselor.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="This appointment slot is no longer available",
+            )
         if slot.starts_at <= datetime.now(timezone.utc):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -386,6 +394,16 @@ class BookingService:
 
     def list_bookings(self, booking_status: Optional[str] = None) -> list[BookingModel]:
         return self.booking_repo.list_all(status=booking_status)
+
+    def get_admin_booking(self, booking_id: uuid.UUID) -> BookingModel:
+        """Fetch a single booking for the admin UI (404 if unknown)."""
+        booking = self.booking_repo.get_by_id(booking_id)
+        if booking is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Booking not found",
+            )
+        return booking
 
     def update_status(
         self,

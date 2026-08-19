@@ -52,6 +52,21 @@ def list_bookings(
     return booking_service.list_bookings(status_filter)
 
 
+@router.get("/bookings/{booking_id}", response_model=AdminBookingResponse)
+def get_booking_detail(
+    booking_id: uuid.UUID,
+    booking_service: BookingService = Depends(get_booking_service),
+    current_admin: AdminModel = Depends(get_current_admin),
+):
+    """Fetch a single booking for the admin UI.
+
+    Returns only the requested booking so the frontend never has to download
+    the full booking list. Uses the same AdminBookingResponse privacy model:
+    never exposes session_id or any session/wellbeing content.
+    """
+    return booking_service.get_admin_booking(booking_id)
+
+
 @router.patch("/bookings/{booking_id}/status", response_model=AdminBookingResponse)
 def update_booking_status(
     booking_id: uuid.UUID,

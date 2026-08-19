@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getBookings, updateBookingStatus } from '@/lib/admin-api';
+import { getAdminBooking, updateBookingStatus } from '@/lib/admin-api';
 import { AdminApiError } from '@/lib/admin-api';
 import type { AdminBooking, BookingStatus } from '@/lib/admin-types';
 import {
@@ -28,11 +28,15 @@ const transitions: Record<BookingStatus, BookingStatus[]> = {
 
 export default function AdminBookingDetailPage() {
   const params = useParams<{ id: string }>();
-  const bookingId = params.id;
+  // Key by id so navigating between bookings remounts with fresh state.
+  return <BookingDetail key={params.id} bookingId={params.id} />;
+}
 
-  const [bookings, setBookings] = useState<AdminBooking[] | null>(null);
+function BookingDetail({ bookingId }: { bookingId: string }) {
   const [booking, setBooking] = useState<AdminBooking | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [notFound, setNotFound] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [reveal, setReveal] = useState(false);
   const [adminNotes, setAdminNotes] = useState('');
   const [pendingAction, setPendingAction] = useState<BookingStatus | null>(
@@ -43,21 +47,25 @@ export default function AdminBookingDetailPage() {
 
   useEffect(() => {
     let cancelled = false;
-    getBookings('ALL')
+    getAdminBooking(bookingId)
       .then((data) => {
         if (!cancelled) {
-          const found = data.find((b) => b.id === bookingId) ?? null;
-          setBookings(data);
-          setBooking(found);
-          setAdminNotes(found?.admin_notes ?? '');
+          setBooking(data);
+          setAdminNotes(data.admin_notes ?? '');
         }
       })
       .catch((err: unknown) => {
-        if (!cancelled) {
+        if (cancelled) return;
+        if (err instanceof AdminApiError && err.status === 404) {
+          setNotFound(true);
+        } else {
           setError(
             err instanceof Error ? err.message : 'Unable to load the booking.'
           );
         }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
       });
     return () => {
       cancelled = true;
@@ -73,9 +81,6 @@ export default function AdminBookingDetailPage() {
         booking.id,
         pendingAction,
         adminNotes.trim() || undefined
-      );
-      setBookings((prev) =>
-        (prev ?? []).map((b) => (b.id === updated.id ? updated : b))
       );
       setBooking(updated);
       setAdminNotes(updated.admin_notes ?? '');
@@ -106,11 +111,11 @@ export default function AdminBookingDetailPage() {
     );
   }
 
-  if (bookings === null) {
+  if (loading) {
     return <p className="text-sm text-slate-500 py-6">Loading booking…</p>;
   }
 
-  if (!booking) {
+  if (notFound || !booking) {
     return (
       <div className="space-y-4">
         <Alert variant="warning" title="Booking not found">

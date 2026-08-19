@@ -9,13 +9,14 @@ Covers:
 - Security (no plaintext passwords, no hash leakage, no token leakage)
 """
 
+import time
 import uuid
 
 import pytest
 from jose import jwt
 from sqlalchemy import select
 
-from app.core.config import settings
+from app.core.config import ADMIN_AUTH_ALGORITHM, settings
 from app.models.admin import Admin as AdminModel
 from app.services.admin import AdminService
 from app.schemas.admin import AdminCreateInternal
@@ -174,6 +175,114 @@ class TestLogin:
         assert resp.status_code == 401
 
 
+# --- Login throttling (F1) ---
+
+
+class TestLoginThrottle:
+    """Admin login throttling protects against brute force without locking out
+    legitimate users or revealing account existence."""
+
+    @pytest.fixture
+    def throttle(self):
+        from app.api.rate_limit import LoginThrottle, get_login_throttle
+        from app.main import app
+
+        inst = LoginThrottle(
+            max_failures=2,
+            ip_max_failures=5,
+            window_seconds=60,
+            lockout_seconds=30,
+        )
+        app.dependency_overrides[get_login_throttle] = lambda: inst
+        yield inst
+        app.dependency_overrides.pop(get_login_throttle, None)
+
+    def _wrong(self, client):
+        return login(client, "admin", "wrong-password")
+
+    def test_normal_login_succeeds(self, client, db_session, throttle):
+        create_admin(db_session, username="admin", password="right-password")
+        resp = login(client, "admin", "right-password")
+        assert resp.status_code == 200
+        assert resp.json()["access_token"]
+
+    def test_failure_below_threshold_allows_correct_login(
+        self, client, db_session, throttle
+    ):
+        create_admin(db_session, username="admin", password="right-password")
+        assert self._wrong(client).status_code == 401
+        resp = login(client, "admin", "right-password")
+        assert resp.status_code == 200
+
+    def test_failed_login_remains_generic(self, client, db_session, throttle):
+        create_admin(db_session, username="admin", password="right-password")
+        resp = self._wrong(client)
+        assert resp.status_code == 401
+        assert resp.json()["detail"] == "Invalid credentials"
+
+    def test_repeated_failures_trigger_lockout(self, client, db_session, throttle):
+        create_admin(db_session, username="admin", password="right-password")
+        assert self._wrong(client).status_code == 401
+        assert self._wrong(client).status_code == 401
+        resp = login(client, "admin", "right-password")
+        assert resp.status_code == 429
+        assert "Too many login attempts" in resp.json()["detail"]
+        assert "Retry-After" in resp.headers
+
+    def test_allowed_again_after_window(self, client, db_session, throttle):
+        create_admin(db_session, username="admin", password="right-password")
+        throttle.lockout_seconds = 1
+        assert self._wrong(client).status_code == 401
+        assert self._wrong(client).status_code == 401
+        assert login(client, "admin", "right-password").status_code == 429
+        time.sleep(1.1)
+        assert login(client, "admin", "right-password").status_code == 200
+
+    def test_success_resets_failure_bucket(self, client, db_session, throttle):
+        create_admin(db_session, username="admin", password="right-password")
+        assert self._wrong(client).status_code == 401
+        assert login(client, "admin", "right-password").status_code == 200
+        # Counter was reset by the successful login - one more failure is fine.
+        assert self._wrong(client).status_code == 401
+        resp = login(client, "admin", "right-password")
+        assert resp.status_code == 200
+
+    def test_unknown_username_throttled_without_global_lockout(
+        self, client, db_session, throttle
+    ):
+        create_admin(db_session, username="admin", password="right-password")
+        # Unknown username hits the lockout...
+        assert login(client, "nobody", "guess").status_code == 401
+        assert login(client, "nobody", "guess").status_code == 401
+        assert login(client, "nobody", "guess").status_code == 429
+        # ...but the real admin is NOT locked out (per-(username, IP) buckets).
+        assert login(client, "admin", "right-password").status_code == 200
+
+    def test_unknown_username_lockout_does_not_reveal_account(
+        self, client, db_session, throttle
+    ):
+        create_admin(db_session, username="admin", password="right-password")
+        for _ in range(3):
+            login(client, "does-not-exist", "guess")
+        resp = login(client, "does-not-exist", "guess")
+        assert resp.status_code == 429
+        detail = resp.json()["detail"].lower()
+        assert "account" not in detail
+        assert "exists" not in detail
+
+    def test_ip_wide_limit_blocks_username_spraying(
+        self, client, db_session, throttle
+    ):
+        create_admin(db_session, username="admin", password="right-password")
+        throttle.max_failures = 100
+        throttle.ip_max_failures = 3
+        for name in ("u1", "u2", "u3"):
+            assert login(client, name, "guess").status_code == 401
+        # IP bucket exhausted -> even a valid admin login is throttled.
+        resp = login(client, "admin", "right-password")
+        assert resp.status_code == 429
+
+
 # --- Authentication ---
 
 
@@ -296,7 +405,7 @@ class TestAuthentication:
                 "iat": datetime.now(timezone.utc) - timedelta(hours=2),
             },
             settings.admin_auth_secret,
-            algorithm=settings.admin_auth_algorithm,
+            algorithm=ADMIN_AUTH_ALGORITHM,
         )
         resp = client.get(
             "/api/admin/auth/me",
@@ -316,7 +425,7 @@ class TestAuthentication:
                 "iat": datetime.now(timezone.utc),
             },
             settings.admin_auth_secret,
-            algorithm=settings.admin_auth_algorithm,
+            algorithm=ADMIN_AUTH_ALGORITHM,
         )
         resp = client.get(
             "/api/admin/auth/me",
@@ -348,7 +457,7 @@ class TestAuthentication:
                 "iat": datetime.now(timezone.utc),
             },
             settings.admin_auth_secret,
-            algorithm=settings.admin_auth_algorithm,
+            algorithm=ADMIN_AUTH_ALGORITHM,
         )
         resp = client.get(
             "/api/admin/auth/me",

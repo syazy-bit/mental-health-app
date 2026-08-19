@@ -7,6 +7,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BACKEND_DIR = Path(__file__).resolve().parents[2]
 
+# M8: Admin JWT signing/verification algorithm.
+#
+# Deliberately hard-pinned to HS256 as a module constant. It is NOT read from
+# environment/configuration so deployment configuration can never weaken token
+# verification (e.g. by selecting "none" or a non-HMAC algorithm).
+ADMIN_AUTH_ALGORITHM = "HS256"
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -30,8 +37,17 @@ class Settings(BaseSettings):
 
     # M8: Admin Authentication Configuration
     admin_auth_secret: str = "CHANGE_ME_IN_PRODUCTION_USE_STRONG_RANDOM_SECRET"
-    admin_auth_algorithm: str = "HS256"
     admin_auth_token_expire_minutes: int = 60 * 24  # 24 hours
+
+    # M8: Admin login throttling (application-level, in-memory).
+    # Prevents rapid brute-force attempts on /api/admin/auth/login. Applied per
+    # (username, client IP) and per client IP. In-memory and single-process: for
+    # multi-worker deployments a shared store (Redis) or reverse-proxy limiting
+    # is required (documented limitation).
+    admin_login_max_failures: int = 5
+    admin_login_ip_max_failures: int = 20
+    admin_login_window_seconds: int = 15 * 60
+    admin_login_lockout_seconds: int = 15 * 60
 
     @model_validator(mode="after")
     def validate_admin_auth_secret(self) -> "Settings":

@@ -11,7 +11,7 @@ import bcrypt
 from jose import jwt
 from sqlalchemy.orm import Session
 
-from app.core.config import settings
+from app.core.config import ADMIN_AUTH_ALGORITHM, settings
 from app.models.admin import Admin as AdminModel
 from app.repositories.admin import AdminRepository
 from app.schemas.admin import AdminCreateInternal, AdminLoginRequest, AdminTokenResponse
@@ -110,7 +110,8 @@ class AdminService:
         encoded_jwt = jwt.encode(
             to_encode,
             settings.admin_auth_secret,
-            algorithm=settings.admin_auth_algorithm,
+            # Matches the hard-pinned verification algorithm (see config.py).
+            algorithm=ADMIN_AUTH_ALGORITHM,
         )
         return AdminTokenResponse(
             access_token=encoded_jwt,

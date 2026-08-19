@@ -9,6 +9,7 @@
  *   POST /api/admin/auth/login
  *   GET  /api/admin/auth/me
  *   GET  /api/admin/bookings
+ *   GET  /api/admin/bookings/{id}
  *   PATCH /api/admin/bookings/{id}/status
  *   GET/POST/PATCH /api/admin/counselors...
  *   GET/POST/DELETE /api/admin/counselors/{id}/slots...
@@ -147,6 +148,12 @@ export function getBookings(
       ? `?status_filter=${encodeURIComponent(statusFilter)}`
       : '';
   return adminRequest<AdminBooking[]>(`/api/admin/bookings${query}`);
+}
+
+export function getAdminBooking(bookingId: string): Promise<AdminBooking> {
+  return adminRequest<AdminBooking>(
+    `/api/admin/bookings/${encodeURIComponent(bookingId)}`
+  );
 }
 
 export function updateBookingStatus(

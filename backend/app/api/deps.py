@@ -5,7 +5,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from app.core.config import settings
+from app.core.config import ADMIN_AUTH_ALGORITHM, settings
 from app.core.db import get_db
 from app.models.admin import Admin as AdminModel
 from app.services.admin import AdminService
@@ -48,7 +48,9 @@ async def get_current_admin(
         payload = jwt.decode(
             token,
             settings.admin_auth_secret,
-            algorithms=[settings.admin_auth_algorithm],
+            # Hard-pinned: only HS256 is accepted for verification. The
+            # accepted algorithm is deliberately NOT configurable.
+            algorithms=[ADMIN_AUTH_ALGORITHM],
         )
         admin_id: str | None = payload.get("sub")
         token_type: str | None = payload.get("type")

@@ -320,6 +320,58 @@ class TestCreateBooking:
             assert forbidden not in blob, f"leaked {forbidden}: {body}"
 
 
+# --- Inactive counselor protection (F2) ---
+
+
+class TestInactiveCounselorBooking:
+    """A deactivated counselor's slots must not be bookable, even with a known
+    slot_id. The backend remains authoritative."""
+
+    def _setup(self, client, db_session, counselor_is_active=True):
+        token = admin_token(client, db_session)
+        counselor = create_counselor(
+            client, token, is_active=counselor_is_active
+        ).json()
+        slot = create_slot(client, token, counselor["id"]).json()
+        return token, counselor, slot
+
+    def test_active_counselor_slot_bookable(self, client, db_session):
+        _, _, slot = self._setup(client, db_session)
+        resp = make_booking(client, slot["id"])
+        assert resp.status_code == 201
+
+    def test_inactive_counselor_slot_not_bookable(self, client, db_session):
+        _, _, slot = self._setup(client, db_session, counselor_is_active=False)
+        resp = make_booking(client, slot["id"])
+        assert resp.status_code == 409
+
+    def test_future_slot_unbookable_after_deactivation(self, client, db_session):
+        token, counselor, slot = self._setup(client, db_session)
+        resp = client.patch(
+            f"/api/admin/counselors/{counselor['id']}",
+            json={"is_active": False},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert resp.status_code == 200
+        assert make_booking(client, slot["id"]).status_code == 409
+
+    def test_reactivated_counselor_slot_bookable_again(self, client, db_session):
+        token, counselor, slot = self._setup(client, db_session)
+        client.patch(
+            f"/api/admin/counselors/{counselor['id']}",
+            json={"is_active": False},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert make_booking(client, slot["id"]).status_code == 409
+        resp = client.patch(
+            f"/api/admin/counselors/{counselor['id']}",
+            json={"is_active": True},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert resp.status_code == 200
+        assert make_booking(client, slot["id"]).status_code == 201
+
+
 # --- Booking retrieval / ownership ---
 
 
@@ -543,6 +595,115 @@ class TestAdminList:
         )
         blob = str(resp.json()).lower()
         for forbidden in ["session_id", "message_index", "risk_level", "total_score", "response", "crisis"]:
+            assert forbidden not in blob, f"leaked {forbidden}: {resp.json()}"
+
+
+# --- Admin booking detail (F3) ---
+
+
+class TestAdminBookingDetail:
+    """GET /api/admin/bookings/{id} returns exactly one booking, admin-only,
+    without session_id or any wellbeing/session content."""
+
+    def _setup(self, client, db_session, **booking_overrides):
+        token = admin_token(client, db_session)
+        counselor = create_counselor(client, token).json()
+        slot = create_slot(client, token, counselor["id"]).json()
+        booking = make_booking(client, slot["id"], **booking_overrides).json()
+        return token, booking
+
+    def _detail(self, client, token, booking_id):
+        return client.get(
+            f"/api/admin/bookings/{booking_id}",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+    def test_requires_auth(self, client, db_session):
+        _, booking = self._setup(client, db_session)
+        resp = client.get(f"/api/admin/bookings/{booking['id']}")
+        assert resp.status_code == 401
+
+    def test_fetches_single_booking(self, client, db_session):
+        token, booking = self._setup(
+            client,
+            db_session,
+            student_name="A Student",
+            contact_email="student@university.edu",
+            contact_phone="555-0100",
+            reason="Feeling anxious about exams",
+        )
+        resp = self._detail(client, token, booking["id"])
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["id"] == booking["id"]
+        assert body["confirmation_code"] == booking["confirmation_code"]
+        assert body["status"] == "PENDING"
+        assert body["student_name"] == "A Student"
+        assert body["contact_email"] == "student@university.edu"
+        assert body["contact_phone"] == "555-0100"
+        assert body["reason"] == "Feeling anxious about exams"
+
+    def test_unknown_booking_404(self, client, db_session):
+        token = admin_token(client, db_session)
+        resp = self._detail(client, token, str(uuid.uuid4()))
+        assert resp.status_code == 404
+
+    def test_malformed_uuid_422(self, client, db_session):
+        token = admin_token(client, db_session)
+        resp = client.get(
+            "/api/admin/bookings/not-a-uuid",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert resp.status_code == 422
+
+    def test_response_has_no_session_id(self, client, db_session):
+        token = admin_token(client, db_session)
+        counselor = create_counselor(client, token).json()
+        slot = create_slot(client, token, counselor["id"]).json()
+        session_id = client.post("/api/sessions", json={"language": "en"}).json()["id"]
+        booking = make_booking(client, slot["id"], session_id=session_id).json()
+        resp = self._detail(client, token, booking["id"])
+        assert resp.status_code == 200
+        body = resp.json()
+        assert "session_id" not in body
+        assert str(session_id) not in str(body)
+
+    def test_response_has_no_wellbeing_data(self, client, db_session):
+        """Privacy regression: even with chat + screening data on the linked
+        session, the detail response must never expose it."""
+        token = admin_token(client, db_session)
+        counselor = create_counselor(client, token).json()
+        slot = create_slot(client, token, counselor["id"]).json()
+        session_id = client.post("/api/sessions", json={"language": "en"}).json()["id"]
+        client.post(
+            "/api/chat/message",
+            json={"session_id": session_id, "message": "I want to end my life"},
+        )
+        client.post(
+            "/api/screenings",
+            json={
+                "session_id": session_id,
+                "instrument": "GAD7",
+                "responses": [3, 3, 3, 3, 3, 3, 3],
+            },
+        )
+        booking = make_booking(client, slot["id"], session_id=session_id).json()
+        resp = self._detail(client, token, booking["id"])
+        assert resp.status_code == 200
+        blob = str(resp.json()).lower()
+        for forbidden in [
+            "session_id",
+            "message_index",
+            "risk_level",
+            "category",
+            "matched_patterns",
+            "total_score",
+            "severity",
+            "safety_flag",
+            "item9_score",
+            "response",
+            "crisis",
+        ]:
             assert forbidden not in blob, f"leaked {forbidden}: {resp.json()}"
 
 
