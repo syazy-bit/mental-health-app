@@ -53,6 +53,58 @@ class CounselorResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class AdminCounselorResponse(CounselorResponse):
+    """Counselor profile for the admin UI.
+
+    Adds admin-only operational fields (is_active, timestamps). Still contains
+    no student data of any kind.
+    """
+
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
+
+
+class CounselorUpdate(BaseModel):
+    """Update a counselor (admin only). All fields optional.
+
+    Only the fields provided are changed. Empty name/title are rejected; an
+    empty bio clears the bio.
+    """
+
+    name: Optional[str] = Field(default=None, max_length=120)
+    title: Optional[str] = Field(default=None, max_length=120)
+    areas_of_support: Optional[list[str]] = Field(default=None, max_length=20)
+    bio: Optional[str] = Field(default=None, max_length=2000)
+    is_active: Optional[bool] = None
+
+    @field_validator("name", "title")
+    @classmethod
+    def _strip_required_text(cls, value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return None
+        value = value.strip()
+        if not value:
+            raise ValueError("must not be empty")
+        return value
+
+    @field_validator("areas_of_support")
+    @classmethod
+    def _clean_areas(cls, value: Optional[list[str]]) -> Optional[list[str]]:
+        if value is None:
+            return None
+        cleaned = [item.strip() for item in value if item.strip()]
+        return cleaned[:20]
+
+    @field_validator("bio")
+    @classmethod
+    def _strip_optional(cls, value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return None
+        stripped = value.strip()
+        return stripped or None
+
+
 # --- Counselor slots ---
 
 
@@ -83,6 +135,21 @@ class CounselorSlotResponse(BaseModel):
     ends_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class AdminCounselorSlotResponse(BaseModel):
+    """Admin view of a counselor availability slot (availability management).
+
+    booking_status is "PENDING" or "CONFIRMED" when the slot holds an active
+    booking, otherwise None. NEVER includes student name, contact, reason, or
+    session_id.
+    """
+
+    id: uuid.UUID
+    counselor_id: uuid.UUID
+    starts_at: datetime
+    ends_at: datetime
+    booking_status: Optional[str] = None
 
 
 # --- Bookings ---

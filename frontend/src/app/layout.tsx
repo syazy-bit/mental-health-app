@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { AppShell } from '@/components/shell/AppShell';
 
 export const metadata: Metadata = {
   title: 'MindBridge — Student Mental Health & Emotional Support',
@@ -16,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-[#FAF8F5] text-slate-800">
-        <AppShell>{children}</AppShell>
+        {children}
       </body>
     </html>
   );

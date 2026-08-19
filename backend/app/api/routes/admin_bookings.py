@@ -18,11 +18,14 @@ from app.core.db import get_db
 from app.models.admin import Admin as AdminModel
 from app.schemas.booking import (
     AdminBookingResponse,
+    AdminCounselorResponse,
+    AdminCounselorSlotResponse,
     BookingStatusUpdate,
     CounselorCreate,
     CounselorResponse,
     CounselorSlotCreate,
     CounselorSlotResponse,
+    CounselorUpdate,
 )
 from app.services.booking import BookingService
 
@@ -72,6 +75,57 @@ def create_counselor(
 ):
     """Create a university counseling staff profile."""
     return booking_service.create_counselor(payload)
+
+
+@router.get("/counselors", response_model=list[AdminCounselorResponse])
+def list_admin_counselors(
+    booking_service: BookingService = Depends(get_booking_service),
+    current_admin: AdminModel = Depends(get_current_admin),
+):
+    """List ALL counselors (active and inactive) for the admin UI."""
+    return booking_service.list_counselors(active_only=False)
+
+
+@router.patch("/counselors/{counselor_id}", response_model=AdminCounselorResponse)
+def update_counselor(
+    counselor_id: uuid.UUID,
+    payload: CounselorUpdate,
+    booking_service: BookingService = Depends(get_booking_service),
+    current_admin: AdminModel = Depends(get_current_admin),
+):
+    """Update counselor profile / activation state (admin only)."""
+    return booking_service.update_counselor(counselor_id, payload)
+
+
+@router.get(
+    "/counselors/{counselor_id}/slots",
+    response_model=list[AdminCounselorSlotResponse],
+)
+def list_admin_counselor_slots(
+    counselor_id: uuid.UUID,
+    booking_service: BookingService = Depends(get_booking_service),
+    current_admin: AdminModel = Depends(get_current_admin),
+):
+    """List all future slots for a counselor with active booking status.
+
+    Privacy: slot metadata and booking status only. Never includes student
+    name, contact, reason, or session_id.
+    """
+    return booking_service.list_admin_slots(counselor_id)
+
+
+@router.delete(
+    "/counselors/{counselor_id}/slots/{slot_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_counselor_slot(
+    counselor_id: uuid.UUID,
+    slot_id: uuid.UUID,
+    booking_service: BookingService = Depends(get_booking_service),
+    current_admin: AdminModel = Depends(get_current_admin),
+):
+    """Delete an unused, not-yet-started slot (admin only)."""
+    booking_service.delete_slot(counselor_id, slot_id)
 
 
 @router.post(

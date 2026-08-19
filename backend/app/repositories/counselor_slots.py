@@ -62,6 +62,51 @@ class CounselorSlotRepository:
             ).scalars()
         )
 
+    def list_overlapping(
+        self,
+        counselor_id: uuid.UUID,
+        starts_at: datetime,
+        ends_at: datetime,
+    ) -> list[CounselorSlotModel]:
+        """Existing slots for a counselor that overlap the given range.
+
+        Overlap is a strict time-range intersection (back-to-back slots are
+        allowed). Includes any slot still ongoing or future relative to the new
+        range, regardless of its booking status.
+        """
+        return list(
+            self.db.execute(
+                select(CounselorSlotModel)
+                .where(
+                    CounselorSlotModel.counselor_id == counselor_id,
+                    CounselorSlotModel.starts_at < ends_at,
+                    CounselorSlotModel.ends_at > starts_at,
+                )
+                .order_by(CounselorSlotModel.starts_at)
+            ).scalars()
+        )
+
+    def get_booking_statuses(
+        self,
+        slot_ids: list[uuid.UUID],
+    ) -> dict[uuid.UUID, str]:
+        """Map slot_id -> active booking status for the given slots.
+
+        Only PENDING/CONFIRMED bookings count as active. Slots with a
+        CANCELLED/COMPLETED booking (or none) are omitted from the map.
+        """
+        if not slot_ids:
+            return {}
+        from app.models.booking import Booking as BookingModel
+
+        rows = self.db.execute(
+            select(BookingModel.slot_id, BookingModel.status).where(
+                BookingModel.slot_id.in_(slot_ids),
+                BookingModel.status.in_(("PENDING", "CONFIRMED")),
+            )
+        ).all()
+        return {slot_id: status for slot_id, status in rows}
+
     def list_available_future_for_counselor(
         self,
         counselor_id: uuid.UUID,

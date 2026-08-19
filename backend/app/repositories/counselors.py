@@ -37,6 +37,18 @@ class CounselorRepository:
     def get_by_id(self, counselor_id: uuid.UUID) -> CounselorModel | None:
         return self.db.get(CounselorModel, counselor_id)
 
+    def get_by_id_for_update(self, counselor_id: uuid.UUID) -> CounselorModel | None:
+        """Fetch a counselor while locking the row (SELECT ... FOR UPDATE).
+
+        Used during slot creation to serialize concurrent slot creation for
+        the same counselor so authoritative overlap checks cannot race.
+        """
+        return self.db.execute(
+            select(CounselorModel)
+            .where(CounselorModel.id == counselor_id)
+            .with_for_update()
+        ).scalar_one_or_none()
+
     def get_active_by_id(self, counselor_id: uuid.UUID) -> CounselorModel | None:
         return self.db.execute(
             select(CounselorModel).where(

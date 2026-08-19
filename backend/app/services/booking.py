@@ -29,10 +29,12 @@ from app.repositories.counselor_slots import CounselorSlotRepository
 from app.repositories.counselors import CounselorRepository
 from app.repositories.sessions import SessionRepository
 from app.schemas.booking import (
+    AdminCounselorSlotResponse,
     BookingCreate,
     BookingStatusUpdate,
     CounselorCreate,
     CounselorSlotCreate,
+    CounselorUpdate,
 )
 
 # Unambiguous alphabet (no 0/O, 1/I/L): 32 characters.
@@ -126,7 +128,9 @@ class BookingService:
         counselor_id: uuid.UUID,
         data: CounselorSlotCreate,
     ) -> CounselorSlotModel:
-        counselor = self.counselor_repo.get_by_id(counselor_id)
+        # Lock the counselor row so concurrent slot creation for the same
+        # counselor serializes and the overlap check below is authoritative.
+        counselor = self.counselor_repo.get_by_id_for_update(counselor_id)
         if counselor is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -147,10 +151,105 @@ class BookingService:
                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail="Slot must be in the future",
             )
+        overlapping = self.slot_repo.list_overlapping(
+            counselor_id, data.starts_at, data.ends_at
+        )
+        if overlapping:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Slot overlaps an existing availability slot for this counselor",
+            )
         slot = self.slot_repo.create(counselor_id, data.starts_at, data.ends_at)
         self.db.commit()
         self.db.refresh(slot)
         return slot
+
+    def update_counselor(
+        self,
+        counselor_id: uuid.UUID,
+        data: CounselorUpdate,
+    ) -> CounselorModel:
+        """Update a counselor profile / activation state (admin only)."""
+        counselor = self.counselor_repo.get_by_id(counselor_id)
+        if counselor is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Counselor not found",
+            )
+        # model_fields_set distinguishes "field not provided" from "field
+        # provided as empty/None" (e.g. bio="" clears the bio).
+        if "name" in data.model_fields_set:
+            counselor.name = data.name
+        if "title" in data.model_fields_set:
+            counselor.title = data.title
+        if "areas_of_support" in data.model_fields_set:
+            counselor.areas_of_support = data.areas_of_support
+        if "bio" in data.model_fields_set:
+            counselor.bio = data.bio
+        if "is_active" in data.model_fields_set:
+            counselor.is_active = data.is_active
+        self.db.commit()
+        self.db.refresh(counselor)
+        return counselor
+
+    def list_admin_slots(self, counselor_id: uuid.UUID) -> list[AdminCounselorSlotResponse]:
+        """All future slots for a counselor with active booking status (admin).
+
+        Privacy: returns slot metadata and booking status only. Never includes
+        student name, contact, reason, or session_id.
+        """
+        counselor = self.counselor_repo.get_by_id(counselor_id)
+        if counselor is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Counselor not found",
+            )
+        slots = self.slot_repo.list_future_for_counselor(
+            counselor_id,
+            datetime.now(timezone.utc),
+        )
+        statuses = self.slot_repo.get_booking_statuses([s.id for s in slots])
+        return [
+            AdminCounselorSlotResponse(
+                id=slot.id,
+                counselor_id=slot.counselor_id,
+                starts_at=slot.starts_at,
+                ends_at=slot.ends_at,
+                booking_status=statuses.get(slot.id),
+            )
+            for slot in slots
+        ]
+
+    def delete_slot(self, counselor_id: uuid.UUID, slot_id: uuid.UUID) -> None:
+        """Delete an unused, not-yet-started slot (admin only).
+
+        Booked or already-started slots cannot be deleted.
+        """
+        counselor = self.counselor_repo.get_by_id(counselor_id)
+        if counselor is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Counselor not found",
+            )
+        slot = self.slot_repo.get_by_id_for_update(slot_id)
+        if slot is None or slot.counselor_id != counselor_id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Slot not found",
+            )
+        if slot.starts_at <= datetime.now(timezone.utc):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="Cannot delete a slot that has already started",
+            )
+        active = self.booking_repo.get_active_by_slot(slot.id)
+        if active is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Cannot delete a slot with an active booking",
+            )
+        self.db.delete(slot)
+        self.db.commit()
 
     def list_available_slots(self, counselor_id: uuid.UUID) -> list[CounselorSlotModel]:
         """Future slots for an active counselor that have no active booking."""

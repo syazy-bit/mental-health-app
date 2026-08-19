@@ -20,8 +20,8 @@ from app.services.output_safety import OutputSafetyCheck
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 FRONTEND_DIR = BACKEND_DIR.parent / "frontend"
-SUPPORT_NOW_PAGE = FRONTEND_DIR / "src" / "app" / "support-now" / "page.tsx"
-RESOURCES_PAGE = FRONTEND_DIR / "src" / "app" / "resources" / "page.tsx"
+SUPPORT_NOW_PAGE = FRONTEND_DIR / "src" / "app" / "(student)" / "support-now" / "page.tsx"
+RESOURCES_PAGE = FRONTEND_DIR / "src" / "app" / "(student)" / "resources" / "page.tsx"
 
 
 def _authorized(digits: str) -> bool:
