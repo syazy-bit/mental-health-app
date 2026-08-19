@@ -8,7 +8,17 @@ milestones and will be mounted here as routers.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import health, sessions, chat, screenings, admin_auth, admin
+from app.api.routes import (
+    health,
+    sessions,
+    chat,
+    screenings,
+    admin_auth,
+    admin,
+    counselors,
+    bookings,
+    admin_bookings,
+)
 from app.core.config import settings
 
 
@@ -33,6 +43,9 @@ def create_app() -> FastAPI:
     app.include_router(screenings.router)
     app.include_router(admin_auth.router)
     app.include_router(admin.router)
+    app.include_router(counselors.router)
+    app.include_router(bookings.router)
+    app.include_router(admin_bookings.router)
 
     return app
 

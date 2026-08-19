@@ -11,6 +11,7 @@ export const DesktopHeader: React.FC = () => {
     { href: '/', label: 'Home' },
     { href: '/chat', label: 'Talk (AI Support)' },
     { href: '/screening', label: 'Check-in (Screening)' },
+    { href: '/booking', label: 'Counseling' },
     { href: '/resources', label: 'Resources' },
     { href: '/about', label: 'About & Privacy' },
   ];

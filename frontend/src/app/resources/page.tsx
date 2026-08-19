@@ -165,13 +165,21 @@ export default function ResourcesPage() {
             <p className="text-sm text-slate-600 leading-relaxed">
               Most universities and colleges provide dedicated student counseling cells or wellness centers with licensed psychologists.
             </p>
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs text-slate-600">
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3 text-xs text-slate-600">
               <p className="font-bold text-slate-800 uppercase tracking-wide">
-                Campus Contact Configuration:
+                Book an appointment
               </p>
               <p>
-                <em>[Configurable Placeholder]</em> Campus Wellness Centre &bull; Health Centre Building, Ground Floor. Please check your institution&apos;s student intranet or health services portal for local appointment booking details.
+                You can meet the university counseling team and request a
+                confidential appointment directly through MindBridge.
               </p>
+              <div className="pt-1">
+                <Link href="/booking">
+                  <Button variant="secondary" size="sm">
+                    Meet the team & book a time &rarr;
+                  </Button>
+                </Link>
+              </div>
             </div>
           </Card>
 

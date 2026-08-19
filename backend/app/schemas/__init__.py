@@ -14,6 +14,16 @@ from app.schemas.admin import (
     AdminResponse,
     AdminCreateInternal,
 )
+from app.schemas.booking import (
+    CounselorCreate,
+    CounselorResponse,
+    CounselorSlotCreate,
+    CounselorSlotResponse,
+    BookingCreate,
+    BookingResponse,
+    AdminBookingResponse,
+    BookingStatusUpdate,
+)
 
 __all__ = [
     "SessionCreate",
@@ -27,4 +37,12 @@ __all__ = [
     "AdminTokenResponse",
     "AdminResponse",
     "AdminCreateInternal",
+    "CounselorCreate",
+    "CounselorResponse",
+    "CounselorSlotCreate",
+    "CounselorSlotResponse",
+    "BookingCreate",
+    "BookingResponse",
+    "AdminBookingResponse",
+    "BookingStatusUpdate",
 ]

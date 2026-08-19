@@ -94,3 +94,55 @@ export interface CrisisResource {
   telLink: string;
   category: 'general' | 'specialized' | 'emergency';
 }
+
+// --- M7: University Counseling Booking ---
+
+export interface Counselor {
+  id: string;
+  name: string;
+  title: string;
+  areas_of_support: string[];
+  bio?: string | null;
+}
+
+export interface CounselorSlot {
+  id: string;
+  counselor_id: string;
+  starts_at: string;
+  ends_at: string;
+}
+
+export interface BookingSlotInfo {
+  id: string;
+  starts_at: string;
+  ends_at: string;
+}
+
+export interface BookingCounselorInfo {
+  id: string;
+  name: string;
+  title: string;
+}
+
+export interface Booking {
+  id: string;
+  confirmation_code: string;
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+  student_name?: string | null;
+  contact_email?: string | null;
+  contact_phone?: string | null;
+  reason?: string | null;
+  created_at: string;
+  updated_at: string;
+  slot: BookingSlotInfo;
+  counselor: BookingCounselorInfo;
+}
+
+export interface BookingCreateRequest {
+  slot_id: string;
+  session_id?: string;
+  student_name?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  reason?: string;
+}

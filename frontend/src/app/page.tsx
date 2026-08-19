@@ -23,12 +23,17 @@ export default function HomePage() {
           A safe, confidential space for your emotional well-being.
         </h1>
         <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
-          Navigate academic stress, anxiety, burnout, or daily challenges with empathetic AI support, clinical self-screenings, and verified support resources.
+          Navigate academic stress, anxiety, burnout, or daily challenges with empathetic AI support, clinical self-screenings, verified support resources, and one-to-one university counseling.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           <Link href="/chat">
             <Button variant="primary" size="lg">
               Start Anonymous Chat &rarr;
+            </Button>
+          </Link>
+          <Link href="/booking">
+            <Button variant="brand" size="lg">
+              University Counseling &rarr;
             </Button>
           </Link>
           <Link href="/screening">
@@ -44,7 +49,7 @@ export default function HomePage() {
         <h2 id="pathways-heading" className="sr-only">
           Support Pathways
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Pathway 1: Chat */}
           <Card
             variant="interactive"
@@ -119,7 +124,44 @@ export default function HomePage() {
             </div>
           </Card>
 
-          {/* Pathway 3: Resources */}
+          {/* Pathway 3: University Counseling */}
+          <Card
+            variant="interactive"
+            padding="lg"
+            className="flex flex-col justify-between border-t-4 border-t-[#0F766E]"
+          >
+            <div className="space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-[#F0FDFA] flex items-center justify-center text-[#0F766E]">
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">
+                University Counseling
+              </h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Meet the counseling team and book a confidential appointment time that fits your schedule.
+              </p>
+            </div>
+            <div className="pt-6">
+              <Link href="/booking" className="inline-flex items-center text-sm font-bold text-[#0F766E] hover:underline focus-accessible">
+                Meet the team &rarr;
+              </Link>
+            </div>
+          </Card>
+
+          {/* Pathway 4: Resources */}
           <Card
             variant="interactive"
             padding="lg"

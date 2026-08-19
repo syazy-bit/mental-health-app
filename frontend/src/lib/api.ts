@@ -4,8 +4,12 @@
  */
 
 import {
+  Booking,
+  BookingCreateRequest,
   ChatMessageRequest,
   ChatMessageResponse,
+  Counselor,
+  CounselorSlot,
   ScreeningFollowUpRequest,
   ScreeningFollowUpResponse,
   ScreeningRequest,
@@ -129,5 +133,60 @@ export async function submitFollowup(
   return request<ScreeningFollowUpResponse>('/api/screenings/followup', {
     method: 'POST',
     body: JSON.stringify(payload),
+  });
+}
+
+/**
+ * Lists active university counseling staff.
+ */
+export async function listCounselors(): Promise<Counselor[]> {
+  return request<Counselor[]>('/api/counselors');
+}
+
+/**
+ * Lists future available appointment times for a counselor.
+ */
+export async function listCounselorSlots(counselorId: string): Promise<CounselorSlot[]> {
+  return request<CounselorSlot[]>(`/api/counselors/${counselorId}/slots`);
+}
+
+/**
+ * Requests an appointment (anonymous-first; all contact fields optional).
+ */
+export async function createBooking(payload: BookingCreateRequest): Promise<Booking> {
+  return request<Booking>('/api/bookings', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+/**
+ * Retrieves a booking. Ownership is proven by the matching session_id (if the
+ * booking was linked to one) or the booking confirmation code.
+ */
+export async function getBooking(
+  bookingId: string,
+  params: { sessionId?: string; code?: string } = {}
+): Promise<Booking> {
+  const query = new URLSearchParams();
+  if (params.sessionId) query.set('session_id', params.sessionId);
+  if (params.code) query.set('code', params.code);
+  const qs = query.toString();
+  return request<Booking>(`/api/bookings/${bookingId}${qs ? `?${qs}` : ''}`);
+}
+
+/**
+ * Cancels a booking (only PENDING or CONFIRMED bookings).
+ */
+export async function cancelBooking(
+  bookingId: string,
+  params: { sessionId?: string; code?: string } = {}
+): Promise<Booking> {
+  const query = new URLSearchParams();
+  if (params.sessionId) query.set('session_id', params.sessionId);
+  if (params.code) query.set('code', params.code);
+  const qs = query.toString();
+  return request<Booking>(`/api/bookings/${bookingId}/cancel${qs ? `?${qs}` : ''}`, {
+    method: 'PATCH',
   });
 }
