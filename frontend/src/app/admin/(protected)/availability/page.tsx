@@ -20,6 +20,48 @@ import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 
 const MAX_SLOT_HOURS = 4;
 
+type Meridiem = 'AM' | 'PM';
+
+/** Parse "H:MM" (12-hour) into 12-hour clock parts. */
+function parseTime12(raw: string): { hour12: number; minute: number } | null {
+  const match = /^(\d{1,2}):([0-5]\d)$/.exec(raw.trim());
+  if (!match) return null;
+  const hour12 = Number(match[1]);
+  if (hour12 < 1 || hour12 > 12) return null;
+  return { hour12, minute: Number(match[2]) };
+}
+
+/** Convert a 12-hour clock time (with AM/PM) to a 24-hour hour. */
+function to24Hour(hour12: number, meridiem: Meridiem): number {
+  if (meridiem === 'AM') return hour12 === 12 ? 0 : hour12;
+  return hour12 === 12 ? 12 : hour12 + 12;
+}
+
+/**
+ * Format free-form 12-hour keystrokes into "H:MM" text.
+ *
+ * Strips non-digits and inserts a colon so the user never has to type ":".
+ * "1030" -> "10:30", "930" -> "9:30", "10:30" -> "10:30". It never rejects
+ * input (so editing stays smooth); strict validity is enforced later by
+ * parseTime12() and the backend.
+ */
+function formatTime12(raw: string): string {
+  const digits = raw.replace(/\D/g, '').slice(0, 4);
+  if (digits.length <= 1) return digits;
+  if (digits.length === 2) {
+    const value = Number(digits);
+    return value >= 1 && value <= 12 ? digits : `${digits[0]}:${digits[1]}`;
+  }
+  if (digits.length === 3) {
+    const hour = Number(digits.slice(0, 2));
+    return hour >= 1 && hour <= 12
+      ? `${digits.slice(0, 2)}:${digits.slice(2)}`
+      : `${digits.slice(0, 1)}:${digits.slice(1)}`;
+  }
+  const hour = Number(digits.slice(0, 2));
+  return `${hour >= 1 ? hour : digits.slice(0, 2)}:${digits.slice(2)}`;
+}
+
 export default function AdminAvailabilityPage() {
   const searchParams = useSearchParams();
   const presetCounselorId = searchParams.get('counselor');
@@ -32,8 +74,10 @@ export default function AdminAvailabilityPage() {
   const [slotError, setSlotError] = useState<string | null>(null);
 
   const [date, setDate] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
+  const [startTime, setStartTime] = useState('10:00');
+  const [startMeridiem, setStartMeridiem] = useState<Meridiem>('AM');
+  const [endTime, setEndTime] = useState('11:00');
+  const [endMeridiem, setEndMeridiem] = useState<Meridiem>('AM');
   const [isAdding, setIsAdding] = useState(false);
 
   const [toDelete, setToDelete] = useState<AdminCounselorSlot | null>(null);
@@ -96,22 +140,35 @@ export default function AdminAvailabilityPage() {
 
   const addSlot = async () => {
     if (!selectedCounselor) return;
-    if (!date || !startTime || !endTime) {
-      setSlotError('Pick a date, start time, and end time.');
+    if (!date) {
+      setSlotError('Pick a date for the slot.');
       return;
     }
-
-    const [startHour, startMinute] = startTime.split(':').map(Number);
-    const [endHour, endMinute] = endTime.split(':').map(Number);
+    const startParsed = parseTime12(startTime);
+    const endParsed = parseTime12(endTime);
+    if (!startParsed || !endParsed) {
+      setSlotError(
+        'Enter a valid time (1–12 hours, 00–59 minutes) and choose AM/PM.'
+      );
+      return;
+    }
     const [year, month, day] = date.split('-').map(Number);
 
-    const start = new Date(year, month - 1, day, startHour, startMinute);
-    const end = new Date(year, month - 1, day, endHour, endMinute);
+    const start = new Date(
+      year,
+      month - 1,
+      day,
+      to24Hour(startParsed.hour12, startMeridiem),
+      startParsed.minute
+    );
+    const end = new Date(
+      year,
+      month - 1,
+      day,
+      to24Hour(endParsed.hour12, endMeridiem),
+      endParsed.minute
+    );
 
-    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
-      setSlotError('Enter a valid date and time.');
-      return;
-    }
     if (end <= start) {
       setSlotError('End time must be after the start time.');
       return;
@@ -131,8 +188,10 @@ export default function AdminAvailabilityPage() {
     try {
       await createSlot(selectedCounselor.id, start.toISOString(), end.toISOString());
       setDate('');
-      setStartTime('');
-      setEndTime('');
+      setStartTime('10:00');
+      setStartMeridiem('AM');
+      setEndTime('11:00');
+      setEndMeridiem('AM');
       const updated = await listAdminSlots(selectedCounselor.id);
       setLoadedFor(selectedCounselor.id);
       setSlots(updated);
@@ -214,24 +273,73 @@ export default function AdminAvailabilityPage() {
                 value={date}
                 onChange={(event) => setDate(event.target.value)}
               />
-              <Input
-                id="slot-start"
-                label="Start time"
-                type="time"
-                value={startTime}
-                onChange={(event) => setStartTime(event.target.value)}
-              />
-              <Input
-                id="slot-end"
-                label="End time"
-                type="time"
-                value={endTime}
-                onChange={(event) => setEndTime(event.target.value)}
-              />
+              <div className="flex items-end gap-2">
+                <div className="flex-1">
+                  <Input
+                    id="slot-start"
+                    label="Start time"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]{1,2}:[0-9]{2}"
+                    placeholder="HH:MM (e.g. 1030)"
+                    maxLength={5}
+                    autoComplete="off"
+                    value={startTime}
+                    onChange={(event) =>
+                      setStartTime(formatTime12(event.target.value))
+                    }
+                  />
+                </div>
+                <div className="w-24 shrink-0">
+                  <Select
+                    id="slot-start-meridiem"
+                    label="AM/PM"
+                    value={startMeridiem}
+                    onChange={(event) =>
+                      setStartMeridiem(event.target.value as Meridiem)
+                    }
+                  >
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex items-end gap-2">
+                <div className="flex-1">
+                  <Input
+                    id="slot-end"
+                    label="End time"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]{1,2}:[0-9]{2}"
+                    placeholder="HH:MM (e.g. 1100)"
+                    maxLength={5}
+                    autoComplete="off"
+                    value={endTime}
+                    onChange={(event) =>
+                      setEndTime(formatTime12(event.target.value))
+                    }
+                  />
+                </div>
+                <div className="w-24 shrink-0">
+                  <Select
+                    id="slot-end-meridiem"
+                    label="AM/PM"
+                    value={endMeridiem}
+                    onChange={(event) =>
+                      setEndMeridiem(event.target.value as Meridiem)
+                    }
+                  >
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </Select>
+                </div>
+              </div>
             </div>
             <p className="mt-3 text-xs text-slate-500">
-              Times are in your local timezone. Slots are limited to{' '}
-              {MAX_SLOT_HOURS} hours and must be in the future.
+              Times are 12-hour with AM/PM in your local timezone. Type the
+              time as digits (e.g. 1030) or with a colon (10:30). Slots are
+              limited to {MAX_SLOT_HOURS} hours and must be in the future.
             </p>
             <div className="mt-4">
               <Button
