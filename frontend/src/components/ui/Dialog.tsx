@@ -23,22 +23,34 @@ export const Dialog: React.FC<DialogProps> = ({
 }) => {
   const panelRef = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
+  const wasOpen = useRef(false);
   const titleId = useId();
   const descriptionId = useId();
 
+  // Move focus into the panel only when the dialog transitions to open.
+  // Deliberately keyed on `open` alone: parent components often pass a fresh
+  // inline `onClose` on every render, which would otherwise re-run this
+  // effect (and steal focus from a typing input) after each keystroke.
+  useEffect(() => {
+    if (open && !wasOpen.current) {
+      previousFocus.current = document.activeElement as HTMLElement | null;
+      panelRef.current?.focus();
+    }
+    wasOpen.current = open;
+  }, [open]);
+
+  // Keyboard handling: Escape closes, Tab is trapped inside the panel. This
+  // never moves focus itself, so re-subscribing on every render is harmless.
   useEffect(() => {
     if (!open) return;
-    previousFocus.current = document.activeElement as HTMLElement | null;
-    const panel = panelRef.current;
-    panel?.focus();
-
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
         onClose();
         return;
       }
-      if (event.key === 'Tab' && panel) {
+      if (event.key === 'Tab' && panelRef.current) {
+        const panel = panelRef.current;
         const focusables = Array.from(
           panel.querySelectorAll<HTMLElement>(
             'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -60,9 +72,17 @@ export const Dialog: React.FC<DialogProps> = ({
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      previousFocus.current?.focus();
     };
   }, [open, onClose]);
+
+  // Restore focus to the previously focused element when the dialog closes.
+  useEffect(() => {
+    if (open) return;
+    if (previousFocus.current) {
+      previousFocus.current.focus();
+      previousFocus.current = null;
+    }
+  }, [open]);
 
   if (!open) return null;
 
