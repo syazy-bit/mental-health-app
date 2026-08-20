@@ -80,3 +80,121 @@ export interface AdminCounselorSlot {
   ends_at: string;
   booking_status: BookingStatus | null;
 }
+
+// --- M12 Analytics ---------------------------------------------------------
+// The analytics payload is aggregate-only: it never contains student PII,
+// booking contact details, session/booking IDs, or individual wellbeing data.
+
+export interface AnalyticsPeriodCount {
+  bucket: string;
+  count: number;
+}
+
+export interface AnalyticsLanguageCount {
+  language: string;
+  count: number;
+}
+
+export interface AnalyticsInstrumentCount {
+  instrument: string;
+  count: number;
+}
+
+export interface AnalyticsSeverityCell {
+  instrument: string;
+  severity: string;
+  count: number | null;
+  suppressed: boolean;
+}
+
+export interface AnalyticsRiskLevelCell {
+  risk_level: string;
+  count: number | null;
+  suppressed: boolean;
+}
+
+export interface AnalyticsRiskCategoryCell {
+  category: string;
+  count: number | null;
+  suppressed: boolean;
+}
+
+export interface AnalyticsRiskTrendCell {
+  bucket: string;
+  risk_level: string;
+  count: number | null;
+  suppressed: boolean;
+}
+
+export interface AnalyticsBookingStatusCell {
+  status: string;
+  count: number;
+}
+
+export interface AnalyticsFunnelStage {
+  stage: string;
+  count: number;
+}
+
+export interface AnalyticsSuppressedRate {
+  value: number | null;
+  suppressed: boolean;
+}
+
+export interface AnalyticsOverview {
+  total_sessions: number;
+  total_screenings: number;
+  total_safety_evaluations: number;
+  total_bookings: number;
+  active_counselors: number;
+  total_counselor_slots: number;
+  booking_completion_rate: number | null;
+  booking_cancellation_rate: number | null;
+}
+
+export interface AnalyticsSession {
+  over_time: AnalyticsPeriodCount[];
+  language_distribution: AnalyticsLanguageCount[];
+  average_messages_per_session: number | null;
+}
+
+export interface AnalyticsScreening {
+  by_instrument: AnalyticsInstrumentCount[];
+  severity_distribution: AnalyticsSeverityCell[];
+  safety_flag_rate: AnalyticsSuppressedRate;
+}
+
+export interface AnalyticsSafety {
+  risk_level_distribution: AnalyticsRiskLevelCell[];
+  risk_category_distribution: AnalyticsRiskCategoryCell[];
+  risk_trends: AnalyticsRiskTrendCell[];
+}
+
+export interface AnalyticsBooking {
+  by_status: AnalyticsBookingStatusCell[];
+  funnel: AnalyticsFunnelStage[];
+  cancellation_rate: number | null;
+  over_time: AnalyticsPeriodCount[];
+}
+
+export interface AnalyticsCounselor {
+  counselor_id: string;
+  name: string;
+  is_active: boolean;
+  total_slots: number;
+  booked_slots: number;
+  completed_bookings: number;
+  pending_bookings: number;
+  cancelled_bookings: number;
+  utilization_rate: number | null;
+}
+
+export interface AnalyticsDashboard {
+  generated_at: string;
+  overview: AnalyticsOverview;
+  sessions: AnalyticsSession;
+  screenings: AnalyticsScreening;
+  safety: AnalyticsSafety;
+  bookings: AnalyticsBooking;
+  counselors: AnalyticsCounselor[];
+}

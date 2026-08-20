@@ -18,6 +18,7 @@ from app.api.routes import (
     counselors,
     bookings,
     admin_bookings,
+    analytics,
 )
 from app.core.config import settings
 
@@ -46,6 +47,7 @@ def create_app() -> FastAPI:
     app.include_router(counselors.router)
     app.include_router(bookings.router)
     app.include_router(admin_bookings.router)
+    app.include_router(analytics.router)
 
     return app
 

@@ -8,6 +8,7 @@
  * Authorized endpoints used here:
  *   POST /api/admin/auth/login
  *   GET  /api/admin/auth/me
+ *   GET  /api/admin/analytics
  *   GET  /api/admin/bookings
  *   GET  /api/admin/bookings/{id}
  *   PATCH /api/admin/bookings/{id}/status
@@ -30,6 +31,7 @@ import type {
   AdminCounselorUpdatePayload,
   AdminLoginResponse,
   AdminMe,
+  AnalyticsDashboard,
   BookingStatus,
 } from '@/lib/admin-types';
 
@@ -225,4 +227,14 @@ export function deleteSlot(counselorId: string, slotId: string): Promise<void> {
     `/api/admin/counselors/${encodeURIComponent(counselorId)}/slots/${encodeURIComponent(slotId)}`,
     { method: 'DELETE' }
   );
+}
+
+/**
+ * Fetches the aggregate admin analytics dashboard.
+ *
+ * Admin-only endpoint. Returns aggregate counts only — never student PII,
+ * booking contact details, session/booking IDs, or individual wellbeing data.
+ */
+export function getAnalytics(): Promise<AnalyticsDashboard> {
+  return adminRequest<AnalyticsDashboard>('/api/admin/analytics');
 }

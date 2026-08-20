@@ -10,6 +10,7 @@ from app.api.routes import (
     counselors,
     bookings,
     admin_bookings,
+    analytics,
 )
 
 __all__ = [
@@ -22,4 +23,5 @@ __all__ = [
     "counselors",
     "bookings",
     "admin_bookings",
+    "analytics",
 ]

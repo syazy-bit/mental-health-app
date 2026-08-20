@@ -93,6 +93,18 @@ export default function AdminDashboardPage() {
         </p>
       </div>
 
+      <div className="flex flex-wrap items-center gap-3">
+        <Link
+          href="/admin/analytics"
+          className="inline-flex items-center gap-1 text-sm font-medium text-[#0F766E] hover:underline focus-accessible rounded px-2 py-1"
+        >
+          View aggregate usage analytics
+        </Link>
+        <span className="text-xs text-slate-400">
+          Summary counts only — no student or booking details.
+        </span>
+      </div>
+
       {error && <Alert variant="error">{error}</Alert>}
 
       <section aria-label="Booking statistics" className="grid grid-cols-2 lg:grid-cols-4 gap-4">
