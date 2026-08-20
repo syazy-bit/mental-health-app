@@ -27,11 +27,27 @@ Stop:
 & "$env:LOCALAPPDATA\PostgreSQL\pgsql\bin\pg_ctl.exe" -D "$env:LOCALAPPDATA\PostgreSQL\pgdata" stop
 ```
 
+Create the database referenced by `DATABASE_URL` if it does not exist yet
+(PostgreSQL's standard `createdb` tool, same bin directory):
+
+```powershell
+& "$env:LOCALAPPDATA\PostgreSQL\pgsql\bin\createdb.exe" -U postgres mental_health
+```
+
+(The Docker option in this file creates the database automatically via
+`POSTGRES_DB`.)
+
 ## Configuration
 
 The backend reads `DATABASE_URL` from `backend/.env` (see `backend/.env.example`).
 
 Connection string format: `postgresql+psycopg://USER:PASSWORD@localhost:5432/mental_health`
 
-The full application schema is introduced in Milestone 2 via Alembic migrations
-(`backend/migrations/`). No tables exist yet.
+The full application schema is defined by the Alembic migrations in
+`backend/migrations/` (sessions, safety_evaluations, screenings, admins,
+counselors, counselor_slots, bookings). Apply them from the backend directory:
+
+```powershell
+cd backend
+alembic upgrade head
+```
