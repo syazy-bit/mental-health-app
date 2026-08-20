@@ -32,6 +32,11 @@ class ChatResponseProvider(ABC):
     can be awaited safely from the async FastAPI route without event-loop
     conflicts. Deterministic/sync providers implement the same method and may
     simply return a ChatResponse (the pipeline awaits only if awaitable).
+
+    M10: This abstraction IS the AIProvider boundary. The chat pipeline depends
+    on this interface only; the concrete provider (e.g. OllamaProvider) is
+    selected via create_provider_from_env() and can be replaced without
+    changing ChatService or the safety pipeline.
     """
 
     @abstractmethod
@@ -58,6 +63,11 @@ class ChatResponseProvider(ABC):
             ProviderError: If generation fails
         """
         ...
+
+
+# M10: AIProvider is the abstract contract the chat pipeline depends on.
+# Aliased for M10 vocabulary; the concrete provider is created by the factory.
+AIProvider = ChatResponseProvider
 
 
 class ProviderError(Exception):
@@ -168,22 +178,35 @@ class OllamaProvider(ChatResponseProvider):
     """Ollama local LLM provider.
 
     Connects to local Ollama REST API (default: http://localhost:11434/api/chat).
-    Uses llama3.2:3b by default for balanced quality/speed on consumer hardware.
 
     M6: generate_response is genuinely async so it can be awaited directly from
     the async FastAPI route. The httpx client is loop-safe: it is recreated if
     the running event loop changes (e.g. across asyncio.run() boundaries).
+
+    M10: Qwen3 (and other reasoning models) expose a thinking/reasoning trace.
+    This provider sends ``think: True`` so Ollama splits the reasoning trace into
+    ``message.thinking`` (NEVER returned) and the final answer into
+    ``message.content`` (the only thing returned to the student). As defense in
+    depth, a response whose content still contains the Qwen3 closing thinking
+    marker (``</think>``) is treated as invalid so the reasoning trace can never
+    reach the student through the normal AI path.
     """
+
+    # M10: Qwen3 closing reasoning marker. If it appears in message.content the
+    # provider API did not properly separate thinking - reject (safe fallback).
+    _THINK_CLOSE_MARKER = "</think>"
 
     def __init__(
         self,
         base_url: str = "http://localhost:11434",
-        model: str = "llama3.2:3b",
+        model: str = "qwen3:8b",
         timeout: float = 3.5,
+        enable_thinking: bool = True,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.model = model
         self.timeout = timeout
+        self.enable_thinking = enable_thinking
         self._client: Optional[httpx.AsyncClient] = None
         self._client_loop_id: Optional[int] = None
 
@@ -246,10 +269,20 @@ class OllamaProvider(ChatResponseProvider):
             "model": self.model,
             "messages": messages,
             "stream": False,
+            # M10: Keep reasoning separated from the answer. With think:true,
+            # Ollama puts the reasoning trace in message.thinking and the final
+            # answer in message.content. We only ever read message.content.
+            # Non-reasoning models (e.g. qwen2.5) reject think:true with HTTP
+            # 400, so it can be disabled per-model via enable_thinking.
+            "think": self.enable_thinking,
             "options": {
                 "temperature": 0.7,
                 "top_p": 0.9,
-                "num_predict": 256,
+                # M10: Qwen3 shares the token budget between the (discarded)
+                # thinking trace and the final answer. 256 was truncating the
+                # answer mid-sentence; 512 leaves room for reasoning plus a
+                # short, complete response.
+                "num_predict": 512,
             },
         }
 
@@ -272,7 +305,9 @@ class OllamaProvider(ChatResponseProvider):
 
         processing_time_ms = int((time.perf_counter() - start_time) * 1000)
 
-        # Extract response text
+        # Extract response text.
+        # M10: Only message.content may reach the student. The reasoning trace
+        # (message.thinking) is NEVER read or returned.
         if "message" not in data or "content" not in data["message"]:
             raise ProviderError("Invalid Ollama response format")
 
@@ -280,6 +315,12 @@ class OllamaProvider(ChatResponseProvider):
 
         if not response_text:
             raise ProviderError("Empty response from Ollama")
+
+        # M10 defense in depth: if the reasoning trace leaked into content
+        # (e.g. an Ollama/Qwen3 version that does not honor think:true), reject
+        # the response entirely so it can never reach the student.
+        if self._THINK_CLOSE_MARKER in response_text:
+            raise ProviderError("Ollama response contains reasoning content")
 
         # Get token count if available
         tokens = data.get("eval_count", 0)
@@ -301,9 +342,10 @@ def create_provider_from_env() -> ChatResponseProvider:
     """Create a chat provider based on environment configuration.
 
     Uses settings from app.core.config (loaded from .env):
-        ai_provider: "ollama" (default), "fallback"
+        ai_provider: "ollama" | "fallback" (default "fallback")
         ollama_base_url: Default "http://localhost:11434"
-        ollama_model: Default "llama3.2:3b"
+        ollama_model: Default "qwen3:8b"
+        ollama_timeout_seconds: Ollama request timeout (default 3.5s)
 
     Returns:
         Configured ChatResponseProvider instance
@@ -314,7 +356,12 @@ def create_provider_from_env() -> ChatResponseProvider:
         return DeterministicFallbackProvider()
 
     if provider_type == "ollama":
-        return OllamaProvider(base_url=settings.ollama_base_url, model=settings.ollama_model)
+        return OllamaProvider(
+            base_url=settings.ollama_base_url,
+            model=settings.ollama_model,
+            timeout=settings.ollama_timeout_seconds,
+            enable_thinking=settings.ollama_enable_thinking,
+        )
 
     # Default to fallback for unknown providers
     return DeterministicFallbackProvider()

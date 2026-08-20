@@ -159,6 +159,8 @@ def test_ollama_success():
     assert roles[-1] == "user"
     assert payload["messages"][-1]["content"] == "I'm stressed"
     assert payload["model"] == "llama3.2:3b"
+    # M10: thinking must be requested so reasoning stays out of content
+    assert payload["think"] is True
 
 
 def test_ollama_connection_failure():
@@ -252,6 +254,67 @@ def test_ollama_limits_history_to_8():
 
 
 # ---------------------------------------------------------------------------
+# M10: Qwen3 reasoning handling (thinking must never reach the student)
+# ---------------------------------------------------------------------------
+
+def test_ollama_sends_think_true():
+    """Payload requests think:true so reasoning is separated from content."""
+    fake = FakeAsyncClient(
+        FakeResponse({"message": {"content": "That sounds hard. What's been the hardest part?"}})
+    )
+    provider = make_ollama_provider(fake)
+
+    asyncio.run(provider.generate_response("I'm stressed", make_assessment()))
+
+    _, payload = fake.post_calls[0]
+    assert payload.get("think") is True
+
+
+def test_ollama_returns_content_only_and_discards_thinking():
+    """message.thinking is never returned - only message.content is used."""
+    fake = FakeAsyncClient(
+        FakeResponse({
+            "message": {
+                "content": "I'm really sorry you're feeling this way. Want to tell me more about it?",
+                "thinking": "The user is stressed. I should validate and ask a follow-up question...",
+            }
+        })
+    )
+    provider = make_ollama_provider(fake)
+
+    result = asyncio.run(provider.generate_response("I'm stressed", make_assessment()))
+
+    assert result.text == "I'm really sorry you're feeling this way. Want to tell me more about it?"
+    assert "The user is stressed" not in result.text
+    assert "thinking" not in result.text.lower()
+
+
+def test_ollama_thinking_leak_in_content_is_rejected():
+    """If reasoning leaks into content, the response is rejected (safe fallback)."""
+    leaked = (
+        "Okay, the user is stressed. Let me help them."
+        + OllamaProvider._THINK_CLOSE_MARKER
+        + "\nI'm here for you."
+    )
+    fake = FakeAsyncClient(
+        FakeResponse({"message": {"content": leaked}})
+    )
+    provider = make_ollama_provider(fake)
+
+    with pytest.raises(ProviderError):
+        asyncio.run(provider.generate_response("I'm stressed", make_assessment()))
+
+
+def test_ai_provider_is_the_pipeline_abstraction():
+    """AIProvider is the abstraction the chat pipeline depends on."""
+    from app.services.chat_providers import AIProvider
+    from app.services.chat import ChatService
+
+    assert AIProvider is ChatResponseProvider
+    assert issubclass(FakeAIProvider, AIProvider)
+
+
+# ---------------------------------------------------------------------------
 # Provider factory / environment configuration
 # ---------------------------------------------------------------------------
 
@@ -259,11 +322,33 @@ def test_factory_returns_ollama_when_configured(monkeypatch):
     monkeypatch.setattr(settings, "ai_provider", "ollama")
     monkeypatch.setattr(settings, "ollama_base_url", "http://localhost:11434")
     monkeypatch.setattr(settings, "ollama_model", "llama3.2:3b")
+    monkeypatch.setattr(settings, "ollama_timeout_seconds", 90.0)
 
     provider = create_provider_from_env()
     assert isinstance(provider, OllamaProvider)
     assert provider.base_url == "http://localhost:11434"
     assert provider.model == "llama3.2:3b"
+    assert provider.timeout == 90.0
+
+
+def test_factory_uses_configured_timeout(monkeypatch):
+    """OLLAMA_TIMEOUT_SECONDS is passed through to the OllamaProvider."""
+    monkeypatch.setattr(settings, "ai_provider", "ollama")
+    monkeypatch.setattr(settings, "ollama_timeout_seconds", 120.0)
+
+    provider = create_provider_from_env()
+    assert isinstance(provider, OllamaProvider)
+    assert provider.timeout == 120.0
+
+
+def test_factory_timeout_default_is_finite(monkeypatch):
+    """Default timeout stays finite (fast fail to safe fallback if Ollama is dead)."""
+    monkeypatch.setattr(settings, "ai_provider", "ollama")
+
+    provider = create_provider_from_env()
+    assert isinstance(provider, OllamaProvider)
+    assert provider.timeout > 0
+    assert provider.timeout == settings.ollama_timeout_seconds
 
 
 def test_factory_returns_fallback_when_configured(monkeypatch):
@@ -374,6 +459,50 @@ def test_ai_provider_failure_falls_back_to_safe(client):
         assert result.provider == "safe_fallback"
         assert result.response  # Has a warm fallback response
         assert "kill yourself" not in result.response.lower()
+    finally:
+        db.close()
+
+
+def test_chat_service_empty_provider_text_falls_back(client):
+    """Empty provider text is treated as a provider failure -> safe fallback."""
+    session_id = create_session_via_api(client)
+
+    from app.core.db import SessionLocal
+    db = SessionLocal()
+    try:
+        provider = FakeAIProvider(response_text="   ")
+        chat_service = ChatService(db=db, safety_engine=SafetyEngine(), chat_provider=provider)
+
+        result = chat_service.process_message(
+            session_id=uuid.UUID(session_id),
+            message="I'm feeling stressed",
+        )
+
+        assert provider.call_count == 1
+        assert result.provider == "safe_fallback"
+        assert result.response
+    finally:
+        db.close()
+
+
+def test_chat_service_overlong_provider_text_falls_back(client):
+    """Provider text over MAX_RESPONSE_LENGTH is rejected -> safe fallback."""
+    session_id = create_session_via_api(client)
+
+    from app.core.db import SessionLocal
+    db = SessionLocal()
+    try:
+        provider = FakeAIProvider(response_text="x" * (ChatService.MAX_RESPONSE_LENGTH + 1))
+        chat_service = ChatService(db=db, safety_engine=SafetyEngine(), chat_provider=provider)
+
+        result = chat_service.process_message(
+            session_id=uuid.UUID(session_id),
+            message="I'm feeling stressed",
+        )
+
+        assert provider.call_count == 1
+        assert result.provider == "safe_fallback"
+        assert result.response
     finally:
         db.close()
 
@@ -693,6 +822,23 @@ def test_system_prompt_prompt_injection_boundary():
     prompt = build_system_prompt(make_assessment())
     assert "bypass" in prompt.lower()
     assert "SAFE BOUNDARIES" in prompt
+
+
+def test_system_prompt_student_wellness_conversation_style():
+    """Prompt enforces concise, conversational, student-focused behavior (M10)."""
+    prompt = build_system_prompt(make_assessment())
+    assert "STUDENT WELLNESS CONVERSATION STYLE" in prompt
+    assert "CONCISE" in prompt
+    assert "at most 2-3 practical suggestions" in prompt
+    assert "Never produce numbered sections" in prompt
+    assert "Ask one relevant follow-up question" in prompt
+    assert "LISTEN FIRST" in prompt
+    assert "prioritize listening and conversation" in prompt
+    assert "Never make independent safety determinations" in prompt
+    # Existing core rules are preserved
+    assert "supportive, empathetic student mental health assistant" in prompt
+    assert "NOT A DIAGNOSTICIAN" in prompt
+    assert "NO CRISIS NUMBERS" in prompt
 
 
 # ---------------------------------------------------------------------------

@@ -31,9 +31,24 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:3000"]
 
     # M6: AI Provider Configuration
+    # M10: Local provider/model is Ollama + qwen3:8b. AI_PROVIDER stays
+    # "fallback" by default so the application runs deterministically without a
+    # local LLM; set AI_PROVIDER=ollama to enable the LLM provider.
     ai_provider: str = "fallback"  # "ollama" | "fallback"
     ollama_base_url: str = "http://localhost:11434"
-    ollama_model: str = "llama3.2:3b"
+    ollama_model: str = "qwen3:8b"
+    # M10: Ollama request timeout in seconds. Local CPU inference of qwen3:8b
+    # can take 40-60s/turn; raise via OLLAMA_TIMEOUT_SECONDS for local
+    # development. Kept finite so a dead Ollama fails fast to the safe
+    # fallback (ProviderError) instead of hanging.
+    ollama_timeout_seconds: float = 3.5
+    # M10: Send Ollama's "think" flag so reasoning models (e.g. qwen3) keep
+    # their reasoning trace in message.thinking (discarded) and the final
+    # answer in message.content. Non-reasoning models such as qwen2.5 reject
+    # think:true with HTTP 400, so this can be disabled via
+    # OLLAMA_ENABLE_THINKING=false to benchmark a non-reasoning model through
+    # the same provider without changing the pipeline.
+    ollama_enable_thinking: bool = True
 
     # M8: Admin Authentication Configuration
     admin_auth_secret: str = "CHANGE_ME_IN_PRODUCTION_USE_STRONG_RANDOM_SECRET"

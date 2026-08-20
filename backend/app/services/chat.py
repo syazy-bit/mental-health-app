@@ -33,7 +33,7 @@ from app.repositories.safety_evaluations import SafetyEvaluationRepository
 from app.safety.engine import SafetyEngine
 from app.safety.crisis import select_crisis_response, CrisisResponse
 from app.services.chat_providers import (
-    ChatResponseProvider,
+    AIProvider,
     DeterministicFallbackProvider,
     ChatResponse,
     ProviderError,
@@ -67,11 +67,15 @@ class ChatService:
     # M6: Max history messages (4 turns = 8 messages)
     MAX_HISTORY_MESSAGES = 8
 
+    # M10: Defense in depth - a provider response longer than this is treated
+    # as invalid (runaway/verbose output) and swapped for the safe fallback.
+    MAX_RESPONSE_LENGTH = 2000
+
     def __init__(
         self,
         db: Session,
         safety_engine: SafetyEngine | None = None,
-        chat_provider: ChatResponseProvider | None = None,
+        chat_provider: AIProvider | None = None,
     ) -> None:
         self.db = db
         self.safety_engine = safety_engine or SafetyEngine()
@@ -221,6 +225,16 @@ class ChatService:
                 else:
                     chat_response = candidate
                 response_text = chat_response.text
+
+                # M10: Provider output validation boundary. The pipeline must
+                # not trust arbitrary provider output. Empty/whitespace or
+                # runaway (> MAX_RESPONSE_LENGTH) text is treated as a provider
+                # failure and flows into the existing safe fallback path.
+                if not response_text or not response_text.strip():
+                    raise ProviderError("Empty provider response")
+                if len(response_text) > self.MAX_RESPONSE_LENGTH:
+                    raise ProviderError("Provider response exceeds maximum length")
+
                 response_metadata = chat_response.metadata or {}
                 provider_name = response_metadata.get("provider", "unknown")
                 model_name = response_metadata.get("model")
