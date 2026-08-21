@@ -1,6 +1,21 @@
 import type { Metadata, Viewport } from 'next';
+import { Plus_Jakarta_Sans, Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/lib/theme';
+
+const fontHeading = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-heading',
+  display: 'swap',
+  weight: ['500', '600', '700', '800'],
+});
+
+const fontBody = Inter({
+  subsets: ['latin'],
+  variable: '--font-body',
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
+});
 
 export const metadata: Metadata = {
   title: 'MindBridge — Student Mental Health & Emotional Support',
@@ -21,8 +36,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#FAF9F6' },
-    { media: '(prefers-color-scheme: dark)', color: '#101817' },
+    { media: '(prefers-color-scheme: light)', color: '#FAF8F5' },
+    { media: '(prefers-color-scheme: dark)', color: '#0F1615' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -54,12 +69,12 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className="h-full antialiased selection:bg-[#CCFBF1] selection:text-[#0D5C56] dark:selection:bg-[#1A3734] dark:selection:text-[#4FA79D]"
+      className={`${fontHeading.variable} ${fontBody.variable} h-full antialiased selection:bg-[#CCFBF1] selection:text-[#0D5C56] dark:selection:bg-[#1A3734] dark:selection:text-[#57ADA3]`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="min-h-full flex flex-col bg-background text-foreground transition-colors duration-150">
+      <body className="min-h-full flex flex-col font-sans bg-background text-foreground transition-colors duration-200">
         <ThemeProvider>
           {children}
         </ThemeProvider>

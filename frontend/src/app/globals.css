@@ -3,41 +3,41 @@
 @variant dark (&:where(.dark, .dark *));
 
 :root {
-  /* Surface & Background */
-  --background: #FAF9F6;
-  --foreground: #19232D;
+  /* Surface & Background (Warm Oat / Rice Paper Canvas) */
+  --background: #FAF8F5;
+  --foreground: #1A242B;
   --card-bg: #FFFFFF;
   --card-elevated-bg: #FFFFFF;
-  --card-border: #E6E4DD;
-  --card-border-subtle: #F0EEE6;
-  --surface-muted: #F4F7F5;
-  --surface-subtle: #FAF9F6;
-  --text-muted: #64748B;
-  --text-subtle: #94A3B8;
+  --card-border: #E8E5DC;
+  --card-border-subtle: #F2EFE8;
+  --surface-muted: #F3F6F4;
+  --surface-subtle: #FAF8F5;
+  --text-muted: #5D6E77;
+  --text-subtle: #8A9CA5;
   
-  /* Brand Structural - Deep Spruce Teal */
-  --color-brand: #0D5C56;
-  --color-brand-hover: #115E59;
-  --color-brand-active: #09403C;
-  --color-brand-light: #F0FDFA;
-  --color-brand-subtle: #CCFBF1;
-  --color-brand-border: #99F6E4;
+  /* Brand Structural - Deep Spruce Teal (Security, Calming Grounding) */
+  --color-brand: #0E5A54;
+  --color-brand-hover: #126D66;
+  --color-brand-active: #09403B;
+  --color-brand-light: #F0F9F8;
+  --color-brand-subtle: #CEF0EB;
+  --color-brand-border: #9DE0D6;
 
-  /* Primary Accent / Warm CTA - Earthy Terracotta */
-  --color-cta: #D96B4F;
-  --color-cta-hover: #C4573C;
-  --color-cta-active: #A8422A;
-  --color-cta-light: #FFF5F2;
-  --color-cta-border: #FCD5CC;
+  /* Primary Accent / Warm Empathy - Earthy Terracotta */
+  --color-cta: #CE674D;
+  --color-cta-hover: #B9573E;
+  --color-cta-active: #9A412A;
+  --color-cta-light: #FDF5F2;
+  --color-cta-border: #F7D4CA;
 
-  /* Safety & Clinical Wellness - Sage Green */
-  --color-sage: #4A6B62;
-  --color-sage-hover: #3D5A52;
-  --color-sage-light: #F4F7F5;
-  --color-sage-subtle: #E3ECE7;
-  --color-sage-border: #CBD5E1;
+  /* Safety & Clinical Wellness - Soft Sage Green */
+  --color-sage: #456B61;
+  --color-sage-hover: #37574E;
+  --color-sage-light: #F1F6F4;
+  --color-sage-subtle: #DDE8E3;
+  --color-sage-border: #CAD8D1;
 
-  /* Crisis & Urgent Notice - Calming Warm Amber */
+  /* Crisis & Urgent Notice - Calming Amber Coral (Non-alarming) */
   --color-amber-crisis: #D97706;
   --color-amber-crisis-dark: #B45309;
   --color-amber-crisis-bg: #FFFBEB;
@@ -45,73 +45,73 @@
   --color-amber-crisis-text: #78350F;
 
   /* Neutrals */
-  --color-slate-main: #19232D;
-  --color-slate-muted: #64748B;
-  --color-slate-subtle: #94A3B8;
+  --color-slate-main: #1A242B;
+  --color-slate-muted: #5D6E77;
+  --color-slate-subtle: #8A9CA5;
 
   /* Focus & Accessibility */
-  --focus-ring: #0D5C56;
+  --focus-ring: #0E5A54;
 
-  /* Elevation Shadows */
-  --shadow-ambient: 0 1px 3px rgba(25, 35, 45, 0.04), 0 1px 2px rgba(25, 35, 45, 0.02);
-  --shadow-card: 0 4px 12px rgba(25, 35, 45, 0.05), 0 1px 3px rgba(25, 35, 45, 0.03);
-  --shadow-card-hover: 0 10px 24px -4px rgba(25, 35, 45, 0.08), 0 4px 8px -2px rgba(25, 35, 45, 0.03);
+  /* Elevation & Ambient Shadows */
+  --shadow-ambient: 0 1px 3px rgba(26, 36, 43, 0.04), 0 1px 2px rgba(26, 36, 43, 0.02);
+  --shadow-card: 0 4px 16px rgba(14, 90, 84, 0.04), 0 1px 3px rgba(26, 36, 43, 0.03);
+  --shadow-card-hover: 0 12px 28px -4px rgba(14, 90, 84, 0.08), 0 4px 12px -2px rgba(26, 36, 43, 0.04);
 }
 
 .dark, [data-theme='dark'] {
-  /* Surface & Background */
-  --background: #101817;
-  --foreground: #F1F3EF;
-  --card-bg: #18211F;
-  --card-elevated-bg: #202B28;
-  --card-border: #283632;
-  --card-border-subtle: #212C28;
-  --surface-muted: #141C1A;
-  --surface-subtle: #1C2623;
-  --text-muted: #AAB6B1;
-  --text-subtle: #73827D;
+  /* Surface & Background (Deep Midnight Pine) */
+  --background: #0F1615;
+  --foreground: #F1F5F3;
+  --card-bg: #162220;
+  --card-elevated-bg: #1C2B28;
+  --card-border: #253633;
+  --card-border-subtle: #1E2D2A;
+  --surface-muted: #131D1B;
+  --surface-subtle: #182522;
+  --text-muted: #9EAEA9;
+  --text-subtle: #6D7F7A;
 
-  /* Brand Structural - Lighter Spruce Teal for dark contrast */
-  --color-brand: #4FA79D;
-  --color-brand-hover: #61B8AE;
-  --color-brand-active: #3D8F86;
-  --color-brand-light: #142725;
-  --color-brand-subtle: #1A3734;
-  --color-brand-border: #28534E;
+  /* Brand Structural - Sage Teal */
+  --color-brand: #57ADA3;
+  --color-brand-hover: #69BFB5;
+  --color-brand-active: #45938A;
+  --color-brand-light: #142825;
+  --color-brand-subtle: #193834;
+  --color-brand-border: #2B5751;
 
-  /* Primary Accent / Warm CTA - Lighter Earthy Terracotta */
+  /* Primary Accent / Warm CTA - Warm Terracotta Coral */
   --color-cta: #E58A73;
-  --color-cta-hover: #F09A83;
-  --color-cta-active: #D47760;
-  --color-cta-light: #2A1E1B;
-  --color-cta-border: #523630;
+  --color-cta-hover: #F09B85;
+  --color-cta-active: #D4755D;
+  --color-cta-light: #2A1D1A;
+  --color-cta-border: #563932;
 
-  /* Safety & Clinical Wellness - Lighter Sage Green */
-  --color-sage: #86A69D;
-  --color-sage-hover: #97B7AE;
-  --color-sage-light: #172320;
-  --color-sage-subtle: #21302C;
-  --color-sage-border: #30443F;
+  /* Safety & Clinical Wellness - Lighter Sage */
+  --color-sage: #8CB1A7;
+  --color-sage-hover: #9EC0B7;
+  --color-sage-light: #162420;
+  --color-sage-subtle: #1F322D;
+  --color-sage-border: #2E4740;
 
-  /* Crisis & Urgent Notice - Balanced Warm Amber */
-  --color-amber-crisis: #E7A044;
-  --color-amber-crisis-dark: #F0B260;
-  --color-amber-crisis-bg: #281F13;
-  --color-amber-crisis-border: #5E421E;
+  /* Crisis & Urgent Notice - Balanced Amber */
+  --color-amber-crisis: #ECA347;
+  --color-amber-crisis-dark: #F5B666;
+  --color-amber-crisis-bg: #281D10;
+  --color-amber-crisis-border: #5C3F1C;
   --color-amber-crisis-text: #FDE68A;
 
   /* Neutrals */
-  --color-slate-main: #F1F3EF;
-  --color-slate-muted: #AAB6B1;
-  --color-slate-subtle: #73827D;
+  --color-slate-main: #F1F5F3;
+  --color-slate-muted: #9EAEA9;
+  --color-slate-subtle: #6D7F7A;
 
   /* Focus & Accessibility */
-  --focus-ring: #4FA79D;
+  --focus-ring: #57ADA3;
 
   /* Elevation Shadows */
-  --shadow-ambient: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.12);
-  --shadow-card: 0 4px 14px rgba(0, 0, 0, 0.28), 0 1px 3px rgba(0, 0, 0, 0.16);
-  --shadow-card-hover: 0 10px 24px -4px rgba(0, 0, 0, 0.4), 0 4px 8px -2px rgba(0, 0, 0, 0.2);
+  --shadow-ambient: 0 1px 3px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.15);
+  --shadow-card: 0 6px 18px rgba(0, 0, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-card-hover: 0 14px 30px -4px rgba(0, 0, 0, 0.5), 0 6px 12px -2px rgba(0, 0, 0, 0.3);
 }
 
 @theme inline {
@@ -146,8 +146,9 @@
   --color-crisis-border: var(--color-amber-crisis-border);
   --color-crisis-text: var(--color-amber-crisis-text);
 
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-heading: var(--font-heading), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 body {
@@ -160,6 +161,67 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+}
+
+/* Glassmorphism & Ambient Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--card-border);
+}
+
+.dark .glass-panel {
+  background: rgba(22, 34, 32, 0.75);
+  border-color: var(--card-border);
+}
+
+/* Breathing animation for grounding */
+@keyframes gentle-breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+    box-shadow: 0 0 20px rgba(14, 90, 84, 0.15);
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+    box-shadow: 0 0 35px rgba(14, 90, 84, 0.35);
+  }
+}
+
+.animate-breathe {
+  animation: gentle-breathe 7s ease-in-out infinite;
+}
+
+/* Ambient glow gradient circles */
+.ambient-glow-teal {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(14, 90, 84, 0.12) 0%, rgba(14, 90, 84, 0) 70%);
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+.dark .ambient-glow-teal {
+  background: radial-gradient(circle, rgba(87, 173, 163, 0.14) 0%, rgba(87, 173, 163, 0) 70%);
+}
+
+.ambient-glow-amber {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(206, 103, 77, 0.09) 0%, rgba(206, 103, 77, 0) 70%);
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+.dark .ambient-glow-amber {
+  background: radial-gradient(circle, rgba(229, 138, 115, 0.12) 0%, rgba(229, 138, 115, 0) 70%);
 }
 
 /* Accessibility: Skip to main content */
@@ -196,7 +258,7 @@ body {
   min-width: 44px;
 }
 
-/* Custom scrollbar for modern browsers */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -207,20 +269,20 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.25);
+  background: rgba(93, 110, 119, 0.25);
   border-radius: 9999px;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: rgba(170, 182, 177, 0.25);
+  background: rgba(158, 174, 169, 0.25);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.4);
+  background: rgba(93, 110, 119, 0.4);
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(170, 182, 177, 0.4);
+  background: rgba(158, 174, 169, 0.4);
 }
 
 /* Respect user's motion preferences */
