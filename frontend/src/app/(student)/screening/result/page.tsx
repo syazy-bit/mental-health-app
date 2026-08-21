@@ -30,13 +30,14 @@ export default function ScreeningResultPage() {
   if (!screening) {
     return (
       <div className="max-w-xl mx-auto py-12 text-center space-y-4">
-        <h1 className="text-xl font-bold text-slate-800">No recent screening found</h1>
-        <p className="text-sm text-slate-500">
+        <h1 className="text-xl font-bold text-[#19232D]">No recent check-in found</h1>
+        <p className="text-xs sm:text-sm text-slate-500">
           Complete a PHQ-9 or GAD-7 check-in to see your score and self-care recommendations.
         </p>
         <Link href="/screening">
           <Button variant="primary" size="md">
-            Go to Check-ins &rarr;
+            <span>Go to Check-ins</span>
+            <span aria-hidden="true">&rarr;</span>
           </Button>
         </Link>
       </div>
@@ -56,20 +57,45 @@ export default function ScreeningResultPage() {
     return 'neutral';
   };
 
-  const getSeverityDescription = (instrument: string, severity: string) => {
+  const getSeverityDescription = (severity: string) => {
     const sev = severity.toLowerCase();
     if (sev.includes('minimal')) {
-      return 'Your score reflects minimal to no significant symptoms over the past 2 weeks. Continuing everyday healthy habits (sleep, movement, breaks) helps maintain baseline wellness.';
+      return 'Your responses reflect minimal to no significant symptoms over the past 2 weeks. Continuing everyday healthy habits (consistent sleep, movement, and study breaks) helps maintain baseline wellness.';
     }
     if (sev.includes('mild')) {
-      return 'Your score suggests mild symptoms. While these may not severely interfere with daily routine, engaging in proactive self-care, mindfulness, and talking with supportive friends can be helpful.';
+      return 'Your responses suggest mild symptoms. While these may not severely interfere with your daily routine, engaging in proactive self-care, mindfulness, and talking through thoughts with supportive friends or our listening assistant can be very helpful.';
     }
     if (sev.includes('moderately severe') || sev.includes('severe')) {
-      return 'Your score indicates significant symptom intensity that may be heavily impacting academic focus, sleep, or daily activities. Connecting with a campus counselor or healthcare provider is strongly recommended.';
+      return 'Your responses indicate significant symptom intensity that may be heavily impacting academic focus, sleep, or daily routines. We strongly recommend scheduling a conversation with a campus counselor or healthcare provider.';
     }
     // Moderate
-    return 'Your score reflects moderate symptom levels. Consider exploring stress reduction techniques, speaking with a university counselor, or discussing your feelings with someone you trust.';
+    return 'Your responses reflect moderate symptom levels. Consider exploring structured stress-reduction techniques, speaking with a university counselor, or discussing your feelings with someone you trust.';
   };
+
+  // Determine active spectrum tier (0: Minimal, 1: Mild, 2: Moderate, 3: Severe)
+  const getSpectrumTier = (sev: string): number => {
+    const lower = sev.toLowerCase();
+    if (lower.includes('minimal')) return 0;
+    if (lower.includes('mild')) return 1;
+    if (lower.includes('moderately severe') || lower.includes('severe')) return 3;
+    return 2; // Moderate
+  };
+
+  const activeTier = getSpectrumTier(screening.severity);
+
+  const spectrumBands = isPHQ9
+    ? [
+        { label: 'Minimal', range: '0–4' },
+        { label: 'Mild', range: '5–9' },
+        { label: 'Moderate', range: '10–14' },
+        { label: 'Significant', range: '15–27' },
+      ]
+    : [
+        { label: 'Minimal', range: '0–4' },
+        { label: 'Mild', range: '5–9' },
+        { label: 'Moderate', range: '10–14' },
+        { label: 'Significant', range: '15–21' },
+      ];
 
   const handleEscalateCrisis = async () => {
     setIsFollowupLoading(true);
@@ -81,7 +107,6 @@ export default function ScreeningResultPage() {
       });
       router.push('/support-now');
     } catch {
-      // Even if the network call fails, safety comes first: redirect to crisis helplines
       router.push('/support-now');
     } finally {
       setIsFollowupLoading(false);
@@ -105,81 +130,115 @@ export default function ScreeningResultPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto w-full space-y-6 py-4">
-      {/* Top Breadcrumb */}
+    <div className="max-w-3xl mx-auto w-full space-y-6 py-2 sm:py-6">
+      {/* 1. TOP BREADCRUMB */}
       <div className="flex items-center justify-between">
         <Link
           href="/screening"
-          className="text-xs font-semibold text-slate-500 hover:text-slate-800 focus-accessible p-1"
+          className="text-xs font-semibold text-slate-500 hover:text-[#0D5C56] focus-accessible p-1 -ml-1 transition-colors"
         >
           &larr; Take Another Check-in
         </Link>
-        <Badge variant={getSeverityBadgeVariant(screening.severity)} size="sm">
+        <Badge variant={getSeverityBadgeVariant(screening.severity)} size="sm" dot>
           {screening.instrument} Assessment Result
         </Badge>
       </div>
 
-      {/* Main Result Card */}
-      <Card variant="default" padding="lg" className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
-          <div>
+      {/* 2. MAIN RESULT CARD */}
+      <Card variant="elevated" padding="lg" className="space-y-6 bg-white border border-[#E6E4DD]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E6E4DD]">
+          <div className="space-y-1">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              {isPHQ9 ? 'PHQ-9 Depression Screener' : 'GAD-7 Anxiety Screener'}
+              {isPHQ9 ? 'PHQ-9 Mood Check-in' : 'GAD-7 Anxiety Check-in'}
             </span>
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
-              Your Result: <span className="text-[#0F766E]">{screening.severity}</span>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#19232D]">
+              Result: <span className="text-[#0D5C56]">{screening.severity}</span>
             </h1>
           </div>
-          <div className="flex items-baseline gap-1 bg-[#F0FDFA] p-4 rounded-2xl border border-[#CCFBF1] text-center sm:text-right shrink-0">
-            <span className="text-3xl font-extrabold text-[#0F766E]">{screening.total_score}</span>
-            <span className="text-sm font-semibold text-slate-400">/ {maxScore}</span>
+          <div className="flex items-baseline gap-1.5 bg-[#F0FDFA] px-4 py-3 rounded-2xl border border-[#CCFBF1] text-center sm:text-right shrink-0">
+            <span className="text-xs font-semibold text-slate-500">Total Score:</span>
+            <span className="text-2xl font-extrabold text-[#0D5C56]">{screening.total_score}</span>
+            <span className="text-xs font-medium text-slate-400">/ {maxScore}</span>
           </div>
         </div>
 
-        {/* Clinical Plain-Language Explanation */}
-        <div className="space-y-2">
-          <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wide">
-            What this score means
+        {/* 3. VISUAL SYMPTOM SPECTRUM */}
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
+            <span>Symptom Intensity Spectrum</span>
+            <span className="text-[#0D5C56] font-bold">Your band: {screening.severity}</span>
+          </div>
+
+          <div className="grid grid-cols-4 gap-1.5 p-1.5 rounded-xl bg-[#FAF9F6] border border-[#E6E4DD]">
+            {spectrumBands.map((band, idx) => {
+              const isCurrent = activeTier === idx;
+
+              return (
+                <div
+                  key={band.label}
+                  className={`p-2.5 rounded-lg text-center transition-all ${
+                    isCurrent
+                      ? 'bg-white border border-[#0D5C56] shadow-xs ring-1 ring-[#0D5C56]/20'
+                      : 'opacity-50'
+                  }`}
+                >
+                  <p
+                    className={`text-xs font-bold ${
+                      isCurrent ? 'text-[#0D5C56]' : 'text-slate-600'
+                    }`}
+                  >
+                    {band.label}
+                  </p>
+                  <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                    {band.range}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 4. PLAIN-LANGUAGE EXPLANATION */}
+        <div className="space-y-1.5">
+          <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+            What this score reflects
           </h2>
-          <p className="text-sm text-slate-700 leading-relaxed">
-            {getSeverityDescription(screening.instrument, screening.severity)}
+          <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+            {getSeverityDescription(screening.severity)}
           </p>
         </div>
 
-        {/* Non-Diagnostic Disclaimer */}
-        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 text-xs text-slate-500 space-y-1">
-          <p className="font-semibold text-slate-700">Important Medical Disclaimer:</p>
-          <p>
-            This score is an indicator of symptom frequency over the past 14 days, <strong>not a medical or psychiatric diagnosis</strong>. Mood and anxiety fluctuate with semester deadlines and life circumstances.
+        {/* 5. MEDICAL DISCLAIMER */}
+        <div className="p-3.5 bg-[#FAF9F6] rounded-xl border border-[#E6E4DD] text-xs text-slate-500 space-y-1">
+          <p className="font-bold text-slate-700">Non-Diagnostic Self-Reflection:</p>
+          <p className="leading-relaxed">
+            This score indicates symptom frequency over the past 14 days and is <strong>not a clinical or psychiatric diagnosis</strong>. Emotional states fluctuate naturally with exam deadlines, sleep patterns, and campus life.
           </p>
         </div>
       </Card>
 
-      {/* PHQ-9 Item 9 Safety Check-in Card (Calm Warm Amber, NOT alarming red) */}
+      {/* 6. ITEM-9 SAFETY FOLLOW-UP CARD (WARM AMBER, SUPPORTIVE) */}
       {hasSafetyFlag && (
-        <Card variant="crisis" padding="lg" className="space-y-4 border-l-8 border-l-[#D97706]">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#D97706]" aria-hidden="true" />
-              <h2 className="text-base font-bold text-amber-950">
-                Safety & Well-being Check-in
-              </h2>
-            </div>
-            <p className="text-sm text-amber-950 leading-relaxed">
-              Your check-in indicated thoughts regarding self-harm or ending your life. You do not have to carry this alone. Confidential, compassionate support is available right now.
+        <Card variant="crisis" padding="lg" className="space-y-4 border border-[#FDE68A]">
+          <div className="space-y-1.5">
+            <h2 className="text-base font-bold text-[#92400E]">
+              Safety & Well-being Check-in
+            </h2>
+            <p className="text-xs sm:text-sm text-[#78350F] leading-relaxed">
+              Your check-in indicated thoughts regarding self-harm or ending your life. You do not have to navigate this alone. Free, confidential support is available right now.
             </p>
           </div>
 
           {followupStatus ? (
-            <div className="p-4 bg-white/90 rounded-xl border border-[#FDE68A] text-xs text-amber-950 space-y-2">
+            <div className="p-4 bg-white/90 rounded-xl border border-[#FDE68A] text-xs text-[#78350F] space-y-2">
               <p className="font-semibold">{followupStatus}</p>
               <p>
                 Tele-MANAS free 24/7 national helpline is always reachable at <a href="tel:14416" className="font-bold underline text-[#B45309]">14416</a>.
               </p>
             </div>
           ) : (
-            <div className="space-y-3 pt-2">
-              <p className="text-xs font-semibold text-amber-900">
+            <div className="space-y-3 pt-1">
+              <p className="text-xs font-semibold text-[#92400E]">
                 How would you like to proceed?
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
@@ -191,7 +250,8 @@ export default function ScreeningResultPage() {
                   isLoading={isFollowupLoading}
                   className="sm:w-1/2"
                 >
-                  I need immediate crisis support &rarr;
+                  <span>Connect with 24/7 Crisis Helplines</span>
+                  <span aria-hidden="true">&rarr;</span>
                 </Button>
                 <Button
                   type="button"
@@ -199,9 +259,9 @@ export default function ScreeningResultPage() {
                   size="md"
                   onClick={handleSupportiveCare}
                   disabled={isFollowupLoading}
-                  className="sm:w-1/2 bg-white"
+                  className="sm:w-1/2 bg-white text-slate-700"
                 >
-                  I prefer supportive resources / self-care
+                  I prefer supportive resources & self-care
                 </Button>
               </div>
             </div>
@@ -209,37 +269,43 @@ export default function ScreeningResultPage() {
         </Card>
       )}
 
-      {/* Suggested Next Steps */}
+      {/* 7. RECOMMENDED NEXT STEPS */}
       <section aria-labelledby="next-steps-heading" className="space-y-3 pt-2">
-        <h2 id="next-steps-heading" className="text-base font-bold text-slate-800">
+        <h2 id="next-steps-heading" className="text-sm font-bold text-[#19232D] uppercase tracking-wider">
           Recommended Next Steps
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Card variant="interactive" padding="md">
-            <Link href="/chat" className="block space-y-2 focus-accessible">
-              <div className="flex items-center gap-2">
-                <span className="text-lg" aria-hidden="true">💬</span>
-                <h3 className="font-bold text-slate-900 text-sm">Talk with AI Assistant</h3>
-              </div>
-              <p className="text-xs text-slate-600 leading-normal">
-                Discuss personalized coping exercises for your current stress and anxiety levels.
+            <Link href="/chat" className="block space-y-1.5 focus-accessible">
+              <h3 className="font-bold text-[#19232D] text-sm">Talk &amp; Reflect</h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Decompress and explore tailored stress-reduction exercises.
               </p>
-              <span className="text-xs font-semibold text-[#0F766E] inline-flex items-center pt-1">
-                Open Chat &rarr;
+              <span className="text-xs font-semibold text-[#0D5C56] inline-flex items-center pt-1">
+                Start a conversation &rarr;
               </span>
             </Link>
           </Card>
 
           <Card variant="interactive" padding="md">
-            <Link href="/resources" className="block space-y-2 focus-accessible">
-              <div className="flex items-center gap-2">
-                <span className="text-lg" aria-hidden="true">🌿</span>
-                <h3 className="font-bold text-slate-900 text-sm">Explore Student Resources</h3>
-              </div>
-              <p className="text-xs text-slate-600 leading-normal">
-                Discover campus counseling services, guided mindfulness tools, and sleep guides.
+            <Link href="/booking" className="block space-y-1.5 focus-accessible">
+              <h3 className="font-bold text-[#19232D] text-sm">University Counseling</h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Schedule a confidential 1-on-1 session with a campus counselor.
               </p>
-              <span className="text-xs font-semibold text-[#0F766E] inline-flex items-center pt-1">
+              <span className="text-xs font-semibold text-[#0D5C56] inline-flex items-center pt-1">
+                View Counselors &rarr;
+              </span>
+            </Link>
+          </Card>
+
+          <Card variant="interactive" padding="md">
+            <Link href="/resources" className="block space-y-1.5 focus-accessible">
+              <h3 className="font-bold text-[#19232D] text-sm">Self-Care Tools</h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Discover somatic breathing exercises and sleep hygiene guides.
+              </p>
+              <span className="text-xs font-semibold text-[#0D5C56] inline-flex items-center pt-1">
                 View Resources &rarr;
               </span>
             </Link>

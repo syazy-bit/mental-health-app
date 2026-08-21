@@ -1,32 +1,51 @@
 @import "tailwindcss";
 
 :root {
-  --background: #FAF8F5;
-  --foreground: #1E293B;
+  /* Surface & Background */
+  --background: #FAF9F6;
+  --foreground: #19232D;
   --card-bg: #FFFFFF;
-  --card-border: #E2E8F0;
+  --card-border: #E6E4DD;
+  --card-border-subtle: #F0EEE6;
   
-  /* Brand Structural - Muted Teal */
-  --color-brand: #0F766E;
+  /* Brand Structural - Deep Spruce Teal */
+  --color-brand: #0D5C56;
   --color-brand-hover: #115E59;
+  --color-brand-active: #09403C;
   --color-brand-light: #F0FDFA;
   --color-brand-subtle: #CCFBF1;
+  --color-brand-border: #99F6E4;
 
-  /* Primary CTA - Soft Coral / Terracotta */
-  --color-cta: #E07A5F;
-  --color-cta-hover: #CE6549;
+  /* Primary Accent / Warm CTA - Earthy Terracotta */
+  --color-cta: #D96B4F;
+  --color-cta-hover: #C4573C;
+  --color-cta-active: #A8422A;
   --color-cta-light: #FFF5F2;
+  --color-cta-border: #FCD5CC;
 
-  /* Safety / Screening - Sage Green */
-  --color-sage: #52796F;
+  /* Safety & Clinical Wellness - Sage Green */
+  --color-sage: #4A6B62;
+  --color-sage-hover: #3D5A52;
   --color-sage-light: #F4F7F5;
+  --color-sage-subtle: #E3ECE7;
   --color-sage-border: #CBD5E1;
 
-  /* Crisis / Safety Check-in - Warm Amber (Never alarming red) */
+  /* Crisis & Urgent Notice - Calming Warm Amber (Never alarming red) */
   --color-amber-crisis: #D97706;
   --color-amber-crisis-dark: #B45309;
   --color-amber-crisis-bg: #FFFBEB;
   --color-amber-crisis-border: #FDE68A;
+  --color-amber-crisis-text: #78350F;
+
+  /* Neutrals */
+  --color-slate-main: #19232D;
+  --color-slate-muted: #64748B;
+  --color-slate-subtle: #94A3B8;
+
+  /* Elevation Shadows */
+  --shadow-ambient: 0 1px 3px rgba(25, 35, 45, 0.04), 0 1px 2px rgba(25, 35, 45, 0.02);
+  --shadow-card: 0 4px 12px rgba(25, 35, 45, 0.05), 0 1px 3px rgba(25, 35, 45, 0.03);
+  --shadow-card-hover: 0 10px 24px -4px rgba(25, 35, 45, 0.08), 0 4px 8px -2px rgba(25, 35, 45, 0.03);
 }
 
 @theme inline {
@@ -34,25 +53,35 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card-bg);
   --color-card-border: var(--card-border);
+  --color-card-border-subtle: var(--card-border-subtle);
   
   --color-brand: var(--color-brand);
   --color-brand-hover: var(--color-brand-hover);
+  --color-brand-active: var(--color-brand-active);
   --color-brand-light: var(--color-brand-light);
   --color-brand-subtle: var(--color-brand-subtle);
+  --color-brand-border: var(--color-brand-border);
 
   --color-cta: var(--color-cta);
   --color-cta-hover: var(--color-cta-hover);
+  --color-cta-active: var(--color-cta-active);
   --color-cta-light: var(--color-cta-light);
+  --color-cta-border: var(--color-cta-border);
 
   --color-sage: var(--color-sage);
+  --color-sage-hover: var(--color-sage-hover);
   --color-sage-light: var(--color-sage-light);
+  --color-sage-subtle: var(--color-sage-subtle);
+  --color-sage-border: var(--color-sage-border);
 
   --color-crisis-amber: var(--color-amber-crisis);
+  --color-crisis-dark: var(--color-amber-crisis-dark);
   --color-crisis-bg: var(--color-amber-crisis-bg);
   --color-crisis-border: var(--color-amber-crisis-border);
+  --color-crisis-text: var(--color-amber-crisis-text);
 
-  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 body {
@@ -63,6 +92,8 @@ body {
   display: flex;
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* Accessibility: Skip to main content */
@@ -72,23 +103,24 @@ body {
   left: 1rem;
   z-index: 9999;
   padding: 0.75rem 1.25rem;
-  background-color: #0F766E;
+  background-color: #0D5C56;
   color: #FFFFFF;
   font-weight: 600;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transition: top 0.15s ease-in-out;
 }
 
 .skip-link:focus {
   top: 1rem;
-  outline: 3px solid #E07A5F;
+  outline: 3px solid #D96B4F;
   outline-offset: 2px;
 }
 
 /* Accessible focus ring style helper */
 .focus-accessible:focus-visible {
-  outline: 2px solid #0F766E;
+  outline: 2px solid #0D5C56;
   outline-offset: 2px;
 }
 
@@ -96,4 +128,35 @@ body {
 .touch-target {
   min-height: 44px;
   min-width: 44px;
+}
+
+/* Custom scrollbar for modern browsers */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.25);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.4);
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -13,7 +13,7 @@ export const MobileNav: React.FC = () => {
       label: 'Home',
       icon: (
         <svg
-          className="w-6 h-6"
+          className="w-5 h-5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -33,7 +33,7 @@ export const MobileNav: React.FC = () => {
       label: 'Talk',
       icon: (
         <svg
-          className="w-6 h-6"
+          className="w-5 h-5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -53,7 +53,7 @@ export const MobileNav: React.FC = () => {
       label: 'Check-in',
       icon: (
         <svg
-          className="w-6 h-6"
+          className="w-5 h-5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -73,7 +73,7 @@ export const MobileNav: React.FC = () => {
       label: 'Counseling',
       icon: (
         <svg
-          className="w-6 h-6"
+          className="w-5 h-5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -93,7 +93,7 @@ export const MobileNav: React.FC = () => {
       label: 'Resources',
       icon: (
         <svg
-          className="w-6 h-6"
+          className="w-5 h-5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -112,10 +112,10 @@ export const MobileNav: React.FC = () => {
 
   return (
     <nav
-      aria-label="Mobile Navigation"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-t border-slate-200/80 px-2 py-1 shadow-lg"
+      aria-label="Mobile Bottom Navigation"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FAF9F6]/95 backdrop-blur-md border-t border-[#E6E4DD] px-2 py-1.5 shadow-[0_-4px_16px_rgba(25,35,45,0.04)]"
     >
-      <div className="flex items-center justify-around">
+      <div className="flex items-center justify-around max-w-md mx-auto">
         {navItems.map((item) => {
           const isActive =
             item.href === '/'
@@ -126,17 +126,23 @@ export const MobileNav: React.FC = () => {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl touch-target focus-accessible transition-colors ${
+              className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl touch-target focus-accessible transition-all select-none ${
                 isActive
-                  ? 'text-[#0F766E] font-semibold'
+                  ? 'text-[#0D5C56] font-bold'
                   : 'text-slate-500 hover:text-slate-800'
               }`}
               aria-current={isActive ? 'page' : undefined}
             >
-              <div className={isActive ? 'scale-110 transition-transform' : ''}>
+              <div
+                className={`p-1 rounded-lg transition-transform ${
+                  isActive ? 'bg-[#0D5C56]/10 scale-105 text-[#0D5C56]' : ''
+                }`}
+              >
                 {item.icon}
               </div>
-              <span className="text-[11px] mt-0.5">{item.label}</span>
+              <span className="text-[10px] sm:text-xs mt-0.5 tracking-tight font-medium">
+                {item.label}
+              </span>
             </Link>
           );
         })}

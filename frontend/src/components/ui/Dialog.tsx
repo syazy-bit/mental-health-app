@@ -28,9 +28,6 @@ export const Dialog: React.FC<DialogProps> = ({
   const descriptionId = useId();
 
   // Move focus into the panel only when the dialog transitions to open.
-  // Deliberately keyed on `open` alone: parent components often pass a fresh
-  // inline `onClose` on every render, which would otherwise re-run this
-  // effect (and steal focus from a typing input) after each keystroke.
   useEffect(() => {
     if (open && !wasOpen.current) {
       previousFocus.current = document.activeElement as HTMLElement | null;
@@ -39,8 +36,7 @@ export const Dialog: React.FC<DialogProps> = ({
     wasOpen.current = open;
   }, [open]);
 
-  // Keyboard handling: Escape closes, Tab is trapped inside the panel. This
-  // never moves focus itself, so re-subscribing on every render is harmless.
+  // Keyboard handling: Escape closes, Tab is trapped inside the panel.
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -92,7 +88,7 @@ export const Dialog: React.FC<DialogProps> = ({
       role="presentation"
     >
       <div
-        className="absolute inset-0 bg-slate-900/50"
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -103,17 +99,17 @@ export const Dialog: React.FC<DialogProps> = ({
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
         tabIndex={-1}
-        className="relative w-full sm:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-xl border border-slate-200 outline-none focus-accessible max-h-[90vh] overflow-y-auto"
+        className="relative w-full sm:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-xl border border-[#E6E4DD] outline-none focus-accessible max-h-[90vh] overflow-y-auto"
       >
-        <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-2 border-b border-slate-100">
-          <h2 id={titleId} className="text-lg font-bold text-slate-900">
+        <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-3 border-b border-[#E6E4DD]/60">
+          <h2 id={titleId} className="text-lg font-bold text-[#19232D]">
             {title}
           </h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close dialog"
-            className="inline-flex items-center justify-center w-11 h-11 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 focus-accessible touch-target"
+            className="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 hover:text-[#19232D] hover:bg-slate-100 focus-accessible touch-target transition-colors cursor-pointer"
           >
             <svg
               className="w-5 h-5"
@@ -134,7 +130,7 @@ export const Dialog: React.FC<DialogProps> = ({
         {description && (
           <p
             id={descriptionId}
-            className="px-6 pt-3 text-sm text-slate-600"
+            className="px-6 pt-3 text-xs sm:text-sm text-slate-600 leading-relaxed"
           >
             {description}
           </p>

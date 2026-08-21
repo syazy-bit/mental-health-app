@@ -36,45 +36,55 @@ export default function BookingPage() {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto w-full space-y-8 py-4">
-      {/* Header */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-xs font-semibold text-slate-500 hover:text-slate-800 focus-accessible p-1"
-          >
-            &larr; Back to Home
-          </Link>
-          <Badge variant="brand" size="sm">
+    <div className="max-w-4xl mx-auto w-full space-y-10 py-2 sm:py-6">
+      {/* 1. EDITORIAL HEADER */}
+      <div className="space-y-3 max-w-2xl">
+        <div className="flex items-center gap-2">
+          <Badge variant="brand" size="md" dot>
             University Counseling
           </Badge>
         </div>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900">
-          Meet the team
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#19232D] tracking-tight">
+          Talk with someone from your university
         </h1>
-        <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl">
-          Our university counseling team offers confidential, judgment-free
-          support for academic stress, anxiety, relationships, and everyday
-          challenges. Choose a counselor to see their available appointment
-          times.
+        <p className="text-slate-600 text-xs sm:text-sm sm:leading-relaxed">
+          Connect with dedicated campus counseling staff for private one-to-one support with academic stress, exam burnout, personal challenges, or daily well-being.
         </p>
       </div>
 
-      {/* Loading state */}
+      {/* 2. LOADING STATE */}
       {isLoading && (
-        <div className="text-center py-12 text-sm text-slate-500">
-          Loading the counseling team...
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="p-6 bg-white rounded-2xl border border-[#E6E4DD] space-y-4 animate-pulse">
+            <div className="flex items-center justify-between">
+              <div className="w-10 h-10 rounded-xl bg-slate-100" />
+              <div className="w-24 h-5 rounded-full bg-slate-100" />
+            </div>
+            <div className="w-3/4 h-6 rounded bg-slate-100" />
+            <div className="w-full h-12 rounded bg-slate-100" />
+            <div className="w-full h-10 rounded-xl bg-slate-100" />
+          </div>
+          <div className="p-6 bg-white rounded-2xl border border-[#E6E4DD] space-y-4 animate-pulse">
+            <div className="flex items-center justify-between">
+              <div className="w-10 h-10 rounded-xl bg-slate-100" />
+              <div className="w-24 h-5 rounded-full bg-slate-100" />
+            </div>
+            <div className="w-3/4 h-6 rounded bg-slate-100" />
+            <div className="w-full h-12 rounded bg-slate-100" />
+            <div className="w-full h-10 rounded-xl bg-slate-100" />
+          </div>
         </div>
       )}
 
-      {/* Error state */}
+      {/* 3. ERROR STATE */}
       {!isLoading && errorMessage && (
-        <Card variant="crisis" padding="md" className="space-y-2">
-          <p className="text-sm font-semibold text-amber-950">
-            We could not load the counseling team right now.
-          </p>
-          <p className="text-xs text-amber-900">{errorMessage}</p>
+        <Card variant="crisis" padding="lg" className="space-y-3 border border-[#FDE68A]">
+          <div className="space-y-1">
+            <h2 className="text-base font-bold text-[#92400E]">
+              We could not load the counseling team right now.
+            </h2>
+            <p className="text-xs sm:text-sm text-[#78350F]">{errorMessage}</p>
+          </div>
           <div className="pt-1">
             <Button
               type="button"
@@ -94,6 +104,7 @@ export default function BookingPage() {
                   )
                   .finally(() => setIsLoading(false));
               }}
+              className="bg-white"
             >
               Try again
             </Button>
@@ -101,70 +112,86 @@ export default function BookingPage() {
         </Card>
       )}
 
-      {/* Empty state */}
+      {/* 4. EMPTY STATE */}
       {!isLoading && !errorMessage && counselors.length === 0 && (
-        <Card variant="subtle" padding="lg" className="text-center space-y-2">
-          <p className="font-semibold text-slate-700">
-            No counselors are available at the moment.
-          </p>
-          <p className="text-xs text-slate-500">
-            Please check back soon or explore our other support pathways.
-          </p>
+        <Card variant="default" padding="lg" className="text-center space-y-4 py-10 bg-white border border-[#E6E4DD]">
+          <div className="space-y-1 max-w-md mx-auto">
+            <h2 className="text-base font-bold text-[#19232D]">
+              No counselors are available at the moment
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500">
+              Please check back soon or explore our self-guided tools and 24/7 support lines.
+            </p>
+          </div>
           <div className="pt-2">
             <Link href="/resources">
               <Button variant="secondary" size="md">
-                Browse Resources &rarr;
+                <span>Explore Coping Tools</span>
+                <span aria-hidden="true">&rarr;</span>
               </Button>
             </Link>
           </div>
         </Card>
       )}
 
-      {/* Counselor list */}
+      {/* 5. COUNSELORS LIST */}
       {!isLoading && !errorMessage && counselors.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {counselors.map((counselor) => (
             <Card
               key={counselor.id}
-              variant="default"
+              variant="interactive"
               padding="lg"
-              className="flex flex-col justify-between space-y-4"
+              className="bg-white border border-[#E6E4DD] shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between space-y-5 rounded-2xl"
             >
-              <div className="space-y-3">
+              <div className="space-y-3.5">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-[#F0FDFA] flex items-center justify-center text-[#0F766E] font-bold text-lg">
+                  <div className="w-11 h-11 rounded-xl bg-[#F0FDFA] border border-[#CCFBF1] flex items-center justify-center text-[#0D5C56] font-bold text-base font-mono">
                     {counselor.name.charAt(0)}
                   </div>
                   <Badge variant="sage" size="sm">
                     {counselor.title}
                   </Badge>
                 </div>
-                <h2 className="text-lg font-bold text-slate-900">
-                  {counselor.name}
-                </h2>
-                {counselor.bio && (
-                  <p className="text-sm text-slate-600 leading-relaxed">
-                    {counselor.bio}
-                  </p>
+
+                <div className="space-y-1">
+                  <h2 className="text-lg font-bold text-[#19232D]">
+                    {counselor.name}
+                  </h2>
+                  {counselor.bio && (
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      {counselor.bio}
+                    </p>
+                  )}
+                </div>
+
+                {counselor.areas_of_support && counselor.areas_of_support.length > 0 && (
+                  <div className="pt-1">
+                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                      Areas of Support
+                    </p>
+                    <ul className="flex flex-wrap gap-1.5" aria-label="Areas of support">
+                      {counselor.areas_of_support.map((area) => (
+                        <li
+                          key={area}
+                          className="text-[11px] font-semibold px-2.5 py-1 rounded-md bg-[#FAF9F6] text-slate-600 border border-[#E6E4DD]"
+                        >
+                          {area}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
-                <ul
-                  className="flex flex-wrap gap-2 pt-1"
-                  aria-label="Areas of support"
-                >
-                  {counselor.areas_of_support.map((area) => (
-                    <li
-                      key={area}
-                      className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200"
-                    >
-                      {area}
-                    </li>
-                  ))}
-                </ul>
               </div>
-              <div className="pt-2">
-                <Link href={`/booking/slots?counselor=${encodeURIComponent(counselor.id)}&name=${encodeURIComponent(counselor.name)}`}>
-                  <Button variant="primary" size="md" fullWidth>
-                    View available times
+
+              <div className="pt-3 border-t border-slate-100">
+                <Link
+                  href={`/booking/slots?counselor=${encodeURIComponent(counselor.id)}&name=${encodeURIComponent(counselor.name)}`}
+                  className="block"
+                >
+                  <Button variant="brand" size="md" fullWidth>
+                    <span>View available times</span>
+                    <span aria-hidden="true">&rarr;</span>
                   </Button>
                 </Link>
               </div>
@@ -173,36 +200,37 @@ export default function BookingPage() {
         </div>
       )}
 
-      {/* Privacy note */}
-      <Card variant="subtle" padding="md" className="space-y-2">
-        <h2 className="text-sm font-bold text-slate-800">
-          Your privacy comes first
-        </h2>
-        <p className="text-xs text-slate-600 leading-relaxed">
-          You can request an appointment without giving your name, email, or
-          phone number. Any details you share are only used to arrange your
-          appointment and are never combined with your anonymous chat or
-          screening data.
-        </p>
-      </Card>
+      {/* 6. PRIVACY & TRANSITION INFORMATION (Honest, Verified) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+        <Card variant="default" padding="md" className="bg-white border border-[#E6E4DD] space-y-1.5">
+          <h2 className="text-xs font-bold text-[#19232D] uppercase tracking-wider">
+            How booking works with your privacy
+          </h2>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Booking an appointment is anonymous-optional. Any contact details you choose to share are used solely to arrange your appointment and are never connected with your self-guided chat or check-in answers.
+          </p>
+        </Card>
 
-      {/* Status lookup link */}
-      <Card variant="subtle" padding="md" className="space-y-2">
-        <h2 className="text-sm font-bold text-slate-800">
-          Already requested an appointment?
-        </h2>
-        <p className="text-xs text-slate-600 leading-relaxed">
-          Use your confirmation code to check the latest status of your
-          appointment anytime, without an account.
-        </p>
-        <div className="pt-1">
-          <Link href="/booking/status">
-            <Button variant="secondary" size="sm">
-              Check appointment status
-            </Button>
-          </Link>
-        </div>
-      </Card>
+        {/* 7. APPOINTMENT STATUS LOOKUP */}
+        <Card variant="default" padding="md" className="bg-white border border-[#E6E4DD] space-y-2 flex flex-col justify-between">
+          <div className="space-y-1">
+            <h2 className="text-xs font-bold text-[#19232D] uppercase tracking-wider">
+              Already scheduled an appointment?
+            </h2>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Use your private 8-character confirmation code to check status or cancel anytime without an account.
+            </p>
+          </div>
+          <div className="pt-1">
+            <Link href="/booking/status">
+              <Button variant="secondary" size="sm">
+                <span>Check appointment status</span>
+                <span aria-hidden="true">&rarr;</span>
+              </Button>
+            </Link>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }

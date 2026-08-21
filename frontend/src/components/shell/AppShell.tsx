@@ -10,13 +10,13 @@ interface AppShellProps {
 
 export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-slate-800">
+    <div className="min-h-screen flex flex-col bg-[#FAF9F6] text-[#19232D] selection:bg-[#CCFBF1] selection:text-[#0D5C56]">
       {/* Skip to Content Link for Accessibility */}
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
 
-      {/* Top Disclaimer & Emergency Link */}
+      {/* Top Disclaimer & 24/7 Helpline Link */}
       <DisclaimerStrip />
 
       {/* Header */}
@@ -26,28 +26,48 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
       <main
         id="main-content"
         tabIndex={-1}
-        className="flex-1 flex flex-col max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 pb-24 md:pb-12 outline-none"
+        className="flex-1 flex flex-col max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 md:pb-14 outline-none"
       >
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="hidden md:block bg-stone-100 border-t border-slate-200/80 py-8 px-4 text-slate-500 text-xs text-center">
-        <div className="max-w-4xl mx-auto space-y-2">
-          <p className="font-medium text-slate-700">
-            MindBridge Student Mental Well-being Platform
-          </p>
-          <p>
-            This service provides supportive active listening, stress management coping tools, and clinical self-screenings. It is not a substitute for professional clinical medical advice, psychiatric diagnosis, or emergency healthcare.
-          </p>
-          <div className="flex justify-center gap-4 pt-2">
-            <Link href="/about" className="underline hover:text-slate-800 focus-accessible">
-              About & Privacy Architecture
-            </Link>
-            <span>&bull;</span>
-            <Link href="/support-now" className="underline text-amber-700 hover:text-amber-900 focus-accessible font-medium">
-              Emergency & Crisis Contacts
-            </Link>
+      {/* Institutional Footer */}
+      <footer className="hidden md:block bg-stone-100/80 border-t border-[#E6E4DD] py-10 px-4 text-slate-500 text-xs">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="space-y-1.5 text-center sm:text-left max-w-lg">
+            <p className="font-bold text-[#19232D] text-sm">
+              MindBridge Student Well-being Platform
+            </p>
+            <p className="leading-relaxed text-slate-500">
+              A confidential, zero-registration support space for university students. Provides supportive active listening, stress coping tools, and clinical self-screenings. Not a substitute for formal psychiatric diagnosis or emergency medical healthcare.
+            </p>
+          </div>
+          <div className="flex flex-col sm:items-end gap-2 text-center sm:text-right shrink-0">
+            <div className="flex items-center gap-3 font-semibold text-slate-600">
+              <Link
+                href="/about"
+                className="hover:text-[#0D5C56] transition-colors focus-accessible rounded-md p-1"
+              >
+                About & Privacy
+              </Link>
+              <span>&bull;</span>
+              <Link
+                href="/support-now"
+                className="text-[#D97706] hover:text-[#B45309] transition-colors focus-accessible rounded-md p-1"
+              >
+                Emergency Contacts
+              </Link>
+              <span>&bull;</span>
+              <Link
+                href="/admin/login"
+                className="hover:text-[#0D5C56] transition-colors focus-accessible rounded-md p-1"
+              >
+                Admin Portal
+              </Link>
+            </div>
+            <p className="text-[11px] text-slate-400">
+              &copy; {new Date().getFullYear()} University Student Counseling Service. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, Suspense } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -9,11 +10,27 @@ import { ChatMessage } from '@/lib/types';
 import { ensureSession } from '@/lib/session';
 import { sendChatMessage, ApiError } from '@/lib/api';
 
-const STARTER_PILLS = [
-  "I'm stressed about exams and deadlines",
-  "I don't know who to talk to about my feelings",
-  "I just want to vent about my day",
-  "I'm having trouble sleeping well",
+const CONVERSATION_STARTERS = [
+  {
+    topic: 'Academic Stress',
+    text: "I'm feeling overwhelmed with exam pressure and deadlines",
+  },
+  {
+    topic: 'Racing Thoughts',
+    text: "I'm having trouble sleeping because my mind won't stop racing",
+  },
+  {
+    topic: 'Exhaustion',
+    text: "I feel completely burnt out and can't find motivation to study",
+  },
+  {
+    topic: 'Venting Space',
+    text: "I just need someone to listen to what's going on without judgment",
+  },
+  {
+    topic: 'Grounding',
+    text: 'Can you guide me through a quick 2-minute calming exercise?',
+  },
 ];
 
 function ChatContent() {
@@ -101,7 +118,6 @@ function ChatContent() {
       // If the backend indicates HIGH_RISK or crisis, IMMEDIATELY route to /support-now
       if (response.is_crisis || response.risk_level === 'HIGH_RISK') {
         setIsCrisisTriggered(true);
-        // Lock composer and redirect immediately to the dedicated crisis screen
         router.push('/support-now');
         return;
       }
@@ -124,7 +140,6 @@ function ChatContent() {
           setRateLimitTimer(waitTime);
           setErrorMessage(`You've sent several messages quickly. Please take a pause for ${waitTime}s.`);
         } else if (err.status === 404) {
-          // Session expired or reset
           ensureSession().then(() => {
             setErrorMessage('Your session was refreshed. Please send your message again.');
           });
@@ -146,75 +161,77 @@ function ChatContent() {
     }
   };
 
-  const selectStarterPill = (text: string) => {
+  const selectStarter = (text: string) => {
     setInputText(text);
     inputRef.current?.focus();
   };
 
   return (
-    <div className="max-w-3xl mx-auto w-full flex-1 flex flex-col space-y-4">
-      {/* Header Info */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-200/80">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
-            Emotional Support Assistant
+    <div className="max-w-3xl mx-auto w-full flex-1 flex flex-col space-y-4 py-1 sm:py-3">
+      {/* 1. CALM SANCTUARY HEADER */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E6E4DD]">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <Link
+              href="/"
+              className="text-xs font-semibold text-slate-500 hover:text-[#0D5C56] transition-colors focus-accessible rounded-md p-0.5 -ml-0.5"
+            >
+              &larr; Home
+            </Link>
+            <span className="text-slate-300">&bull;</span>
+            <span className="text-xs font-semibold text-slate-500">
+              Supportive Listening
+            </span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-bold text-[#19232D] tracking-tight">
+            A quiet space to talk & reflect
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Empathetic, non-judgmental listening. Responses are not saved to a database.
+          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Take your time. Share whatever is on your mind in complete privacy.
           </p>
         </div>
-        <Badge variant="brand" size="sm">
-          Anonymous &bull; Non-Clinical
-        </Badge>
+
+        <div className="flex items-center gap-2 shrink-0">
+          <Badge variant="brand" size="sm" dot>
+            Anonymous &bull; Not Stored
+          </Badge>
+        </div>
       </div>
 
-      {/* Messages Container */}
+      {/* 2. CONVERSATION CANVAS */}
       <div
-        className="flex-1 min-h-[380px] max-h-[550px] overflow-y-auto p-4 space-y-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs"
+        className="flex-1 min-h-[400px] max-h-[580px] overflow-y-auto p-4 sm:p-6 space-y-5 rounded-2xl bg-white border border-[#E6E4DD] shadow-[0_1px_3px_rgba(25,35,45,0.03)]"
         aria-live="polite"
         aria-label="Conversation messages"
       >
         {messages.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4 my-auto">
-            <div className="w-12 h-12 rounded-2xl bg-[#F0FDFA] flex items-center justify-center text-[#0F766E]">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                />
-              </svg>
-            </div>
-            <div className="space-y-1 max-w-sm">
-              <h2 className="text-base font-bold text-slate-800">
-                How are you feeling today?
+          <div className="h-full flex flex-col items-center justify-center text-center p-4 sm:p-8 space-y-6 my-auto">
+            <div className="space-y-1.5 max-w-md">
+              <h2 className="text-base sm:text-lg font-bold text-[#19232D]">
+                What&rsquo;s weighing on your mind today?
               </h2>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                You can talk about school stress, burnout, relationship worries, or anything on your mind.
+              <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                You can explore academic burnout, pressure to succeed, relationship tension, or simply unpack your day. There is no right or wrong way to start.
               </p>
             </div>
 
-            {/* Quick Starter Suggestions */}
-            <div className="w-full space-y-2 pt-2">
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                Tap a topic to fill:
+            {/* Guided Starter Prompts */}
+            <div className="w-full space-y-2.5 pt-2 max-w-lg">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                Or tap a prompt to begin:
               </p>
-              <div className="flex flex-wrap justify-center gap-2">
-                {STARTER_PILLS.map((pill) => (
+              <div className="flex flex-col gap-2">
+                {CONVERSATION_STARTERS.map((starter) => (
                   <button
-                    key={pill}
+                    key={starter.text}
                     type="button"
-                    onClick={() => selectStarterPill(pill)}
-                    className="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-[#F0FDFA] hover:text-[#0F766E] border border-slate-200 text-slate-700 transition-colors focus-accessible touch-target cursor-pointer"
+                    onClick={() => selectStarter(starter.text)}
+                    className="w-full text-left p-3 rounded-xl bg-[#FAF9F6] hover:bg-[#F0FDFA] border border-[#E6E4DD] hover:border-[#0D5C56]/40 text-xs sm:text-sm text-slate-700 hover:text-[#0D5C56] transition-all flex items-center justify-between group focus-accessible cursor-pointer"
                   >
-                    {pill}
+                    <span className="leading-snug">&ldquo;{starter.text}&rdquo;</span>
+                    <span className="text-slate-400 group-hover:text-[#0D5C56] text-xs font-semibold shrink-0 ml-2" aria-hidden="true">
+                      &rarr;
+                    </span>
                   </button>
                 ))}
               </div>
@@ -229,16 +246,18 @@ function ChatContent() {
               }`}
             >
               <div
-                className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-4 text-sm leading-relaxed whitespace-pre-wrap ${
+                className={`max-w-[90%] sm:max-w-[80%] rounded-2xl p-4 text-xs sm:text-sm leading-relaxed whitespace-pre-wrap ${
                   msg.role === 'user'
-                    ? 'bg-[#0F766E] text-white rounded-br-xs shadow-xs'
-                    : 'bg-[#F4F7F5] text-slate-800 border border-slate-200/80 rounded-bl-xs'
+                    ? 'bg-[#0D5C56] text-white rounded-br-xs shadow-2xs font-normal'
+                    : 'bg-[#F7FAF8] text-[#19232D] border border-[#E2E8E5] rounded-bl-xs shadow-2xs'
                 }`}
               >
                 {msg.content}
               </div>
-              <div className="flex items-center gap-2 mt-1 px-1 text-[11px] text-slate-400">
-                <span>{msg.role === 'user' ? 'You' : 'Assistant'}</span>
+              <div className="flex items-center gap-1.5 mt-1 px-1 text-[11px] text-slate-400">
+                <span className="font-medium text-slate-500">
+                  {msg.role === 'user' ? 'You' : 'Support Assistant'}
+                </span>
                 <span>&bull;</span>
                 <span>{msg.timestamp}</span>
               </div>
@@ -246,14 +265,14 @@ function ChatContent() {
           ))
         )}
 
-        {/* Loading Indicator */}
+        {/* Listening / Typing State */}
         {isLoading && (
           <div className="flex flex-col items-start">
-            <div className="bg-[#F4F7F5] border border-slate-200 rounded-2xl rounded-bl-xs p-4 flex items-center gap-2 text-slate-500 text-sm">
-              <span className="inline-block w-2 h-2 rounded-full bg-[#0F766E] animate-pulse" />
-              <span className="inline-block w-2 h-2 rounded-full bg-[#0F766E] animate-pulse delay-75" />
-              <span className="inline-block w-2 h-2 rounded-full bg-[#0F766E] animate-pulse delay-150" />
-              <span className="ml-1 text-xs">Assistant is typing...</span>
+            <div className="bg-[#F7FAF8] border border-[#E2E8E5] rounded-2xl rounded-bl-xs p-4 flex items-center gap-2 text-slate-500 text-xs sm:text-sm shadow-2xs">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#0D5C56] animate-pulse" />
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#0D5C56] animate-pulse delay-75" />
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#0D5C56] animate-pulse delay-150" />
+              <span className="ml-1 text-xs text-slate-500 font-medium">Listening and reflecting...</span>
             </div>
           </div>
         )}
@@ -261,36 +280,35 @@ function ChatContent() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Rate Limit Banner */}
+      {/* 3. ALERTS & TIMERS */}
       {rateLimitTimer !== null && (
         <Card variant="crisis" padding="sm" className="text-xs flex items-center justify-between">
           <span>
-            <strong>Message limit reached.</strong> Please wait {rateLimitTimer}s before sending another message.
+            <strong>Please pause a moment.</strong> You&rsquo;ve sent several messages quickly. Please wait {rateLimitTimer}s before sending another.
           </span>
           <span className="font-mono font-bold text-amber-900">{rateLimitTimer}s</span>
         </Card>
       )}
 
-      {/* Error Banner */}
       {errorMessage && rateLimitTimer === null && (
         <div
           role="alert"
-          className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs flex items-center justify-between"
+          className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-900 text-xs flex items-center justify-between shadow-2xs"
         >
           <span>{errorMessage}</span>
           <button
             type="button"
             onClick={() => setErrorMessage(null)}
-            className="text-red-700 font-bold hover:text-red-900 p-1"
+            className="text-red-700 font-bold hover:text-red-950 p-1 cursor-pointer focus-accessible"
           >
             &times;
           </button>
         </div>
       )}
 
-      {/* Composer Form */}
+      {/* 4. COMPOSER */}
       <form onSubmit={handleSendMessage} className="space-y-2">
-        <div className="relative">
+        <div className="relative rounded-2xl bg-white border border-[#E6E4DD] focus-within:border-[#0D5C56] focus-within:ring-2 focus-within:ring-[#0D5C56]/15 shadow-2xs transition-all">
           <label htmlFor="chat-composer-input" className="sr-only">
             Your message
           </label>
@@ -301,39 +319,45 @@ function ChatContent() {
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type your message here (Shift+Enter for new line)..."
+            placeholder="Type what's on your mind... (Press Enter to send, Shift+Enter for new line)"
             disabled={isLoading || isCrisisTriggered || rateLimitTimer !== null}
             maxLength={2000}
-            className="w-full rounded-2xl border border-slate-300 p-3.5 pr-28 text-sm focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 outline-none resize-none bg-white text-slate-900 disabled:bg-slate-100 disabled:text-slate-400 placeholder:text-slate-400 shadow-xs"
+            className="w-full p-3.5 pb-12 text-xs sm:text-sm text-[#19232D] placeholder:text-slate-400 bg-transparent outline-none resize-none disabled:text-slate-400"
           />
-          <div className="absolute right-2.5 bottom-3 flex items-center gap-2">
+
+          <div className="absolute left-3.5 bottom-2.5 flex items-center gap-1.5 text-[11px] text-slate-400 pointer-events-none">
+            <span>In-memory only &bull; Never stored</span>
+          </div>
+
+          <div className="absolute right-2.5 bottom-2.5 flex items-center gap-2">
             <span
               className={`text-[11px] ${
                 inputText.length > 1800 ? 'text-amber-600 font-bold' : 'text-slate-400'
               }`}
             >
-              {inputText.length}/2000
+              {inputText.length > 0 ? `${inputText.length}/2000` : ''}
             </span>
             <Button
               type="submit"
               size="sm"
               variant="primary"
               disabled={!inputText.trim() || isLoading || rateLimitTimer !== null || isCrisisTriggered}
-              className="px-4"
+              className="px-4 text-xs font-bold"
             >
               Send
             </Button>
           </div>
         </div>
-        <p className="text-[11px] text-slate-400 text-center">
-          In distress or immediate danger?{' '}
-          <button
-            type="button"
-            onClick={() => router.push('/support-now')}
-            className="text-amber-700 underline font-semibold hover:text-amber-900 cursor-pointer"
+
+        {/* Reassuring Crisis Access */}
+        <p className="text-[11px] text-slate-500 text-center">
+          In immediate crisis or severe distress?{' '}
+          <Link
+            href="/support-now"
+            className="text-[#D97706] hover:text-[#B45309] font-bold underline focus-accessible"
           >
-            View 24/7 Crisis Helplines
-          </button>
+            Access 24/7 Free Helplines (Tele-MANAS 14416)
+          </Link>
         </p>
       </form>
     </div>
@@ -345,7 +369,7 @@ export default function ChatPage() {
     <Suspense
       fallback={
         <div className="p-12 text-center text-slate-500 text-sm">
-          Loading emotional support assistant...
+          Loading emotional support space...
         </div>
       }
     >

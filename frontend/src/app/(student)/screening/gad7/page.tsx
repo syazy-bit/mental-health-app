@@ -45,7 +45,7 @@ export default function GAD7ScreeningPage() {
 
   const handleNext = async () => {
     if (selectedValue === -1) {
-      setErrorMessage('Please select an option to continue.');
+      setErrorMessage('Please choose an option to continue.');
       return;
     }
 
@@ -73,7 +73,7 @@ export default function GAD7ScreeningPage() {
         router.push('/screening/result');
       } catch (err) {
         setErrorMessage(
-          err instanceof Error ? err.message : 'Failed to submit screening. Please try again.'
+          err instanceof Error ? err.message : 'Failed to submit check-in. Please try again.'
         );
         setIsSubmitting(false);
       }
@@ -90,47 +90,47 @@ export default function GAD7ScreeningPage() {
   const progressPercentage = Math.round(((currentIndex + 1) / GAD7_QUESTIONS.length) * 100);
 
   return (
-    <div className="max-w-2xl mx-auto w-full space-y-6 py-4">
-      {/* Top Breadcrumb & Header */}
+    <div className="max-w-2xl mx-auto w-full space-y-6 py-2 sm:py-6">
+      {/* 1. BREADCRUMB & INSTRUMENT BADGE */}
       <div className="flex items-center justify-between">
         <Link
           href="/screening"
-          className="text-xs font-semibold text-slate-500 hover:text-slate-800 focus-accessible p-1"
+          className="text-xs font-semibold text-slate-500 hover:text-[#0D5C56] focus-accessible p-1 -ml-1 transition-colors"
         >
-          &larr; Back to Screeners
+          &larr; Back to Check-ins
         </Link>
-        <Badge variant="sage" size="sm">
-          GAD-7 Anxiety Screener
+        <Badge variant="sage" size="sm" dot>
+          GAD-7 Anxiety Check-in
         </Badge>
       </div>
 
-      {/* Progress Bar */}
+      {/* 2. PROGRESS BAR */}
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs font-medium text-slate-500">
           <span>Question {currentIndex + 1} of {GAD7_QUESTIONS.length}</span>
           <span>{progressPercentage}% Completed</span>
         </div>
-        <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden">
           <div
-            className="h-full bg-[#52796F] rounded-full transition-all duration-300 ease-out"
+            className="h-full bg-[#4A6B62] rounded-full transition-all duration-300 ease-out"
             style={{ width: `${progressPercentage}%` }}
           />
         </div>
       </div>
 
-      {/* Question Card */}
-      <Card variant="default" padding="lg" className="space-y-6">
+      {/* 3. QUESTION CANVAS */}
+      <Card variant="elevated" padding="lg" className="space-y-6 bg-white border border-[#E6E4DD]">
         <div className="space-y-2">
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
             Over the last 2 weeks, how often have you been bothered by:
           </span>
-          <h1 className="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
+          <h1 className="text-lg sm:text-xl font-bold text-[#19232D] leading-snug">
             {currentQuestion}
           </h1>
         </div>
 
-        {/* Options */}
-        <div className="space-y-3" role="radiogroup" aria-label="Frequency options">
+        {/* Ergonomic Options */}
+        <div className="space-y-2.5" role="radiogroup" aria-label="Frequency options">
           {RESPONSE_OPTIONS.map((option) => {
             const isSelected = selectedValue === option.value;
 
@@ -141,23 +141,27 @@ export default function GAD7ScreeningPage() {
                 role="radio"
                 aria-checked={isSelected}
                 onClick={() => handleSelectOption(option.value)}
-                className={`w-full p-4 rounded-xl border text-left transition-all flex items-center justify-between touch-target focus-accessible cursor-pointer ${
+                className={`w-full p-4 rounded-xl border text-left transition-all flex items-center justify-between touch-target focus-accessible cursor-pointer select-none ${
                   isSelected
-                    ? 'border-[#52796F] bg-[#F4F7F5] text-[#3B5B52] ring-2 ring-[#52796F]/20 font-semibold'
-                    : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-800'
+                    ? 'border-[#4A6B62] bg-[#F4F7F5] text-[#3B5B52] ring-2 ring-[#4A6B62]/15 font-semibold shadow-2xs'
+                    : 'border-[#E6E4DD] bg-white hover:bg-stone-50 hover:border-slate-300 text-slate-700'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className={`w-5 h-5 rounded-full border flex items-center justify-center text-xs ${
+                    className={`w-5 h-5 rounded-full border flex items-center justify-center text-xs shrink-0 transition-colors ${
                       isSelected
-                        ? 'border-[#52796F] bg-[#52796F] text-white'
+                        ? 'border-[#4A6B62] bg-[#4A6B62] text-white'
                         : 'border-slate-300 bg-white'
                     }`}
                   >
-                    {isSelected && '✓'}
+                    {isSelected && (
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
                   </span>
-                  <span className="text-sm">{option.label}</span>
+                  <span className="text-xs sm:text-sm">{option.label}</span>
                 </div>
                 <span className="text-xs text-slate-400 font-normal">
                   {option.scoreText}
@@ -169,7 +173,7 @@ export default function GAD7ScreeningPage() {
 
         {/* Error message */}
         {errorMessage && (
-          <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-medium">
+          <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 text-xs font-medium">
             {errorMessage}
           </div>
         )}

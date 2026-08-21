@@ -15,13 +15,14 @@ function formatDateTime(iso: string): string {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
+    year: 'numeric',
   })} at ${date.toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
   })}`;
 }
 
-const STATUS_VARIANTS: Record<Booking['status'], 'amber' | 'sage' | 'neutral' | 'coral'> = {
+const STATUS_VARIANTS: Record<Booking['status'], 'amber' | 'sage' | 'neutral'> = {
   PENDING: 'amber',
   CONFIRMED: 'sage',
   CANCELLED: 'neutral',
@@ -38,6 +39,7 @@ function BookingDetailContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!bookingId) return;
@@ -63,6 +65,19 @@ function BookingDetailContent() {
     };
   }, [bookingId, code]);
 
+  const handleCopyCode = async () => {
+    if (!booking?.confirmation_code) return;
+    try {
+      await navigator.clipboard.writeText(booking.confirmation_code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback if clipboard API unavailable
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   const handleCancel = async () => {
     if (!booking) return;
     setIsCancelling(true);
@@ -85,8 +100,8 @@ function BookingDetailContent() {
 
   if (isLoading) {
     return (
-      <div className="text-center py-12 text-sm text-slate-500">
-        Loading your appointment...
+      <div className="max-w-2xl mx-auto w-full py-12 text-center text-sm text-slate-500">
+        Loading your appointment details...
       </div>
     );
   }
@@ -94,13 +109,14 @@ function BookingDetailContent() {
   if (errorMessage && !booking) {
     return (
       <div className="max-w-xl mx-auto py-12 text-center space-y-4">
-        <h1 className="text-xl font-bold text-slate-800">
+        <h1 className="text-xl font-bold text-[#19232D]">
           Appointment not found
         </h1>
-        <p className="text-sm text-slate-500">{errorMessage}</p>
-        <Link href="/booking">
-          <Button variant="primary" size="md">
-            Back to counseling team
+        <p className="text-xs sm:text-sm text-slate-500">{errorMessage}</p>
+        <Link href="/booking" className="inline-block pt-2">
+          <Button variant="brand" size="md">
+            <span>Back to counseling team</span>
+            <span aria-hidden="true">&rarr;</span>
           </Button>
         </Link>
       </div>
@@ -112,160 +128,186 @@ function BookingDetailContent() {
   const isActive = booking.status === 'PENDING' || booking.status === 'CONFIRMED';
 
   return (
-    <div className="max-w-2xl mx-auto w-full space-y-6 py-4">
+    <div className="max-w-2xl mx-auto w-full space-y-8 py-2 sm:py-6">
+      {/* 1. BREADCRUMB & STATUS */}
       <div className="flex items-center justify-between">
         <Link
           href="/booking"
-          className="text-xs font-semibold text-slate-500 hover:text-slate-800 focus-accessible p-1"
+          className="text-xs font-semibold text-slate-500 hover:text-[#0D5C56] focus-accessible p-1 -ml-1 transition-colors"
         >
           &larr; Back to counseling team
         </Link>
-        <Badge variant={STATUS_VARIANTS[booking.status]} size="sm">
+        <Badge variant={STATUS_VARIANTS[booking.status]} size="sm" dot>
           {booking.status}
         </Badge>
       </div>
 
-      <div className="space-y-1">
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
-          {isActive ? 'Your appointment is requested' : `Appointment ${booking.status.toLowerCase()}`}
+      {/* 2. MAIN HEADING */}
+      <div className="space-y-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#19232D] tracking-tight">
+          {booking.status === 'CONFIRMED'
+            ? 'Your appointment is confirmed'
+            : booking.status === 'PENDING'
+            ? 'Your appointment is requested'
+            : `Appointment ${booking.status.toLowerCase()}`}
         </h1>
-        <p className="text-sm text-slate-600">
-          Save this page or your confirmation code to view or manage your
-          appointment.
+        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+          Here is your official appointment confirmation and reference details.
         </p>
       </div>
 
       {errorMessage && (
-        <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-medium">
+        <div role="alert" className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs font-medium">
           {errorMessage}
         </div>
       )}
 
-      {/* Confirmation code card */}
-      <Card variant="sage" padding="lg" className="space-y-4">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-semibold text-slate-700">
-            Confirmation code
-          </span>
-          <code className="text-2xl font-mono font-bold tracking-widest text-[#0F766E] select-all">
-            {booking.confirmation_code}
-          </code>
+      {/* 3. PROMINENT CONFIRMATION CODE BOX */}
+      <Card variant="sage" padding="lg" className="bg-[#F4F7F5] border border-[#E6E4DD] space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-0.5">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Appointment Reference Code
+            </span>
+            <div className="font-mono text-2xl sm:text-3xl font-bold text-[#0D5C56] tracking-wider select-all">
+              {booking.confirmation_code}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleCopyCode}
+            className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl text-xs font-semibold border border-[#0D5C56]/30 bg-white text-[#0D5C56] hover:bg-[#F0FDFA] focus-accessible touch-target transition-all shrink-0"
+            aria-label="Copy confirmation code"
+          >
+            {copied ? '✓ Copied to clipboard' : 'Copy reference code'}
+          </button>
         </div>
-      </Card>
-
-      {/* Check status CTA */}
-      <Card variant="default" padding="md" className="space-y-3">
-        <p className="text-sm text-slate-700">
-          Save this code to check your appointment status later.
+        <p className="text-xs text-slate-600 leading-relaxed border-t border-[#E6E4DD]/60 pt-2.5">
+          Keep this code somewhere safe. You can use it on the <Link href="/booking/status" className="underline font-semibold hover:text-[#0D5C56]">Appointment Status</Link> page to view or manage your appointment anytime without creating an account.
         </p>
-        <Link href="/booking/status">
-          <Button variant="secondary" size="md">
-            Check appointment status
-          </Button>
-        </Link>
       </Card>
 
-      {/* Appointment details */}
-      <Card variant="default" padding="lg" className="space-y-4">
-        <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-          Appointment details
+      {/* 4. APPOINTMENT DETAILS SUMMARY */}
+      <Card variant="default" padding="lg" className="bg-white border border-[#E6E4DD] space-y-4">
+        <h2 className="text-sm font-bold text-[#19232D] uppercase tracking-wider">
+          Appointment Details
         </h2>
         <dl className="space-y-3 text-sm">
           <div className="flex items-start justify-between gap-4">
-            <dt className="text-slate-500 font-medium shrink-0">Counselor</dt>
-            <dd className="text-slate-900 font-semibold text-right">
+            <dt className="text-xs font-medium text-slate-500 shrink-0">Counselor</dt>
+            <dd className="text-sm font-bold text-[#19232D] text-right">
               {booking.counselor.name}
               <span className="block text-xs font-normal text-slate-500">
                 {booking.counselor.title}
               </span>
             </dd>
           </div>
-          <div className="flex items-start justify-between gap-4">
-            <dt className="text-slate-500 font-medium shrink-0">When</dt>
-            <dd className="text-slate-900 font-semibold text-right">
+          <div className="flex items-start justify-between gap-4 border-t border-slate-100 pt-3">
+            <dt className="text-xs font-medium text-slate-500 shrink-0">Date &amp; Time</dt>
+            <dd className="text-sm font-bold text-[#19232D] text-right">
               {formatDateTime(booking.slot.starts_at)}
               <span className="block text-xs font-normal text-slate-500">
-                to {formatDateTime(booking.slot.ends_at)}
+                to {formatDateTime(booking.slot.ends_at)} (50 min)
               </span>
             </dd>
           </div>
           {booking.student_name && (
-            <div className="flex items-start justify-between gap-4">
-              <dt className="text-slate-500 font-medium shrink-0">Name</dt>
-              <dd className="text-slate-900 font-semibold text-right">{booking.student_name}</dd>
+            <div className="flex items-start justify-between gap-4 border-t border-slate-100 pt-3">
+              <dt className="text-xs font-medium text-slate-500 shrink-0">Name</dt>
+              <dd className="text-sm font-semibold text-[#19232D] text-right">{booking.student_name}</dd>
             </div>
           )}
           {booking.reason && (
-            <div className="flex items-start justify-between gap-4">
-              <dt className="text-slate-500 font-medium shrink-0">Reason</dt>
-              <dd className="text-slate-700 text-right">{booking.reason}</dd>
+            <div className="flex items-start justify-between gap-4 border-t border-slate-100 pt-3">
+              <dt className="text-xs font-medium text-slate-500 shrink-0">Focus / Notes</dt>
+              <dd className="text-xs sm:text-sm text-slate-700 text-right max-w-xs">{booking.reason}</dd>
             </div>
           )}
         </dl>
       </Card>
 
-      {/* Actions */}
+      {/* 5. WHAT HAPPENS NEXT */}
+      <Card variant="default" padding="lg" className="bg-[#FAF9F6] border border-[#E6E4DD] space-y-3">
+        <h2 className="text-xs font-bold text-[#19232D] uppercase tracking-wider">
+          What Happens Next
+        </h2>
+        <ul className="space-y-2 text-xs text-slate-600 leading-relaxed list-disc list-inside">
+          <li>Your appointment is registered with the campus counseling team.</li>
+          <li>Save your 8-character reference code to check status or cancel anytime.</li>
+          <li>If you cannot attend, please cancel in advance so another student can use the slot.</li>
+        </ul>
+      </Card>
+
+      {/* 6. CANCELLATION / ACTIONS */}
       {isActive && (
-        <Card variant="subtle" padding="md" className="space-y-3">
-          <p className="text-sm text-slate-700">
-            Changed your mind? You can cancel this appointment. The time will be
-            released for other students.
-          </p>
-          <Button
-            type="button"
-            variant="outline"
-            size="md"
-            onClick={handleCancel}
-            isLoading={isCancelling}
-            disabled={!isActive}
-            className="border-red-300 text-red-700 hover:bg-red-50"
-          >
-            Cancel this appointment
-          </Button>
+        <Card variant="default" padding="md" className="bg-white border border-[#E6E4DD] space-y-2.5">
+          <div className="space-y-0.5">
+            <h3 className="text-xs font-bold text-[#19232D] uppercase tracking-wider">
+              Need to cancel?
+            </h3>
+            <p className="text-xs text-slate-500">
+              If your plans change, you can cancel this appointment anytime. The time slot will immediately be made available for other students.
+            </p>
+          </div>
+          <div className="pt-1">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleCancel}
+              isLoading={isCancelling}
+              disabled={!isActive}
+              className="text-slate-600 hover:text-red-700 hover:border-red-300"
+            >
+              Cancel this appointment
+            </Button>
+          </div>
         </Card>
       )}
 
       {booking.status === 'CANCELLED' && (
-        <Card variant="default" padding="md" className="space-y-2">
-          <p className="text-sm font-semibold text-slate-700">
+        <Card variant="default" padding="md" className="bg-white border border-[#E6E4DD] space-y-2">
+          <p className="text-xs sm:text-sm font-semibold text-[#19232D]">
             This appointment has been cancelled.
           </p>
           <p className="text-xs text-slate-500">
-            Feel free to book another time or explore other support pathways.
+            You can select another time or explore our self-guided resources and support lines.
           </p>
-          <div className="pt-1">
+          <div className="pt-2">
             <Link href="/booking">
-              <Button variant="secondary" size="md">
-                Book a new appointment
+              <Button variant="brand" size="md">
+                <span>Book a new appointment</span>
+                <span aria-hidden="true">&rarr;</span>
               </Button>
             </Link>
           </div>
         </Card>
       )}
 
+      {/* 7. RETURN PATHWAYS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-        <Card variant="interactive" padding="md">
-          <Link href="/chat" className="block space-y-2 focus-accessible">
-            <h3 className="font-bold text-slate-900 text-sm">
-              Talk with AI Assistant
+        <Card variant="interactive" padding="md" className="bg-white border border-[#E6E4DD]">
+          <Link href="/chat" className="block space-y-1.5 focus-accessible">
+            <h3 className="font-bold text-[#19232D] text-xs sm:text-sm">
+              Talk &amp; Reflect
             </h3>
-            <p className="text-xs text-slate-600 leading-normal">
-              Get supportive coping exercises while you wait for your appointment.
+            <p className="text-xs text-slate-500 leading-normal">
+              Practice grounding exercises or talk through your thoughts while you wait.
             </p>
-            <span className="text-xs font-semibold text-[#0F766E] inline-flex items-center pt-1">
-              Open Chat &rarr;
+            <span className="text-xs font-semibold text-[#0D5C56] inline-flex items-center pt-1">
+              Start a conversation &rarr;
             </span>
           </Link>
         </Card>
-        <Card variant="interactive" padding="md">
-          <Link href="/resources" className="block space-y-2 focus-accessible">
-            <h3 className="font-bold text-slate-900 text-sm">
-              Explore Resources
+        <Card variant="interactive" padding="md" className="bg-white border border-[#E6E4DD]">
+          <Link href="/resources" className="block space-y-1.5 focus-accessible">
+            <h3 className="font-bold text-[#19232D] text-xs sm:text-sm">
+              Explore Wellbeing Resources
             </h3>
-            <p className="text-xs text-slate-600 leading-normal">
-              Discover helplines, self-care tools, and wellbeing guides.
+            <p className="text-xs text-slate-500 leading-normal">
+              Access 24/7 helplines, sensory tools, and guided relaxation exercises.
             </p>
-            <span className="text-xs font-semibold text-[#0F766E] inline-flex items-center pt-1">
+            <span className="text-xs font-semibold text-[#0D5C56] inline-flex items-center pt-1">
               View Resources &rarr;
             </span>
           </Link>
@@ -280,7 +322,7 @@ export default function BookingDetailPage() {
     <Suspense
       fallback={
         <div className="p-12 text-center text-slate-500 text-sm">
-          Loading your appointment...
+          Loading your appointment details...
         </div>
       }
     >
