@@ -88,7 +88,7 @@ export const Dialog: React.FC<DialogProps> = ({
       role="presentation"
     >
       <div
-        className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"
+        className="absolute inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-xs transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -99,17 +99,17 @@ export const Dialog: React.FC<DialogProps> = ({
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
         tabIndex={-1}
-        className="relative w-full sm:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-xl border border-[#E6E4DD] outline-none focus-accessible max-h-[90vh] overflow-y-auto"
+        className="relative w-full sm:max-w-lg bg-white dark:bg-[#18211F] rounded-t-2xl sm:rounded-2xl shadow-xl border border-[#E6E4DD] dark:border-[#283632] outline-none focus-accessible max-h-[90vh] overflow-y-auto"
       >
-        <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-3 border-b border-[#E6E4DD]/60">
-          <h2 id={titleId} className="text-lg font-bold text-[#19232D]">
+        <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-3 border-b border-[#E6E4DD]/60 dark:border-[#283632]">
+          <h2 id={titleId} className="text-lg font-bold text-[#19232D] dark:text-[#F1F3EF]">
             {title}
           </h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close dialog"
-            className="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 hover:text-[#19232D] hover:bg-slate-100 focus-accessible touch-target transition-colors cursor-pointer"
+            className="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 dark:text-[#73827D] hover:text-[#19232D] dark:hover:text-[#F1F3EF] hover:bg-slate-100 dark:hover:bg-white/5 focus-accessible touch-target transition-colors cursor-pointer"
           >
             <svg
               className="w-5 h-5"
@@ -130,7 +130,7 @@ export const Dialog: React.FC<DialogProps> = ({
         {description && (
           <p
             id={descriptionId}
-            className="px-6 pt-3 text-xs sm:text-sm text-slate-600 leading-relaxed"
+            className="px-6 pt-3 text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1] leading-relaxed"
           >
             {description}
           </p>

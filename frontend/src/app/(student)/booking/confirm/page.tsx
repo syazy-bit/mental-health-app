@@ -88,7 +88,7 @@ function BookingConfirmContent() {
       <div className="flex items-center justify-between">
         <Link
           href={slotId ? `/booking/slots?counselor=${encodeURIComponent(counselorId)}&name=${encodeURIComponent(counselorName)}` : '/booking'}
-          className="text-xs font-semibold text-slate-500 hover:text-[#0D5C56] focus-accessible p-1 -ml-1 transition-colors"
+          className="text-xs font-semibold text-slate-500 dark:text-[#AAB6B1] hover:text-[#0D5C56] dark:hover:text-[#4FA79D] focus-accessible p-1 -ml-1 transition-colors"
         >
           &larr; Choose a different time
         </Link>
@@ -98,22 +98,22 @@ function BookingConfirmContent() {
       </div>
 
       <div className="space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#19232D] tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#19232D] dark:text-[#F1F3EF] tracking-tight">
           Review &amp; confirm your appointment
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+        <p className="text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1] leading-relaxed">
           Review your appointment time and optional details below. Only the appointment time is required.
         </p>
       </div>
 
       {/* 2. MISSING SLOT WARNING */}
       {missingSlot && (
-        <Card variant="crisis" padding="lg" className="space-y-3 border border-[#FDE68A]">
+        <Card variant="crisis" padding="lg" className="space-y-3 border border-[#FDE68A] dark:border-[#5E421E]">
           <div className="space-y-1">
-            <h2 className="text-base font-bold text-[#92400E]">
+            <h2 className="text-base font-bold text-[#92400E] dark:text-[#FDE68A]">
               No appointment time selected
             </h2>
-            <p className="text-xs sm:text-sm text-[#78350F]">
+            <p className="text-xs sm:text-sm text-[#78350F] dark:text-[#FDE68A]">
               Please select an available appointment slot before confirming.
             </p>
           </div>
@@ -130,41 +130,41 @@ function BookingConfirmContent() {
       {!missingSlot && (
         <form onSubmit={handleSubmit} className="space-y-6" noValidate>
           {/* APPOINTMENT SUMMARY CARD */}
-          <Card variant="sage" padding="lg" className="bg-[#F4F7F5] border border-[#E6E4DD] space-y-3">
-            <span className="text-xs font-bold text-[#0D5C56] uppercase tracking-wider">
+          <Card variant="sage" padding="lg" className="space-y-3">
+            <span className="text-xs font-bold text-[#0D5C56] dark:text-[#4FA79D] uppercase tracking-wider">
               Selected Appointment
             </span>
-            <div className="space-y-2 text-sm text-[#19232D]">
+            <div className="space-y-2 text-sm text-[#19232D] dark:text-[#F1F3EF]">
               <div className="flex items-start justify-between gap-4">
-                <span className="text-xs text-slate-500 font-medium">Counselor</span>
-                <span className="text-sm font-bold text-[#19232D] text-right">{counselorName}</span>
+                <span className="text-xs text-slate-500 dark:text-[#73827D] font-medium">Counselor</span>
+                <span className="text-sm font-bold text-[#19232D] dark:text-[#F1F3EF] text-right">{counselorName}</span>
               </div>
-              <div className="flex items-start justify-between gap-4 border-t border-[#E6E4DD]/60 pt-2">
-                <span className="text-xs text-slate-500 font-medium">When</span>
-                <span className="text-sm font-bold text-[#19232D] text-right">{formatSlotLabel(starts, ends)}</span>
+              <div className="flex items-start justify-between gap-4 border-t border-[#E6E4DD]/60 dark:border-[#283632] pt-2">
+                <span className="text-xs text-slate-500 dark:text-[#73827D] font-medium">When</span>
+                <span className="text-sm font-bold text-[#19232D] dark:text-[#F1F3EF] text-right">{formatSlotLabel(starts, ends)}</span>
               </div>
-              <div className="flex items-start justify-between gap-4 border-t border-[#E6E4DD]/60 pt-2">
-                <span className="text-xs text-slate-500 font-medium">Duration</span>
-                <span className="text-xs font-semibold text-slate-700 text-right">50 minutes (standard session)</span>
+              <div className="flex items-start justify-between gap-4 border-t border-[#E6E4DD]/60 dark:border-[#283632] pt-2">
+                <span className="text-xs text-slate-500 dark:text-[#73827D] font-medium">Duration</span>
+                <span className="text-xs font-semibold text-slate-700 dark:text-[#AAB6B1] text-right">50 minutes (standard session)</span>
               </div>
             </div>
           </Card>
 
           {/* OPTIONAL STUDENT DETAILS */}
-          <Card variant="default" padding="lg" className="bg-white border border-[#E6E4DD] space-y-4">
+          <Card variant="default" padding="lg" className="space-y-4">
             <div className="space-y-1">
-              <h2 className="text-sm font-bold text-[#19232D] uppercase tracking-wider">
+              <h2 className="text-sm font-bold text-[#19232D] dark:text-[#F1F3EF] uppercase tracking-wider">
                 Your details (Optional)
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-[#AAB6B1]">
                 You can leave these blank to book anonymously, or provide details if you want your counselor to know in advance.
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
               <div className="space-y-1.5">
-                <label htmlFor="studentName" className="block text-xs font-bold text-[#19232D]">
-                  Name or preferred name <span className="text-slate-400 font-normal">(optional)</span>
+                <label htmlFor="studentName" className="block text-xs font-bold text-[#19232D] dark:text-[#F1F3EF]">
+                  Name or preferred name <span className="text-slate-400 dark:text-[#73827D] font-normal">(optional)</span>
                 </label>
                 <input
                   id="studentName"
@@ -172,13 +172,13 @@ function BookingConfirmContent() {
                   value={studentName}
                   onChange={(e) => setStudentName(e.target.value)}
                   placeholder="How should the counselor address you?"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E6E4DD] bg-[#FAF9F6] text-sm text-[#19232D] placeholder:text-slate-400 focus:bg-white focus:border-[#0D5C56] focus:ring-2 focus:ring-[#0D5C56]/20 focus:outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E6E4DD] dark:border-[#283632] bg-[#FAF9F6] dark:bg-[#141C1A] text-sm text-[#19232D] dark:text-[#F1F3EF] placeholder:text-slate-400 dark:placeholder:text-[#73827D] focus:bg-white dark:focus:bg-[#18211F] focus:border-[#0D5C56] dark:focus:border-[#4FA79D] focus:ring-2 focus:ring-[#0D5C56]/20 dark:focus:ring-[#4FA79D]/20 focus:outline-none transition-all"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="contactEmail" className="block text-xs font-bold text-[#19232D]">
-                  Email <span className="text-slate-400 font-normal">(optional)</span>
+                <label htmlFor="contactEmail" className="block text-xs font-bold text-[#19232D] dark:text-[#F1F3EF]">
+                  Email <span className="text-slate-400 dark:text-[#73827D] font-normal">(optional)</span>
                 </label>
                 <input
                   id="contactEmail"
@@ -186,13 +186,13 @@ function BookingConfirmContent() {
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
                   placeholder="you@university.edu"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E6E4DD] bg-[#FAF9F6] text-sm text-[#19232D] placeholder:text-slate-400 focus:bg-white focus:border-[#0D5C56] focus:ring-2 focus:ring-[#0D5C56]/20 focus:outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E6E4DD] dark:border-[#283632] bg-[#FAF9F6] dark:bg-[#141C1A] text-sm text-[#19232D] dark:text-[#F1F3EF] placeholder:text-slate-400 dark:placeholder:text-[#73827D] focus:bg-white dark:focus:bg-[#18211F] focus:border-[#0D5C56] dark:focus:border-[#4FA79D] focus:ring-2 focus:ring-[#0D5C56]/20 dark:focus:ring-[#4FA79D]/20 focus:outline-none transition-all"
                 />
               </div>
 
               <div className="sm:col-span-2 space-y-1.5">
-                <label htmlFor="contactPhone" className="block text-xs font-bold text-[#19232D]">
-                  Phone number <span className="text-slate-400 font-normal">(optional)</span>
+                <label htmlFor="contactPhone" className="block text-xs font-bold text-[#19232D] dark:text-[#F1F3EF]">
+                  Phone number <span className="text-slate-400 dark:text-[#73827D] font-normal">(optional)</span>
                 </label>
                 <input
                   id="contactPhone"
@@ -200,13 +200,13 @@ function BookingConfirmContent() {
                   value={contactPhone}
                   onChange={(e) => setContactPhone(e.target.value)}
                   placeholder="e.g. 555-0100"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E6E4DD] bg-[#FAF9F6] text-sm text-[#19232D] placeholder:text-slate-400 focus:bg-white focus:border-[#0D5C56] focus:ring-2 focus:ring-[#0D5C56]/20 focus:outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E6E4DD] dark:border-[#283632] bg-[#FAF9F6] dark:bg-[#141C1A] text-sm text-[#19232D] dark:text-[#F1F3EF] placeholder:text-slate-400 dark:placeholder:text-[#73827D] focus:bg-white dark:focus:bg-[#18211F] focus:border-[#0D5C56] dark:focus:border-[#4FA79D] focus:ring-2 focus:ring-[#0D5C56]/20 dark:focus:ring-[#4FA79D]/20 focus:outline-none transition-all"
                 />
               </div>
 
               <div className="sm:col-span-2 space-y-1.5">
-                <label htmlFor="reason" className="block text-xs font-bold text-[#19232D]">
-                  What would you like to focus on? <span className="text-slate-400 font-normal">(optional)</span>
+                <label htmlFor="reason" className="block text-xs font-bold text-[#19232D] dark:text-[#F1F3EF]">
+                  What would you like to focus on? <span className="text-slate-400 dark:text-[#73827D] font-normal">(optional)</span>
                 </label>
                 <textarea
                   id="reason"
@@ -214,24 +214,24 @@ function BookingConfirmContent() {
                   onChange={(e) => setReason(e.target.value)}
                   rows={3}
                   placeholder="e.g. Exam stress, burnout, anxiety, relationships..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E6E4DD] bg-[#FAF9F6] text-sm text-[#19232D] placeholder:text-slate-400 focus:bg-white focus:border-[#0D5C56] focus:ring-2 focus:ring-[#0D5C56]/20 focus:outline-none transition-all"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E6E4DD] dark:border-[#283632] bg-[#FAF9F6] dark:bg-[#141C1A] text-sm text-[#19232D] dark:text-[#F1F3EF] placeholder:text-slate-400 dark:placeholder:text-[#73827D] focus:bg-white dark:focus:bg-[#18211F] focus:border-[#0D5C56] dark:focus:border-[#4FA79D] focus:ring-2 focus:ring-[#0D5C56]/20 dark:focus:ring-[#4FA79D]/20 focus:outline-none transition-all"
                 />
               </div>
             </div>
           </Card>
 
           {/* PRIVACY NOTICE */}
-          <Card variant="default" padding="md" className="bg-[#FAF9F6] border border-[#E6E4DD] space-y-1.5">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+          <Card variant="default" padding="md" className="space-y-1.5 bg-[#FAF9F6] dark:bg-[#141C1A] border border-[#E6E4DD] dark:border-[#283632]">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-[#73827D]">
               Privacy &amp; Data Handling
             </span>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-[#AAB6B1] leading-relaxed">
               Any details you provide are shared only with the university counseling team for this appointment. They are kept completely separate from self-guided chats and check-in scores.
             </p>
           </Card>
 
           {errorMessage && (
-            <div role="alert" className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs font-medium">
+            <div role="alert" className="p-4 bg-amber-50 dark:bg-[#281F13] border border-amber-200 dark:border-[#5E421E] rounded-xl text-amber-900 dark:text-[#FDE68A] text-xs font-medium">
               {errorMessage}
             </div>
           )}
@@ -240,7 +240,7 @@ function BookingConfirmContent() {
           <div className="flex flex-col-reverse sm:flex-row gap-3 pt-2">
             <Link
               href={`/booking/slots?counselor=${encodeURIComponent(counselorId)}&name=${encodeURIComponent(counselorName)}`}
-              className="inline-flex items-center justify-center px-5 py-3 rounded-xl text-sm font-semibold border border-[#E6E4DD] text-slate-700 hover:bg-slate-50 focus-accessible touch-target transition-colors"
+              className="inline-flex items-center justify-center px-5 py-3 rounded-xl text-sm font-semibold border border-[#E6E4DD] dark:border-[#283632] text-slate-700 dark:text-[#F1F3EF] hover:bg-slate-50 dark:hover:bg-[#202B28] focus-accessible touch-target transition-colors"
             >
               &larr; Back to slots
             </Link>
@@ -265,7 +265,7 @@ export default function BookingConfirmPage() {
   return (
     <Suspense
       fallback={
-        <div className="p-12 text-center text-slate-500 text-sm">
+        <div className="p-12 text-center text-slate-500 dark:text-[#AAB6B1] text-sm">
           Loading appointment details...
         </div>
       }

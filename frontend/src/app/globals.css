@@ -1,12 +1,19 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 :root {
   /* Surface & Background */
   --background: #FAF9F6;
   --foreground: #19232D;
   --card-bg: #FFFFFF;
+  --card-elevated-bg: #FFFFFF;
   --card-border: #E6E4DD;
   --card-border-subtle: #F0EEE6;
+  --surface-muted: #F4F7F5;
+  --surface-subtle: #FAF9F6;
+  --text-muted: #64748B;
+  --text-subtle: #94A3B8;
   
   /* Brand Structural - Deep Spruce Teal */
   --color-brand: #0D5C56;
@@ -30,7 +37,7 @@
   --color-sage-subtle: #E3ECE7;
   --color-sage-border: #CBD5E1;
 
-  /* Crisis & Urgent Notice - Calming Warm Amber (Never alarming red) */
+  /* Crisis & Urgent Notice - Calming Warm Amber */
   --color-amber-crisis: #D97706;
   --color-amber-crisis-dark: #B45309;
   --color-amber-crisis-bg: #FFFBEB;
@@ -42,10 +49,69 @@
   --color-slate-muted: #64748B;
   --color-slate-subtle: #94A3B8;
 
+  /* Focus & Accessibility */
+  --focus-ring: #0D5C56;
+
   /* Elevation Shadows */
   --shadow-ambient: 0 1px 3px rgba(25, 35, 45, 0.04), 0 1px 2px rgba(25, 35, 45, 0.02);
   --shadow-card: 0 4px 12px rgba(25, 35, 45, 0.05), 0 1px 3px rgba(25, 35, 45, 0.03);
   --shadow-card-hover: 0 10px 24px -4px rgba(25, 35, 45, 0.08), 0 4px 8px -2px rgba(25, 35, 45, 0.03);
+}
+
+.dark, [data-theme='dark'] {
+  /* Surface & Background */
+  --background: #101817;
+  --foreground: #F1F3EF;
+  --card-bg: #18211F;
+  --card-elevated-bg: #202B28;
+  --card-border: #283632;
+  --card-border-subtle: #212C28;
+  --surface-muted: #141C1A;
+  --surface-subtle: #1C2623;
+  --text-muted: #AAB6B1;
+  --text-subtle: #73827D;
+
+  /* Brand Structural - Lighter Spruce Teal for dark contrast */
+  --color-brand: #4FA79D;
+  --color-brand-hover: #61B8AE;
+  --color-brand-active: #3D8F86;
+  --color-brand-light: #142725;
+  --color-brand-subtle: #1A3734;
+  --color-brand-border: #28534E;
+
+  /* Primary Accent / Warm CTA - Lighter Earthy Terracotta */
+  --color-cta: #E58A73;
+  --color-cta-hover: #F09A83;
+  --color-cta-active: #D47760;
+  --color-cta-light: #2A1E1B;
+  --color-cta-border: #523630;
+
+  /* Safety & Clinical Wellness - Lighter Sage Green */
+  --color-sage: #86A69D;
+  --color-sage-hover: #97B7AE;
+  --color-sage-light: #172320;
+  --color-sage-subtle: #21302C;
+  --color-sage-border: #30443F;
+
+  /* Crisis & Urgent Notice - Balanced Warm Amber */
+  --color-amber-crisis: #E7A044;
+  --color-amber-crisis-dark: #F0B260;
+  --color-amber-crisis-bg: #281F13;
+  --color-amber-crisis-border: #5E421E;
+  --color-amber-crisis-text: #FDE68A;
+
+  /* Neutrals */
+  --color-slate-main: #F1F3EF;
+  --color-slate-muted: #AAB6B1;
+  --color-slate-subtle: #73827D;
+
+  /* Focus & Accessibility */
+  --focus-ring: #4FA79D;
+
+  /* Elevation Shadows */
+  --shadow-ambient: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.12);
+  --shadow-card: 0 4px 14px rgba(0, 0, 0, 0.28), 0 1px 3px rgba(0, 0, 0, 0.16);
+  --shadow-card-hover: 0 10px 24px -4px rgba(0, 0, 0, 0.4), 0 4px 8px -2px rgba(0, 0, 0, 0.2);
 }
 
 @theme inline {
@@ -103,7 +169,7 @@ body {
   left: 1rem;
   z-index: 9999;
   padding: 0.75rem 1.25rem;
-  background-color: #0D5C56;
+  background-color: var(--color-brand);
   color: #FFFFFF;
   font-weight: 600;
   border-radius: 0.75rem;
@@ -114,13 +180,13 @@ body {
 
 .skip-link:focus {
   top: 1rem;
-  outline: 3px solid #D96B4F;
+  outline: 3px solid var(--color-cta);
   outline-offset: 2px;
 }
 
 /* Accessible focus ring style helper */
 .focus-accessible:focus-visible {
-  outline: 2px solid #0D5C56;
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -145,8 +211,16 @@ body {
   border-radius: 9999px;
 }
 
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(170, 182, 177, 0.25);
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(100, 116, 139, 0.4);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(170, 182, 177, 0.4);
 }
 
 /* Respect user's motion preferences */

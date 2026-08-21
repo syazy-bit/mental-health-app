@@ -44,7 +44,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           {backLink && (
             <Link
               href={backLink.href}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-[#0D5C56] transition-colors focus-accessible rounded-md p-1 -ml-1"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-[#AAB6B1] hover:text-[#0D5C56] dark:hover:text-[#4FA79D] transition-colors focus-accessible rounded-md p-1 -ml-1"
             >
               <span>&larr;</span>
               <span>{backLink.label}</span>
@@ -59,12 +59,12 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         </div>
       )}
 
-      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#19232D] tracking-tight leading-tight">
+      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#19232D] dark:text-[#F1F3EF] tracking-tight leading-tight">
         {title}
       </h1>
 
       {subtitle && (
-        <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl">
+        <p className="text-sm sm:text-base text-slate-600 dark:text-[#AAB6B1] leading-relaxed max-w-3xl">
           {subtitle}
         </p>
       )}

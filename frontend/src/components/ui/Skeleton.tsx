@@ -18,9 +18,10 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 
   return (
     <div
-      className={`animate-pulse bg-slate-200/70 ${variantStyles[variant]} ${className}`}
+      className={`animate-pulse bg-slate-200/70 dark:bg-white/10 ${variantStyles[variant]} ${className}`}
       aria-hidden="true"
       {...props}
-    />
+    >
+      </div>
   );
 };

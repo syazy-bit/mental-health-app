@@ -33,25 +33,25 @@ export const Button: React.FC<ButtonProps> = ({
   const variantStyles = {
     // Primary CTA (Terracotta Warm Accent)
     primary:
-      'bg-[#D96B4F] hover:bg-[#C4573C] active:bg-[#A8422A] text-white shadow-sm hover:shadow-md hover:shadow-[#D96B4F]/20',
+      'bg-[#D96B4F] dark:bg-[#E58A73] dark:text-[#101817] hover:bg-[#C4573C] dark:hover:bg-[#F09A83] active:bg-[#A8422A] dark:active:bg-[#D47760] text-white shadow-sm hover:shadow-md hover:shadow-[#D96B4F]/20',
     // Secondary Outline (Spruce Teal Border)
     secondary:
-      'border-2 border-[#0D5C56] text-[#0D5C56] bg-transparent hover:bg-[#F0FDFA] active:bg-[#CCFBF1]',
+      'border-2 border-[#0D5C56] dark:border-[#4FA79D] text-[#0D5C56] dark:text-[#4FA79D] bg-transparent hover:bg-[#F0FDFA] dark:hover:bg-[#142725] active:bg-[#CCFBF1] dark:active:bg-[#1A3734]',
     // Brand Solid (Deep Spruce Teal)
     brand:
-      'bg-[#0D5C56] hover:bg-[#115E59] active:bg-[#09403C] text-white shadow-sm hover:shadow-md hover:shadow-[#0D5C56]/20',
+      'bg-[#0D5C56] dark:bg-[#4FA79D] dark:text-[#101817] hover:bg-[#115E59] dark:hover:bg-[#61B8AE] active:bg-[#09403C] dark:active:bg-[#3D8F86] text-white shadow-sm hover:shadow-md hover:shadow-[#0D5C56]/20',
     // Crisis Urgent (Warm Golden Amber)
     crisis:
-      'bg-[#D97706] hover:bg-[#B45309] active:bg-[#92400E] text-white shadow-sm font-bold hover:shadow-md hover:shadow-[#D97706]/20',
+      'bg-[#D97706] dark:bg-[#E7A044] dark:text-[#101817] hover:bg-[#B45309] dark:hover:bg-[#F0B260] active:bg-[#92400E] text-white shadow-sm font-bold hover:shadow-md hover:shadow-[#D97706]/20',
     // Clean Neutral Outline
     outline:
-      'border border-[#E6E4DD] bg-white text-[#19232D] hover:bg-stone-50 hover:border-slate-400 shadow-xs',
+      'border border-[#E6E4DD] dark:border-[#283632] bg-white dark:bg-[#18211F] text-[#19232D] dark:text-[#F1F3EF] hover:bg-stone-50 dark:hover:bg-[#202B28] hover:border-slate-400 dark:hover:border-slate-500 shadow-xs',
     // Subtle Ghost
     ghost:
-      'text-slate-700 hover:text-slate-900 hover:bg-slate-100/70 active:bg-slate-200/70',
+      'text-slate-700 dark:text-[#AAB6B1] hover:text-slate-900 dark:hover:text-[#F1F3EF] hover:bg-slate-100/70 dark:hover:bg-white/5 active:bg-slate-200/70 dark:active:bg-white/10',
     // Soft Pill Variant
     soft:
-      'bg-[#F0FDFA] text-[#0D5C56] hover:bg-[#CCFBF1] active:bg-[#99F6E4]/50 border border-[#CCFBF1]',
+      'bg-[#F0FDFA] dark:bg-[#142725] text-[#0D5C56] dark:text-[#4FA79D] hover:bg-[#CCFBF1] dark:hover:bg-[#1A3734] active:bg-[#99F6E4]/50 border border-[#CCFBF1] dark:border-[#28534E]',
   };
 
   return (

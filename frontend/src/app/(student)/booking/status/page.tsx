@@ -111,7 +111,7 @@ export default function BookingStatusPage() {
       <div className="flex items-center justify-between">
         <Link
           href="/booking"
-          className="text-xs font-semibold text-slate-500 hover:text-[#0D5C56] focus-accessible p-1 -ml-1 transition-colors"
+          className="text-xs font-semibold text-slate-500 dark:text-[#AAB6B1] hover:text-[#0D5C56] dark:hover:text-[#4FA79D] focus-accessible p-1 -ml-1 transition-colors"
         >
           &larr; Back to counseling team
         </Link>
@@ -121,16 +121,16 @@ export default function BookingStatusPage() {
       </div>
 
       <div className="space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#19232D] tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#19232D] dark:text-[#F1F3EF] tracking-tight">
           Check your appointment
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-xl">
+        <p className="text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1] leading-relaxed max-w-xl">
           Enter your 8-character confirmation code to retrieve your appointment status and schedule details. No login or student account required.
         </p>
       </div>
 
       {/* 2. LOOKUP FORM */}
-      <Card variant="default" padding="lg" className="bg-white border border-[#E6E4DD] space-y-4">
+      <Card variant="default" padding="lg" className="space-y-4">
         <form onSubmit={handleCheck} className="space-y-4" noValidate>
           <Input
             id="status-code"
@@ -181,9 +181,9 @@ export default function BookingStatusPage() {
 
       {/* 5. VALID APPOINTMENT FOUND */}
       {status && (
-        <Card variant="default" padding="lg" className="bg-white border border-[#E6E4DD] space-y-5">
+        <Card variant="default" padding="lg" className="space-y-5">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-base sm:text-lg font-bold text-[#19232D]">
+            <h2 className="text-base sm:text-lg font-bold text-[#19232D] dark:text-[#F1F3EF]">
               {STATUS_COPY[status.status].heading}
             </h2>
             <Badge variant={STATUS_VARIANTS[status.status]} size="sm" dot>
@@ -191,43 +191,43 @@ export default function BookingStatusPage() {
             </Badge>
           </div>
 
-          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1] leading-relaxed">
             {STATUS_COPY[status.status].body}
           </p>
 
-          <dl className="space-y-3 text-sm border-t border-slate-100 pt-4">
+          <dl className="space-y-3 text-sm border-t border-slate-100 dark:border-[#283632] pt-4">
             <div className="flex items-start justify-between gap-4">
-              <dt className="text-xs font-medium text-slate-500 shrink-0">Counselor</dt>
-              <dd className="text-sm font-bold text-[#19232D] text-right">
+              <dt className="text-xs font-medium text-slate-500 dark:text-[#73827D] shrink-0">Counselor</dt>
+              <dd className="text-sm font-bold text-[#19232D] dark:text-[#F1F3EF] text-right">
                 {status.counselor_name}
               </dd>
             </div>
-            <div className="flex items-start justify-between gap-4 border-t border-slate-100 pt-3">
-              <dt className="text-xs font-medium text-slate-500 shrink-0">When</dt>
-              <dd className="text-sm font-bold text-[#19232D] text-right">
+            <div className="flex items-start justify-between gap-4 border-t border-slate-100 dark:border-[#283632] pt-3">
+              <dt className="text-xs font-medium text-slate-500 dark:text-[#73827D] shrink-0">When</dt>
+              <dd className="text-sm font-bold text-[#19232D] dark:text-[#F1F3EF] text-right">
                 {formatDateTime(status.starts_at)}
-                <span className="block text-xs font-normal text-slate-500">
+                <span className="block text-xs font-normal text-slate-500 dark:text-[#73827D]">
                   to {formatDateTime(status.ends_at)} (50 min)
                 </span>
               </dd>
             </div>
-            <div className="flex items-start justify-between gap-4 border-t border-slate-100 pt-3">
-              <dt className="text-xs font-medium text-slate-500 shrink-0">
+            <div className="flex items-start justify-between gap-4 border-t border-slate-100 dark:border-[#283632] pt-3">
+              <dt className="text-xs font-medium text-slate-500 dark:text-[#73827D] shrink-0">
                 Confirmation Code
               </dt>
-              <dd className="text-sm font-mono font-bold text-[#0D5C56] text-right select-all">
+              <dd className="text-sm font-mono font-bold text-[#0D5C56] dark:text-[#4FA79D] text-right select-all">
                 {status.confirmation_code}
               </dd>
             </div>
           </dl>
 
-          <div className="pt-2 flex items-center justify-between border-t border-slate-100">
+          <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-[#283632]">
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={handleReset}
-              className="text-xs text-slate-500 hover:text-slate-800"
+              className="text-xs text-slate-500 dark:text-[#AAB6B1] hover:text-slate-800 dark:hover:text-[#F1F3EF]"
             >
               Check another code
             </Button>
@@ -237,8 +237,8 @@ export default function BookingStatusPage() {
 
       {/* 6. REASSURANCE FOR CANCELLED STATUS */}
       {status && status.status === 'CANCELLED' && (
-        <Card variant="default" padding="md" className="bg-[#FAF9F6] border border-[#E6E4DD] space-y-2">
-          <p className="text-xs text-slate-600">
+        <Card variant="default" padding="md" className="space-y-2 bg-[#FAF9F6] dark:bg-[#141C1A] border border-[#E6E4DD] dark:border-[#283632]">
+          <p className="text-xs text-slate-600 dark:text-[#AAB6B1]">
             Would you like to book a new appointment with another available time slot?
           </p>
           <div className="pt-1">

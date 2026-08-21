@@ -145,20 +145,20 @@ export default function ResourcesPage() {
       <div className="space-y-3 max-w-2xl">
         <div className="inline-flex items-center">
           <Badge variant="brand" size="md" dot>
-            Interactive Grounding & Coping Tools
+            Interactive Grounding &amp; Coping Tools
           </Badge>
         </div>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#19232D] tracking-tight">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#19232D] dark:text-[#F1F3EF] tracking-tight">
           Take a moment to pause and reset
         </h1>
-        <p className="text-slate-600 text-xs sm:text-sm sm:leading-relaxed">
+        <p className="text-slate-600 dark:text-[#AAB6B1] text-xs sm:text-sm sm:leading-relaxed">
           Self-guided tools you can use right now to slow down racing thoughts, release study tension, or explore your surroundings.
         </p>
       </div>
 
       {/* 2. NEED-ORIENTED ENTRY SELECTOR */}
       <div className="space-y-2">
-        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+        <p className="text-xs font-bold text-slate-500 dark:text-[#73827D] uppercase tracking-wider">
           What do you need right now?
         </p>
         <div
@@ -173,8 +173,8 @@ export default function ResourcesPage() {
             onClick={() => setActiveNeed('calm')}
             className={`px-3.5 py-2 rounded-full transition-all cursor-pointer focus-accessible whitespace-nowrap touch-target ${
               activeNeed === 'calm'
-                ? 'bg-[#0D5C56] text-white shadow-2xs'
-                : 'bg-white border border-[#E6E4DD] text-slate-600 hover:text-slate-900 hover:border-slate-300'
+                ? 'bg-[#0D5C56] dark:bg-[#4FA79D] text-white dark:text-[#101817] shadow-2xs font-bold'
+                : 'bg-white dark:bg-[#18211F] border border-[#E6E4DD] dark:border-[#283632] text-slate-600 dark:text-[#AAB6B1] hover:text-slate-900 dark:hover:text-[#F1F3EF] hover:border-slate-300 dark:hover:border-slate-500'
             }`}
           >
             Calm my mind
@@ -186,8 +186,8 @@ export default function ResourcesPage() {
             onClick={() => setActiveNeed('ground')}
             className={`px-3.5 py-2 rounded-full transition-all cursor-pointer focus-accessible whitespace-nowrap touch-target ${
               activeNeed === 'ground'
-                ? 'bg-[#0D5C56] text-white shadow-2xs'
-                : 'bg-white border border-[#E6E4DD] text-slate-600 hover:text-slate-900 hover:border-slate-300'
+                ? 'bg-[#0D5C56] dark:bg-[#4FA79D] text-white dark:text-[#101817] shadow-2xs font-bold'
+                : 'bg-white dark:bg-[#18211F] border border-[#E6E4DD] dark:border-[#283632] text-slate-600 dark:text-[#AAB6B1] hover:text-slate-900 dark:hover:text-[#F1F3EF] hover:border-slate-300 dark:hover:border-slate-500'
             }`}
           >
             Ground myself
@@ -199,11 +199,11 @@ export default function ResourcesPage() {
             onClick={() => setActiveNeed('focus')}
             className={`px-3.5 py-2 rounded-full transition-all cursor-pointer focus-accessible whitespace-nowrap touch-target ${
               activeNeed === 'focus'
-                ? 'bg-[#0D5C56] text-white shadow-2xs'
-                : 'bg-white border border-[#E6E4DD] text-slate-600 hover:text-slate-900 hover:border-slate-300'
+                ? 'bg-[#0D5C56] dark:bg-[#4FA79D] text-white dark:text-[#101817] shadow-2xs font-bold'
+                : 'bg-white dark:bg-[#18211F] border border-[#E6E4DD] dark:border-[#283632] text-slate-600 dark:text-[#AAB6B1] hover:text-slate-900 dark:hover:text-[#F1F3EF] hover:border-slate-300 dark:hover:border-slate-500'
             }`}
           >
-            Focus & study reset
+            Focus &amp; study reset
           </button>
           <button
             type="button"
@@ -212,8 +212,8 @@ export default function ResourcesPage() {
             onClick={() => setActiveNeed('explore')}
             className={`px-3.5 py-2 rounded-full transition-all cursor-pointer focus-accessible whitespace-nowrap touch-target ${
               activeNeed === 'explore'
-                ? 'bg-[#0D5C56] text-white shadow-2xs'
-                : 'bg-white border border-[#E6E4DD] text-slate-600 hover:text-slate-900 hover:border-slate-300'
+                ? 'bg-[#0D5C56] dark:bg-[#4FA79D] text-white dark:text-[#101817] shadow-2xs font-bold'
+                : 'bg-white dark:bg-[#18211F] border border-[#E6E4DD] dark:border-[#283632] text-slate-600 dark:text-[#AAB6B1] hover:text-slate-900 dark:hover:text-[#F1F3EF] hover:border-slate-300 dark:hover:border-slate-500'
             }`}
           >
             Explore my surroundings
@@ -225,8 +225,8 @@ export default function ResourcesPage() {
             onClick={() => setActiveNeed('talk')}
             className={`px-3.5 py-2 rounded-full transition-all cursor-pointer focus-accessible whitespace-nowrap touch-target ${
               activeNeed === 'talk'
-                ? 'bg-[#D97706] text-white shadow-2xs'
-                : 'bg-white border border-[#E6E4DD] text-slate-600 hover:text-slate-900 hover:border-slate-300'
+                ? 'bg-[#D97706] dark:bg-[#E7A044] text-white dark:text-[#101817] shadow-2xs font-bold'
+                : 'bg-white dark:bg-[#18211F] border border-[#E6E4DD] dark:border-[#283632] text-slate-600 dark:text-[#AAB6B1] hover:text-slate-900 dark:hover:text-[#F1F3EF] hover:border-slate-300 dark:hover:border-slate-500'
             }`}
           >
             Talk to someone
@@ -241,23 +241,23 @@ export default function ResourcesPage() {
           <Card
             variant="elevated"
             padding="lg"
-            className="bg-white border border-[#0D5C56]/20 shadow-[0_4px_20px_rgba(25,35,45,0.05)] rounded-2xl space-y-6"
+            className="space-y-6"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E6E4DD] pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E6E4DD] dark:border-[#283632] pb-4">
               <div className="space-y-1">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#0D5C56]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#0D5C56] dark:text-[#4FA79D]">
                   Guided Pacing &bull; 4-4-4-4 Method
                 </span>
-                <h2 className="text-xl font-bold text-[#19232D]">
+                <h2 className="text-xl font-bold text-[#19232D] dark:text-[#F1F3EF]">
                   Box Breathing Exercise
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-600 max-w-lg leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1] max-w-lg leading-relaxed">
                   A simple rhythmic breathing exercise. Follow the visual cue to inhale, hold, exhale, and pause for 4 seconds each.
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <span className="text-xs font-medium text-slate-500 block">Completed Cycles</span>
-                <span className="text-xl font-bold text-[#0D5C56] font-mono">{breathingCycleCount}</span>
+                <span className="text-xs font-medium text-slate-500 dark:text-[#73827D] block">Completed Cycles</span>
+                <span className="text-xl font-bold text-[#0D5C56] dark:text-[#4FA79D] font-mono">{breathingCycleCount}</span>
               </div>
             </div>
 
@@ -267,22 +267,22 @@ export default function ResourcesPage() {
                 className={`relative w-40 h-40 rounded-3xl flex flex-col items-center justify-center text-center select-none transition-all duration-700 ease-out border ${
                   breathingActive
                     ? breathingPhase === 'Inhale'
-                      ? 'scale-110 bg-[#F0FDFA] border-[#0D5C56] shadow-md'
+                      ? 'scale-110 bg-[#F0FDFA] dark:bg-[#142725] border-[#0D5C56] dark:border-[#4FA79D] shadow-md'
                       : breathingPhase === 'Hold'
-                      ? 'scale-110 bg-[#FAF9F6] border-[#0D5C56]/60 shadow-md'
+                      ? 'scale-110 bg-[#FAF9F6] dark:bg-[#1A2724] border-[#0D5C56]/60 dark:border-[#4FA79D]/60 shadow-md'
                       : breathingPhase === 'Exhale'
-                      ? 'scale-90 bg-stone-50 border-slate-300'
-                      : 'scale-90 bg-[#FAF9F6] border-slate-200'
-                    : 'bg-[#FAF9F6] border-[#E6E4DD]'
+                      ? 'scale-90 bg-stone-50 dark:bg-[#141C1A] border-slate-300 dark:border-slate-600'
+                      : 'scale-90 bg-[#FAF9F6] dark:bg-[#141C1A] border-slate-200 dark:border-slate-700'
+                    : 'bg-[#FAF9F6] dark:bg-[#141C1A] border-[#E6E4DD] dark:border-[#283632]'
                 }`}
               >
-                <span className="text-xs font-bold uppercase tracking-wider text-[#0D5C56]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#0D5C56] dark:text-[#4FA79D]">
                   {breathingActive ? breathingPhase : 'Ready'}
                 </span>
-                <span className="text-3xl font-extrabold text-[#0D5C56] font-mono mt-1">
+                <span className="text-3xl font-extrabold text-[#0D5C56] dark:text-[#4FA79D] font-mono mt-1">
                   {breathingActive ? `${breathingTimer}s` : '4s'}
                 </span>
-                <span className="text-[10px] text-slate-400 mt-1 font-medium">
+                <span className="text-[10px] text-slate-400 dark:text-[#73827D] mt-1 font-medium">
                   {breathingActive
                     ? breathingPhase === 'Inhale'
                       ? 'Breathe in slowly'
@@ -330,17 +330,17 @@ export default function ResourcesPage() {
           <Card
             variant="elevated"
             padding="lg"
-            className="bg-white border border-[#E6E4DD] shadow-2xs rounded-2xl space-y-6"
+            className="space-y-6"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E6E4DD] pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E6E4DD] dark:border-[#283632] pb-4">
               <div className="space-y-1">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#0D5C56]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#0D5C56] dark:text-[#4FA79D]">
                   Interactive Grounding &bull; 5-Step Scan
                 </span>
-                <h2 className="text-xl font-bold text-[#19232D]">
+                <h2 className="text-xl font-bold text-[#19232D] dark:text-[#F1F3EF]">
                   5-4-3-2-1 Sensory Grounding
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-lg">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1] leading-relaxed max-w-lg">
                   Anchor your attention in the physical present. Step through each of the five senses at your own pace.
                 </p>
               </div>
@@ -350,34 +350,34 @@ export default function ResourcesPage() {
             </div>
 
             {/* Current Step Canvas */}
-            <div className="p-5 sm:p-6 bg-[#FAF9F6] rounded-2xl border border-[#E6E4DD] space-y-4">
+            <div className="p-5 sm:p-6 bg-[#FAF9F6] dark:bg-[#141C1A] rounded-2xl border border-[#E6E4DD] dark:border-[#283632] space-y-4">
               <div className="flex items-center gap-3">
-                <span className="w-9 h-9 rounded-full bg-[#0D5C56] text-white font-bold flex items-center justify-center text-sm font-mono shrink-0">
+                <span className="w-9 h-9 rounded-full bg-[#0D5C56] dark:bg-[#4FA79D] text-white dark:text-[#101817] font-bold flex items-center justify-center text-sm font-mono shrink-0">
                   {groundingSteps[groundingStep].count}
                 </span>
                 <div>
-                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-slate-400 dark:text-[#73827D] uppercase tracking-wider">
                     {groundingSteps[groundingStep].sense}
                   </span>
-                  <h3 className="text-base sm:text-lg font-bold text-[#19232D]">
+                  <h3 className="text-base sm:text-lg font-bold text-[#19232D] dark:text-[#F1F3EF]">
                     {groundingSteps[groundingStep].title}
                   </h3>
                 </div>
               </div>
 
-              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed pl-12">
+              <p className="text-xs sm:text-sm text-slate-700 dark:text-[#F1F3EF] leading-relaxed pl-12">
                 {groundingSteps[groundingStep].prompt}
               </p>
 
               <div className="pl-12 pt-2 space-y-1.5">
-                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <p className="text-[11px] font-bold text-slate-500 dark:text-[#AAB6B1] uppercase tracking-wider">
                   Examples you might notice:
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {groundingSteps[groundingStep].hints.map((hint) => (
                     <span
                       key={hint}
-                      className="px-2.5 py-1 bg-white rounded-lg border border-[#E6E4DD] text-xs text-slate-600"
+                      className="px-2.5 py-1 bg-white dark:bg-[#18211F] rounded-lg border border-[#E6E4DD] dark:border-[#283632] text-xs text-slate-600 dark:text-[#AAB6B1]"
                     >
                       {hint}
                     </span>
@@ -416,7 +416,7 @@ export default function ResourcesPage() {
                   size="sm"
                   onClick={() => setGroundingStep(0)}
                 >
-                  Complete & Restart
+                  Complete &amp; Restart
                 </Button>
               )}
             </div>
@@ -428,17 +428,17 @@ export default function ResourcesPage() {
           <Card
             variant="elevated"
             padding="lg"
-            className="bg-white border border-[#E6E4DD] shadow-2xs rounded-2xl space-y-6"
+            className="space-y-6"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E6E4DD] pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E6E4DD] dark:border-[#283632] pb-4">
               <div className="space-y-1">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#0D5C56]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#0D5C56] dark:text-[#4FA79D]">
                   Academic Pacing &bull; 2-Minute Reset
                 </span>
-                <h2 className="text-xl font-bold text-[#19232D]">
-                  Study Pause & Deliberate Rest
+                <h2 className="text-xl font-bold text-[#19232D] dark:text-[#F1F3EF]">
+                  Study Pause &amp; Deliberate Rest
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-lg">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1] leading-relaxed max-w-lg">
                   Before diving back into studying, check off each step to release physical tension and reset your cognitive focus.
                 </p>
               </div>
@@ -458,15 +458,15 @@ export default function ResourcesPage() {
                     onClick={() => toggleStudyCheck(idx)}
                     className={`w-full p-4 rounded-xl border text-left transition-all flex items-start gap-3 cursor-pointer focus-accessible select-none ${
                       isChecked
-                        ? 'bg-[#F0FDFA] border-[#0D5C56]/30 text-[#0D5C56]'
-                        : 'bg-white border-[#E6E4DD] hover:bg-[#FAF9F6] text-slate-700'
+                        ? 'bg-[#F0FDFA] dark:bg-[#142725] border-[#0D5C56]/30 dark:border-[#4FA79D]/40 text-[#0D5C56] dark:text-[#4FA79D]'
+                        : 'bg-white dark:bg-[#18211F] border-[#E6E4DD] dark:border-[#283632] hover:bg-[#FAF9F6] dark:hover:bg-[#202B28] text-slate-700 dark:text-[#F1F3EF]'
                     }`}
                   >
                     <span
                       className={`w-5 h-5 rounded-md border flex items-center justify-center text-xs shrink-0 mt-0.5 transition-colors ${
                         isChecked
-                          ? 'border-[#0D5C56] bg-[#0D5C56] text-white'
-                          : 'border-slate-300 bg-white'
+                          ? 'border-[#0D5C56] dark:border-[#4FA79D] bg-[#0D5C56] dark:bg-[#4FA79D] text-white dark:text-[#101817]'
+                          : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-[#18211F]'
                       }`}
                     >
                       {isChecked && (
@@ -476,10 +476,10 @@ export default function ResourcesPage() {
                       )}
                     </span>
                     <div className="space-y-0.5">
-                      <p className={`text-xs sm:text-sm font-bold ${isChecked ? 'line-through text-slate-500' : 'text-[#19232D]'}`}>
+                      <p className={`text-xs sm:text-sm font-bold ${isChecked ? 'line-through text-slate-500 dark:text-[#73827D]' : 'text-[#19232D] dark:text-[#F1F3EF]'}`}>
                         {item.title}
                       </p>
-                      <p className="text-xs text-slate-500 leading-relaxed">
+                      <p className="text-xs text-slate-500 dark:text-[#AAB6B1] leading-relaxed">
                         {item.desc}
                       </p>
                     </div>
@@ -489,7 +489,7 @@ export default function ResourcesPage() {
             </div>
 
             <div className="pt-2 flex items-center justify-between">
-              <span className="text-xs text-slate-500 font-medium">
+              <span className="text-xs text-slate-500 dark:text-[#AAB6B1] font-medium">
                 {studyChecks.every(Boolean) ? 'All steps complete. Ready for focused work!' : 'Tap each step to check it off.'}
               </span>
               <Button
@@ -509,17 +509,17 @@ export default function ResourcesPage() {
           <Card
             variant="elevated"
             padding="lg"
-            className="bg-white border border-[#E6E4DD] shadow-2xs rounded-2xl space-y-6"
+            className="space-y-6"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E6E4DD] pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E6E4DD] dark:border-[#283632] pb-4">
               <div className="space-y-1">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#0D5C56]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#0D5C56] dark:text-[#4FA79D]">
                   Sensory Attention &bull; 60–90 Seconds
                 </span>
-                <h2 className="text-xl font-bold text-[#19232D]">
+                <h2 className="text-xl font-bold text-[#19232D] dark:text-[#F1F3EF]">
                   Grounding Hunt
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-lg">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1] leading-relaxed max-w-lg">
                   A short sensory attention activity to reconnect with your immediate physical surroundings.
                 </p>
               </div>
@@ -530,20 +530,20 @@ export default function ResourcesPage() {
 
             {/* Step Content / Completion */}
             {huntStep < huntSteps.length ? (
-              <div className="p-6 sm:p-8 bg-[#FAF9F6] rounded-2xl border border-[#E6E4DD] space-y-6 text-center sm:text-left">
+              <div className="p-6 sm:p-8 bg-[#FAF9F6] dark:bg-[#141C1A] rounded-2xl border border-[#E6E4DD] dark:border-[#283632] space-y-6 text-center sm:text-left">
                 <div className="space-y-2">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  <span className="text-xs font-bold text-slate-400 dark:text-[#73827D] uppercase tracking-widest">
                     Prompt {huntStep + 1} of {huntSteps.length}
                   </span>
-                  <h3 className="text-xl sm:text-2xl font-bold text-[#19232D] leading-snug">
+                  <h3 className="text-xl sm:text-2xl font-bold text-[#19232D] dark:text-[#F1F3EF] leading-snug">
                     {huntSteps[huntStep].title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed pt-1">
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1] leading-relaxed pt-1">
                     {huntSteps[huntStep].supporting}
                   </p>
                 </div>
 
-                <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-200/80">
+                <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-200/80 dark:border-[#283632]">
                   <Button
                     type="button"
                     variant="ghost"
@@ -568,12 +568,12 @@ export default function ResourcesPage() {
                 </div>
               </div>
             ) : (
-              <div className="p-8 bg-[#F0FDFA] rounded-2xl border border-[#CCFBF1] text-center space-y-4">
+              <div className="p-8 bg-[#F0FDFA] dark:bg-[#142725] rounded-2xl border border-[#CCFBF1] dark:border-[#28534E] text-center space-y-4">
                 <div className="space-y-1.5 max-w-md mx-auto">
-                  <h3 className="text-xl font-bold text-[#0D5C56]">
+                  <h3 className="text-xl font-bold text-[#0D5C56] dark:text-[#4FA79D]">
                     You made it through.
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1] leading-relaxed">
                     Take a moment before moving on.
                   </p>
                 </div>
@@ -595,21 +595,21 @@ export default function ResourcesPage() {
       </div>
 
       {/* 4. LOWER SUPPORT PATHWAYS (Distinct, Accessible, Clean) */}
-      <div className="space-y-8 pt-4 border-t border-[#E6E4DD]">
+      <div className="space-y-8 pt-4 border-t border-[#E6E4DD] dark:border-[#283632]">
         {/* 24/7 HELPLINES DIRECTORY */}
         <section aria-labelledby="helplines-heading" className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E6E4DD] pb-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E6E4DD] dark:border-[#283632] pb-2">
             <div>
-              <h2 id="helplines-heading" className="text-lg font-bold text-[#19232D]">
+              <h2 id="helplines-heading" className="text-lg font-bold text-[#19232D] dark:text-[#F1F3EF]">
                 Immediate 24/7 Helplines
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-[#AAB6B1]">
                 Toll-free, confidential national support lines available anytime across India.
               </p>
             </div>
             <Link
               href="/support-now"
-              className="text-xs font-bold text-[#D97706] hover:text-[#B45309] underline focus-accessible shrink-0"
+              className="text-xs font-bold text-[#D97706] dark:text-[#E7A044] hover:text-[#B45309] dark:hover:text-[#F0B260] underline focus-accessible shrink-0"
             >
               Full Emergency Screen &rarr;
             </Link>
@@ -620,15 +620,15 @@ export default function ResourcesPage() {
             <Card
               variant="default"
               padding="md"
-              className="space-y-3 bg-white border border-[#E6E4DD] shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between"
+              className="space-y-3 flex flex-col justify-between"
             >
               <div className="space-y-1.5">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h3 className="font-bold text-sm sm:text-base text-[#19232D]">
+                    <h3 className="font-bold text-sm sm:text-base text-[#19232D] dark:text-[#F1F3EF]">
                       Tele-MANAS
                     </h3>
-                    <p className="text-[11px] text-slate-500 font-medium">
+                    <p className="text-[11px] text-slate-500 dark:text-[#73827D] font-medium">
                       Government of India National Tele-Mental Health Programme
                     </p>
                   </div>
@@ -636,18 +636,18 @@ export default function ResourcesPage() {
                     24/7 Toll-free
                   </Badge>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed pt-1">
+                <p className="text-xs text-slate-600 dark:text-[#AAB6B1] leading-relaxed pt-1">
                   Free, confidential 24/7 tele-counseling available in English, Hindi, and regional Indian languages.
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                <span className="font-mono font-bold text-sm text-[#19232D]">
+              <div className="pt-2 border-t border-slate-100 dark:border-[#283632] flex items-center justify-between">
+                <span className="font-mono font-bold text-sm text-[#19232D] dark:text-[#F1F3EF]">
                   14416
                 </span>
                 <a
                   href="tel:14416"
-                  className="inline-flex items-center gap-1 text-xs font-bold text-[#0D5C56] hover:text-[#115E59] focus-accessible p-1 rounded-md"
+                  className="inline-flex items-center gap-1 text-xs font-bold text-[#0D5C56] dark:text-[#4FA79D] hover:text-[#115E59] dark:hover:text-[#61B8AE] focus-accessible p-1 rounded-md"
                 >
                   <span>Call Now</span>
                   <span aria-hidden="true">&rarr;</span>
@@ -659,34 +659,34 @@ export default function ResourcesPage() {
             <Card
               variant="default"
               padding="md"
-              className="space-y-3 bg-white border border-[#E6E4DD] shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between"
+              className="space-y-3 flex flex-col justify-between"
             >
               <div className="space-y-1.5">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h3 className="font-bold text-sm sm:text-base text-[#19232D]">
+                    <h3 className="font-bold text-sm sm:text-base text-[#19232D] dark:text-[#F1F3EF]">
                       KIRAN Helpline
                     </h3>
-                    <p className="text-[11px] text-slate-500 font-medium">
-                      Ministry of Social Justice & Empowerment
+                    <p className="text-[11px] text-slate-500 dark:text-[#73827D] font-medium">
+                      Ministry of Social Justice &amp; Empowerment
                     </p>
                   </div>
                   <Badge variant="neutral" size="sm">
                     24/7 Toll-free
                   </Badge>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed pt-1">
+                <p className="text-xs text-slate-600 dark:text-[#AAB6B1] leading-relaxed pt-1">
                   24/7 national psychological support helpline for anxiety, distress, panic, and emotional crisis.
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                <span className="font-mono font-bold text-sm text-[#19232D]">
+              <div className="pt-2 border-t border-slate-100 dark:border-[#283632] flex items-center justify-between">
+                <span className="font-mono font-bold text-sm text-[#19232D] dark:text-[#F1F3EF]">
                   1800-599-0019
                 </span>
                 <a
                   href="tel:18005990019"
-                  className="inline-flex items-center gap-1 text-xs font-bold text-[#0D5C56] hover:text-[#115E59] focus-accessible p-1 rounded-md"
+                  className="inline-flex items-center gap-1 text-xs font-bold text-[#0D5C56] dark:text-[#4FA79D] hover:text-[#115E59] dark:hover:text-[#61B8AE] focus-accessible p-1 rounded-md"
                 >
                   <span>Call Now</span>
                   <span aria-hidden="true">&rarr;</span>
@@ -698,15 +698,15 @@ export default function ResourcesPage() {
             <Card
               variant="default"
               padding="md"
-              className="space-y-3 bg-white border border-[#E6E4DD] shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between"
+              className="space-y-3 flex flex-col justify-between"
             >
               <div className="space-y-1.5">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h3 className="font-bold text-sm sm:text-base text-[#19232D]">
+                    <h3 className="font-bold text-sm sm:text-base text-[#19232D] dark:text-[#F1F3EF]">
                       AASRA Suicide Prevention
                     </h3>
-                    <p className="text-[11px] text-slate-500 font-medium">
+                    <p className="text-[11px] text-slate-500 dark:text-[#73827D] font-medium">
                       AASRA Crisis Intervention Centre
                     </p>
                   </div>
@@ -714,18 +714,18 @@ export default function ResourcesPage() {
                     24/7 Helpline
                   </Badge>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed pt-1">
+                <p className="text-xs text-slate-600 dark:text-[#AAB6B1] leading-relaxed pt-1">
                   24/7 non-judgmental, confidential emotional listening and suicide prevention intervention.
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                <span className="font-mono font-bold text-sm text-[#19232D]">
+              <div className="pt-2 border-t border-slate-100 dark:border-[#283632] flex items-center justify-between">
+                <span className="font-mono font-bold text-sm text-[#19232D] dark:text-[#F1F3EF]">
                   +91-98204-66726
                 </span>
                 <a
                   href="tel:+919820466726"
-                  className="inline-flex items-center gap-1 text-xs font-bold text-[#0D5C56] hover:text-[#115E59] focus-accessible p-1 rounded-md"
+                  className="inline-flex items-center gap-1 text-xs font-bold text-[#0D5C56] dark:text-[#4FA79D] hover:text-[#115E59] dark:hover:text-[#61B8AE] focus-accessible p-1 rounded-md"
                 >
                   <span>Call Now</span>
                   <span aria-hidden="true">&rarr;</span>
@@ -737,15 +737,15 @@ export default function ResourcesPage() {
             <Card
               variant="default"
               padding="md"
-              className="space-y-3 bg-white border border-[#E6E4DD] shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between"
+              className="space-y-3 flex flex-col justify-between"
             >
               <div className="space-y-1.5">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h3 className="font-bold text-sm sm:text-base text-[#19232D]">
+                    <h3 className="font-bold text-sm sm:text-base text-[#19232D] dark:text-[#F1F3EF]">
                       Vandrevala Foundation
                     </h3>
-                    <p className="text-[11px] text-slate-500 font-medium">
+                    <p className="text-[11px] text-slate-500 dark:text-[#73827D] font-medium">
                       Mental Health Support Initiative
                     </p>
                   </div>
@@ -753,18 +753,18 @@ export default function ResourcesPage() {
                     24/7 Professional
                   </Badge>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed pt-1">
+                <p className="text-xs text-slate-600 dark:text-[#AAB6B1] leading-relaxed pt-1">
                   Free professional psychological counseling by trained mental health professionals.
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                <span className="font-mono font-bold text-sm text-[#19232D]">
+              <div className="pt-2 border-t border-slate-100 dark:border-[#283632] flex items-center justify-between">
+                <span className="font-mono font-bold text-sm text-[#19232D] dark:text-[#F1F3EF]">
                   1860-2662-345
                 </span>
                 <a
                   href="tel:18602662345"
-                  className="inline-flex items-center gap-1 text-xs font-bold text-[#0D5C56] hover:text-[#115E59] focus-accessible p-1 rounded-md"
+                  className="inline-flex items-center gap-1 text-xs font-bold text-[#0D5C56] dark:text-[#4FA79D] hover:text-[#115E59] dark:hover:text-[#61B8AE] focus-accessible p-1 rounded-md"
                 >
                   <span>Call Now</span>
                   <span aria-hidden="true">&rarr;</span>
@@ -778,28 +778,28 @@ export default function ResourcesPage() {
         <Card
           variant="interactive"
           padding="lg"
-          className="bg-white border-t-3 border-t-[#0D5C56] space-y-4"
+          className="border-t-3 border-t-[#0D5C56] dark:border-t-[#4FA79D] space-y-4"
         >
           <div className="space-y-1.5">
-            <h2 className="text-lg font-bold text-[#19232D]">
-              Campus Counseling & 1-on-1 Support
+            <h2 className="text-lg font-bold text-[#19232D] dark:text-[#F1F3EF]">
+              Campus Counseling &amp; 1-on-1 Support
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1] leading-relaxed max-w-2xl">
               Campus counseling provides dedicated, private one-on-one guidance to help you navigate academic stress, burnout, and personal challenges during your studies.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-700 pt-1">
-            <div className="p-3 bg-[#FAF9F6] rounded-xl border border-[#E6E4DD]">
-              <span className="font-bold text-[#0D5C56] block mb-0.5">Private Guidance</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-700 dark:text-[#AAB6B1] pt-1">
+            <div className="p-3 bg-[#FAF9F6] dark:bg-[#141C1A] rounded-xl border border-[#E6E4DD] dark:border-[#283632]">
+              <span className="font-bold text-[#0D5C56] dark:text-[#4FA79D] block mb-0.5">Private Guidance</span>
               A dedicated space to speak with campus professionals.
             </div>
-            <div className="p-3 bg-[#FAF9F6] rounded-xl border border-[#E6E4DD]">
-              <span className="font-bold text-[#0D5C56] block mb-0.5">Collaborative Goals</span>
+            <div className="p-3 bg-[#FAF9F6] dark:bg-[#141C1A] rounded-xl border border-[#E6E4DD] dark:border-[#283632]">
+              <span className="font-bold text-[#0D5C56] dark:text-[#4FA79D] block mb-0.5">Collaborative Goals</span>
               Work together on actionable coping strategies.
             </div>
-            <div className="p-3 bg-[#FAF9F6] rounded-xl border border-[#E6E4DD]">
-              <span className="font-bold text-[#0D5C56] block mb-0.5">Student-Centered</span>
+            <div className="p-3 bg-[#FAF9F6] dark:bg-[#141C1A] rounded-xl border border-[#E6E4DD] dark:border-[#283632]">
+              <span className="font-bold text-[#0D5C56] dark:text-[#4FA79D] block mb-0.5">Student-Centered</span>
               No concern is too small or insignificant to bring.
             </div>
           </div>
@@ -807,13 +807,13 @@ export default function ResourcesPage() {
           <div className="pt-2 flex flex-wrap items-center gap-3">
             <Link href="/booking">
               <Button variant="brand" size="md">
-                <span>Meet Counseling Team & View Open Times</span>
+                <span>Meet Counseling Team &amp; View Open Times</span>
                 <span aria-hidden="true">&rarr;</span>
               </Button>
             </Link>
             <Link
               href="/booking/status"
-              className="text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors p-2"
+              className="text-xs font-semibold text-slate-500 dark:text-[#AAB6B1] hover:text-slate-800 dark:hover:text-[#F1F3EF] transition-colors p-2"
             >
               Already booked? Check Appointment Status &rarr;
             </Link>

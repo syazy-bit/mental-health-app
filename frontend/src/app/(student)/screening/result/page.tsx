@@ -30,8 +30,8 @@ export default function ScreeningResultPage() {
   if (!screening) {
     return (
       <div className="max-w-xl mx-auto py-12 text-center space-y-4">
-        <h1 className="text-xl font-bold text-[#19232D]">No recent check-in found</h1>
-        <p className="text-xs sm:text-sm text-slate-500">
+        <h1 className="text-xl font-bold text-[#19232D] dark:text-[#F1F3EF]">No recent check-in found</h1>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-[#AAB6B1]">
           Complete a PHQ-9 or GAD-7 check-in to see your score and self-care recommendations.
         </p>
         <Link href="/screening">
@@ -135,7 +135,7 @@ export default function ScreeningResultPage() {
       <div className="flex items-center justify-between">
         <Link
           href="/screening"
-          className="text-xs font-semibold text-slate-500 hover:text-[#0D5C56] focus-accessible p-1 -ml-1 transition-colors"
+          className="text-xs font-semibold text-slate-500 dark:text-[#AAB6B1] hover:text-[#0D5C56] dark:hover:text-[#4FA79D] focus-accessible p-1 -ml-1 transition-colors"
         >
           &larr; Take Another Check-in
         </Link>
@@ -145,31 +145,31 @@ export default function ScreeningResultPage() {
       </div>
 
       {/* 2. MAIN RESULT CARD */}
-      <Card variant="elevated" padding="lg" className="space-y-6 bg-white border border-[#E6E4DD]">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E6E4DD]">
+      <Card variant="elevated" padding="lg" className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E6E4DD] dark:border-[#283632]">
           <div className="space-y-1">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-slate-400 dark:text-[#73827D] uppercase tracking-wider">
               {isPHQ9 ? 'PHQ-9 Mood Check-in' : 'GAD-7 Anxiety Check-in'}
             </span>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#19232D]">
-              Result: <span className="text-[#0D5C56]">{screening.severity}</span>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#19232D] dark:text-[#F1F3EF]">
+              Result: <span className="text-[#0D5C56] dark:text-[#4FA79D]">{screening.severity}</span>
             </h1>
           </div>
-          <div className="flex items-baseline gap-1.5 bg-[#F0FDFA] px-4 py-3 rounded-2xl border border-[#CCFBF1] text-center sm:text-right shrink-0">
-            <span className="text-xs font-semibold text-slate-500">Total Score:</span>
-            <span className="text-2xl font-extrabold text-[#0D5C56]">{screening.total_score}</span>
-            <span className="text-xs font-medium text-slate-400">/ {maxScore}</span>
+          <div className="flex items-baseline gap-1.5 bg-[#F0FDFA] dark:bg-[#142725] px-4 py-3 rounded-2xl border border-[#CCFBF1] dark:border-[#28534E] text-center sm:text-right shrink-0">
+            <span className="text-xs font-semibold text-slate-500 dark:text-[#AAB6B1]">Total Score:</span>
+            <span className="text-2xl font-extrabold text-[#0D5C56] dark:text-[#4FA79D]">{screening.total_score}</span>
+            <span className="text-xs font-medium text-slate-400 dark:text-[#73827D]">/ {maxScore}</span>
           </div>
         </div>
 
         {/* 3. VISUAL SYMPTOM SPECTRUM */}
         <div className="space-y-2.5">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-[#AAB6B1]">
             <span>Symptom Intensity Spectrum</span>
-            <span className="text-[#0D5C56] font-bold">Your band: {screening.severity}</span>
+            <span className="text-[#0D5C56] dark:text-[#4FA79D] font-bold">Your band: {screening.severity}</span>
           </div>
 
-          <div className="grid grid-cols-4 gap-1.5 p-1.5 rounded-xl bg-[#FAF9F6] border border-[#E6E4DD]">
+          <div className="grid grid-cols-4 gap-1.5 p-1.5 rounded-xl bg-[#FAF9F6] dark:bg-[#141C1A] border border-[#E6E4DD] dark:border-[#283632]">
             {spectrumBands.map((band, idx) => {
               const isCurrent = activeTier === idx;
 
@@ -178,18 +178,18 @@ export default function ScreeningResultPage() {
                   key={band.label}
                   className={`p-2.5 rounded-lg text-center transition-all ${
                     isCurrent
-                      ? 'bg-white border border-[#0D5C56] shadow-xs ring-1 ring-[#0D5C56]/20'
+                      ? 'bg-white dark:bg-[#202B28] border border-[#0D5C56] dark:border-[#4FA79D] shadow-xs ring-1 ring-[#0D5C56]/20 dark:ring-[#4FA79D]/20'
                       : 'opacity-50'
                   }`}
                 >
                   <p
                     className={`text-xs font-bold ${
-                      isCurrent ? 'text-[#0D5C56]' : 'text-slate-600'
+                      isCurrent ? 'text-[#0D5C56] dark:text-[#4FA79D]' : 'text-slate-600 dark:text-[#AAB6B1]'
                     }`}
                   >
                     {band.label}
                   </p>
-                  <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                  <p className="text-[10px] text-slate-400 dark:text-[#73827D] font-mono mt-0.5">
                     {band.range}
                   </p>
                 </div>
@@ -200,17 +200,17 @@ export default function ScreeningResultPage() {
 
         {/* 4. PLAIN-LANGUAGE EXPLANATION */}
         <div className="space-y-1.5">
-          <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+          <h2 className="text-xs font-bold text-slate-500 dark:text-[#AAB6B1] uppercase tracking-wider">
             What this score reflects
           </h2>
-          <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-700 dark:text-[#F1F3EF] leading-relaxed">
             {getSeverityDescription(screening.severity)}
           </p>
         </div>
 
         {/* 5. MEDICAL DISCLAIMER */}
-        <div className="p-3.5 bg-[#FAF9F6] rounded-xl border border-[#E6E4DD] text-xs text-slate-500 space-y-1">
-          <p className="font-bold text-slate-700">Non-Diagnostic Self-Reflection:</p>
+        <div className="p-3.5 bg-[#FAF9F6] dark:bg-[#141C1A] rounded-xl border border-[#E6E4DD] dark:border-[#283632] text-xs text-slate-500 dark:text-[#AAB6B1] space-y-1">
+          <p className="font-bold text-slate-700 dark:text-[#F1F3EF]">Non-Diagnostic Self-Reflection:</p>
           <p className="leading-relaxed">
             This score indicates symptom frequency over the past 14 days and is <strong>not a clinical or psychiatric diagnosis</strong>. Emotional states fluctuate naturally with exam deadlines, sleep patterns, and campus life.
           </p>
@@ -219,26 +219,26 @@ export default function ScreeningResultPage() {
 
       {/* 6. ITEM-9 SAFETY FOLLOW-UP CARD (WARM AMBER, SUPPORTIVE) */}
       {hasSafetyFlag && (
-        <Card variant="crisis" padding="lg" className="space-y-4 border border-[#FDE68A]">
+        <Card variant="crisis" padding="lg" className="space-y-4">
           <div className="space-y-1.5">
-            <h2 className="text-base font-bold text-[#92400E]">
-              Safety & Well-being Check-in
+            <h2 className="text-base font-bold text-[#92400E] dark:text-[#FDE68A]">
+              Safety &amp; Well-being Check-in
             </h2>
-            <p className="text-xs sm:text-sm text-[#78350F] leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#78350F] dark:text-[#FDE68A] leading-relaxed">
               Your check-in indicated thoughts regarding self-harm or ending your life. You do not have to navigate this alone. Free, confidential support is available right now.
             </p>
           </div>
 
           {followupStatus ? (
-            <div className="p-4 bg-white/90 rounded-xl border border-[#FDE68A] text-xs text-[#78350F] space-y-2">
+            <div className="p-4 bg-white/90 dark:bg-[#18211F] rounded-xl border border-[#FDE68A] dark:border-[#5E421E] text-xs text-[#78350F] dark:text-[#FDE68A] space-y-2">
               <p className="font-semibold">{followupStatus}</p>
               <p>
-                Tele-MANAS free 24/7 national helpline is always reachable at <a href="tel:14416" className="font-bold underline text-[#B45309]">14416</a>.
+                Tele-MANAS free 24/7 national helpline is always reachable at <a href="tel:14416" className="font-bold underline text-[#B45309] dark:text-[#E7A044]">14416</a>.
               </p>
             </div>
           ) : (
             <div className="space-y-3 pt-1">
-              <p className="text-xs font-semibold text-[#92400E]">
+              <p className="text-xs font-semibold text-[#92400E] dark:text-[#FDE68A]">
                 How would you like to proceed?
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
@@ -259,9 +259,9 @@ export default function ScreeningResultPage() {
                   size="md"
                   onClick={handleSupportiveCare}
                   disabled={isFollowupLoading}
-                  className="sm:w-1/2 bg-white text-slate-700"
+                  className="sm:w-1/2"
                 >
-                  I prefer supportive resources & self-care
+                  I prefer supportive resources &amp; self-care
                 </Button>
               </div>
             </div>
@@ -271,17 +271,17 @@ export default function ScreeningResultPage() {
 
       {/* 7. RECOMMENDED NEXT STEPS */}
       <section aria-labelledby="next-steps-heading" className="space-y-3 pt-2">
-        <h2 id="next-steps-heading" className="text-sm font-bold text-[#19232D] uppercase tracking-wider">
+        <h2 id="next-steps-heading" className="text-sm font-bold text-[#19232D] dark:text-[#F1F3EF] uppercase tracking-wider">
           Recommended Next Steps
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Card variant="interactive" padding="md">
             <Link href="/chat" className="block space-y-1.5 focus-accessible">
-              <h3 className="font-bold text-[#19232D] text-sm">Talk &amp; Reflect</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <h3 className="font-bold text-[#19232D] dark:text-[#F1F3EF] text-sm">Talk &amp; Reflect</h3>
+              <p className="text-xs text-slate-600 dark:text-[#AAB6B1] leading-relaxed">
                 Decompress and explore tailored stress-reduction exercises.
               </p>
-              <span className="text-xs font-semibold text-[#0D5C56] inline-flex items-center pt-1">
+              <span className="text-xs font-semibold text-[#0D5C56] dark:text-[#4FA79D] inline-flex items-center pt-1">
                 Start a conversation &rarr;
               </span>
             </Link>
@@ -289,11 +289,11 @@ export default function ScreeningResultPage() {
 
           <Card variant="interactive" padding="md">
             <Link href="/booking" className="block space-y-1.5 focus-accessible">
-              <h3 className="font-bold text-[#19232D] text-sm">University Counseling</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <h3 className="font-bold text-[#19232D] dark:text-[#F1F3EF] text-sm">University Counseling</h3>
+              <p className="text-xs text-slate-600 dark:text-[#AAB6B1] leading-relaxed">
                 Schedule a confidential 1-on-1 session with a campus counselor.
               </p>
-              <span className="text-xs font-semibold text-[#0D5C56] inline-flex items-center pt-1">
+              <span className="text-xs font-semibold text-[#0D5C56] dark:text-[#4FA79D] inline-flex items-center pt-1">
                 View Counselors &rarr;
               </span>
             </Link>
@@ -301,11 +301,11 @@ export default function ScreeningResultPage() {
 
           <Card variant="interactive" padding="md">
             <Link href="/resources" className="block space-y-1.5 focus-accessible">
-              <h3 className="font-bold text-[#19232D] text-sm">Self-Care Tools</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <h3 className="font-bold text-[#19232D] dark:text-[#F1F3EF] text-sm">Self-Care Tools</h3>
+              <p className="text-xs text-slate-600 dark:text-[#AAB6B1] leading-relaxed">
                 Discover somatic breathing exercises and sleep hygiene guides.
               </p>
-              <span className="text-xs font-semibold text-[#0D5C56] inline-flex items-center pt-1">
+              <span className="text-xs font-semibold text-[#0D5C56] dark:text-[#4FA79D] inline-flex items-center pt-1">
                 View Resources &rarr;
               </span>
             </Link>

@@ -93,7 +93,7 @@ function BookingSlotsContent() {
       <div className="flex items-center justify-between">
         <Link
           href="/booking"
-          className="text-xs font-semibold text-slate-500 hover:text-[#0D5C56] focus-accessible p-1 -ml-1 transition-colors"
+          className="text-xs font-semibold text-slate-500 dark:text-[#AAB6B1] hover:text-[#0D5C56] dark:hover:text-[#4FA79D] focus-accessible p-1 -ml-1 transition-colors"
         >
           &larr; Back to counseling team
         </Link>
@@ -104,25 +104,25 @@ function BookingSlotsContent() {
 
       {/* 2. HEADER */}
       <div className="space-y-2">
-        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+        <span className="text-xs font-bold text-slate-400 dark:text-[#73827D] uppercase tracking-wider">
           Availability for {counselorName}
         </span>
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#19232D] tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#19232D] dark:text-[#F1F3EF] tracking-tight">
           Choose a time that works for you
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600">
+        <p className="text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1]">
           Select an available appointment time below. Times are shown in your local timezone.
         </p>
       </div>
 
       {/* 3. MISSING COUNSELOR ID ERROR */}
       {!counselorId && (
-        <Card variant="crisis" padding="lg" className="space-y-3 border border-[#FDE68A]">
+        <Card variant="crisis" padding="lg" className="space-y-3 border border-[#FDE68A] dark:border-[#5E421E]">
           <div className="space-y-1">
-            <h2 className="text-base font-bold text-[#92400E]">
+            <h2 className="text-base font-bold text-[#92400E] dark:text-[#FDE68A]">
               No counselor selected
             </h2>
-            <p className="text-xs sm:text-sm text-[#78350F]">
+            <p className="text-xs sm:text-sm text-[#78350F] dark:text-[#FDE68A]">
               Please choose a counselor from our team to see their schedule.
             </p>
           </div>
@@ -138,18 +138,18 @@ function BookingSlotsContent() {
       {/* 4. LOADING STATE */}
       {counselorId && isLoading && (
         <div className="space-y-6">
-          <div className="p-6 bg-white rounded-2xl border border-[#E6E4DD] space-y-3 animate-pulse">
-            <div className="w-40 h-5 rounded bg-slate-100" />
+          <div className="p-6 bg-white dark:bg-[#18211F] rounded-2xl border border-[#E6E4DD] dark:border-[#283632] space-y-3 animate-pulse">
+            <div className="w-40 h-5 rounded bg-slate-100 dark:bg-white/5" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="h-16 rounded-xl bg-slate-100" />
-              <div className="h-16 rounded-xl bg-slate-100" />
+              <div className="h-16 rounded-xl bg-slate-100 dark:bg-white/5" />
+              <div className="h-16 rounded-xl bg-slate-100 dark:bg-white/5" />
             </div>
           </div>
-          <div className="p-6 bg-white rounded-2xl border border-[#E6E4DD] space-y-3 animate-pulse">
-            <div className="w-40 h-5 rounded bg-slate-100" />
+          <div className="p-6 bg-white dark:bg-[#18211F] rounded-2xl border border-[#E6E4DD] dark:border-[#283632] space-y-3 animate-pulse">
+            <div className="w-40 h-5 rounded bg-slate-100 dark:bg-white/5" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="h-16 rounded-xl bg-slate-100" />
-              <div className="h-16 rounded-xl bg-slate-100" />
+              <div className="h-16 rounded-xl bg-slate-100 dark:bg-white/5" />
+              <div className="h-16 rounded-xl bg-slate-100 dark:bg-white/5" />
             </div>
           </div>
         </div>
@@ -157,12 +157,12 @@ function BookingSlotsContent() {
 
       {/* 5. ERROR STATE */}
       {counselorId && !isLoading && errorMessage && (
-        <Card variant="crisis" padding="lg" className="space-y-3 border border-[#FDE68A]">
+        <Card variant="crisis" padding="lg" className="space-y-3 border border-[#FDE68A] dark:border-[#5E421E]">
           <div className="space-y-1">
-            <h2 className="text-base font-bold text-[#92400E]">
+            <h2 className="text-base font-bold text-[#92400E] dark:text-[#FDE68A]">
               We could not load available times
             </h2>
-            <p className="text-xs sm:text-sm text-[#78350F]">{errorMessage}</p>
+            <p className="text-xs sm:text-sm text-[#78350F] dark:text-[#FDE68A]">{errorMessage}</p>
           </div>
           <div className="pt-1">
             <Button
@@ -181,7 +181,6 @@ function BookingSlotsContent() {
                   )
                   .finally(() => setIsLoading(false));
               }}
-              className="bg-white"
             >
               Try again
             </Button>
@@ -191,12 +190,12 @@ function BookingSlotsContent() {
 
       {/* 6. EMPTY SLOTS STATE */}
       {counselorId && !isLoading && !errorMessage && slots.length === 0 && (
-        <Card variant="default" padding="lg" className="text-center space-y-4 py-10 bg-white border border-[#E6E4DD]">
+        <Card variant="default" padding="lg" className="text-center space-y-4 py-10">
           <div className="space-y-1 max-w-md mx-auto">
-            <h2 className="text-base font-bold text-[#19232D]">
+            <h2 className="text-base font-bold text-[#19232D] dark:text-[#F1F3EF]">
               No upcoming appointments available right now
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-[#AAB6B1]">
               Please check back soon or choose another counselor from our team.
             </p>
           </div>
@@ -217,8 +216,8 @@ function BookingSlotsContent() {
           {dateKeys.map((dateKey) => (
             <div key={dateKey} className="space-y-3">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#0D5C56]" aria-hidden="true" />
-                <h2 className="text-sm font-bold text-[#19232D]">
+                <span className="w-2 h-2 rounded-full bg-[#0D5C56] dark:bg-[#4FA79D]" aria-hidden="true" />
+                <h2 className="text-sm font-bold text-[#19232D] dark:text-[#F1F3EF]">
                   {dateKey}
                 </h2>
               </div>
@@ -229,18 +228,18 @@ function BookingSlotsContent() {
                     key={slot.id}
                     type="button"
                     onClick={() => handleSelectSlot(slot)}
-                    className="w-full p-4 rounded-xl border border-[#E6E4DD] bg-white text-left transition-all hover:border-[#0D5C56] hover:bg-[#F0FDFA] shadow-2xs hover:shadow-xs focus-accessible cursor-pointer touch-target flex items-center justify-between group"
+                    className="w-full p-4 rounded-xl border border-[#E6E4DD] dark:border-[#283632] bg-white dark:bg-[#18211F] text-left transition-all hover:border-[#0D5C56] dark:hover:border-[#4FA79D] hover:bg-[#F0FDFA] dark:hover:bg-[#142725] shadow-2xs hover:shadow-xs focus-accessible cursor-pointer touch-target flex items-center justify-between group"
                   >
                     <div className="space-y-0.5">
-                      <span className="block text-xs font-medium text-slate-500">
+                      <span className="block text-xs font-medium text-slate-500 dark:text-[#73827D]">
                         Appointment Time
                       </span>
-                      <span className="block text-sm font-bold text-[#19232D] group-hover:text-[#0D5C56]">
+                      <span className="block text-sm font-bold text-[#19232D] dark:text-[#F1F3EF] group-hover:text-[#0D5C56] dark:group-hover:text-[#4FA79D]">
                         {formatSlotTime(slot.starts_at)} &ndash; {formatSlotTime(slot.ends_at)}
                       </span>
                     </div>
                     <span
-                      className="text-xs font-bold text-[#0D5C56] inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"
+                      className="text-xs font-bold text-[#0D5C56] dark:text-[#4FA79D] inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"
                       aria-hidden="true"
                     >
                       <span>Select</span>
@@ -255,9 +254,9 @@ function BookingSlotsContent() {
       )}
 
       {/* 8. HELPFUL INFORMATION */}
-      <Card variant="default" padding="md" className="bg-white border border-[#E6E4DD] space-y-1.5">
-        <h2 className="text-xs font-bold text-[#19232D] uppercase tracking-wider">Good to know</h2>
-        <p className="text-xs text-slate-600 leading-relaxed">
+      <Card variant="default" padding="md" className="space-y-1.5">
+        <h2 className="text-xs font-bold text-[#19232D] dark:text-[#F1F3EF] uppercase tracking-wider">Good to know</h2>
+        <p className="text-xs text-slate-600 dark:text-[#AAB6B1] leading-relaxed">
           Sessions are 50 minutes long. After choosing a time, you will receive a private 8-character confirmation code to manage or reschedule your appointment anytime.
         </p>
       </Card>
@@ -269,7 +268,7 @@ export default function BookingSlotsPage() {
   return (
     <Suspense
       fallback={
-        <div className="p-12 text-center text-slate-500 text-sm">
+        <div className="p-12 text-center text-slate-500 dark:text-[#AAB6B1] text-sm">
           Loading available times...
         </div>
       }

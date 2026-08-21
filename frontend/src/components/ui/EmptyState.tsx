@@ -24,7 +24,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   className = '',
 }) => {
   const defaultIcon = (
-    <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <svg className="w-8 h-8 text-slate-400 dark:text-[#73827D]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
     </svg>
   );
@@ -35,14 +35,14 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       padding="lg"
       className={`text-center flex flex-col items-center justify-center p-8 sm:p-12 space-y-4 max-w-lg mx-auto ${className}`}
     >
-      <div className="w-14 h-14 rounded-2xl bg-white border border-[#E6E4DD] flex items-center justify-center shadow-2xs">
+      <div className="w-14 h-14 rounded-2xl bg-white dark:bg-[#18211F] border border-[#E6E4DD] dark:border-[#283632] flex items-center justify-center shadow-2xs">
         {icon ?? defaultIcon}
       </div>
       <div className="space-y-1.5 max-w-sm">
-        <h2 className="text-base sm:text-lg font-bold text-[#19232D]">
+        <h2 className="text-base sm:text-lg font-bold text-[#19232D] dark:text-[#F1F3EF]">
           {title}
         </h2>
-        <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-[#AAB6B1] leading-relaxed">
           {description}
         </p>
       </div>

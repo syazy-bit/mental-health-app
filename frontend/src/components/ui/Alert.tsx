@@ -4,29 +4,29 @@ export type AlertVariant = 'info' | 'success' | 'warning' | 'error' | 'crisis';
 
 const variantStyles: Record<AlertVariant, { container: string; icon: string; title: string }> = {
   info: {
-    container: 'bg-sky-50/80 border-sky-200 text-sky-950',
-    icon: 'text-sky-600',
-    title: 'text-sky-900',
+    container: 'bg-sky-50/80 dark:bg-sky-950/30 border-sky-200 dark:border-sky-800 text-sky-950 dark:text-sky-200',
+    icon: 'text-sky-600 dark:text-sky-400',
+    title: 'text-sky-900 dark:text-sky-300',
   },
   success: {
-    container: 'bg-emerald-50/80 border-emerald-200 text-emerald-950',
-    icon: 'text-emerald-600',
-    title: 'text-emerald-900',
+    container: 'bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-950 dark:text-emerald-200',
+    icon: 'text-emerald-600 dark:text-emerald-400',
+    title: 'text-emerald-900 dark:text-emerald-300',
   },
   warning: {
-    container: 'bg-amber-50/80 border-amber-200 text-amber-950',
-    icon: 'text-amber-600',
-    title: 'text-amber-900',
+    container: 'bg-amber-50/80 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800 text-amber-950 dark:text-amber-200',
+    icon: 'text-amber-600 dark:text-amber-400',
+    title: 'text-amber-900 dark:text-amber-300',
   },
   error: {
-    container: 'bg-red-50/80 border-red-200 text-red-950',
-    icon: 'text-red-600',
-    title: 'text-red-900',
+    container: 'bg-red-50/80 dark:bg-red-950/30 border-red-200 dark:border-red-800 text-red-950 dark:text-red-200',
+    icon: 'text-red-600 dark:text-red-400',
+    title: 'text-red-900 dark:text-red-300',
   },
   crisis: {
-    container: 'bg-[#FFFBEB] border-2 border-[#FDE68A] text-[#78350F]',
-    icon: 'text-[#D97706]',
-    title: 'text-[#92400E]',
+    container: 'bg-[#FFFBEB] dark:bg-[#281F13] border-2 border-[#FDE68A] dark:border-[#5E421E] text-[#78350F] dark:text-[#FDE68A]',
+    icon: 'text-[#D97706] dark:text-[#E7A044]',
+    title: 'text-[#92400E] dark:text-[#FDE68A]',
   },
 };
 

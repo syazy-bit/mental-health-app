@@ -97,7 +97,7 @@ export default function PHQ9ScreeningPage() {
       <div className="flex items-center justify-between">
         <Link
           href="/screening"
-          className="text-xs font-semibold text-slate-500 hover:text-[#0D5C56] focus-accessible p-1 -ml-1 transition-colors"
+          className="text-xs font-semibold text-slate-500 dark:text-[#AAB6B1] hover:text-[#0D5C56] dark:hover:text-[#4FA79D] focus-accessible p-1 -ml-1 transition-colors"
         >
           &larr; Back to Check-ins
         </Link>
@@ -108,25 +108,25 @@ export default function PHQ9ScreeningPage() {
 
       {/* 2. PROGRESS BAR */}
       <div className="space-y-1.5">
-        <div className="flex justify-between text-xs font-medium text-slate-500">
+        <div className="flex justify-between text-xs font-medium text-slate-500 dark:text-[#AAB6B1]">
           <span>Question {currentIndex + 1} of {PHQ9_QUESTIONS.length}</span>
           <span>{progressPercentage}% Completed</span>
         </div>
-        <div className="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-slate-200/80 dark:bg-white/10 rounded-full overflow-hidden">
           <div
-            className="h-full bg-[#0D5C56] rounded-full transition-all duration-300 ease-out"
+            className="h-full bg-[#0D5C56] dark:bg-[#4FA79D] rounded-full transition-all duration-300 ease-out"
             style={{ width: `${progressPercentage}%` }}
           />
         </div>
       </div>
 
       {/* 3. QUESTION CANVAS */}
-      <Card variant="elevated" padding="lg" className="space-y-6 bg-white border border-[#E6E4DD]">
+      <Card variant="elevated" padding="lg" className="space-y-6">
         <div className="space-y-2">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+          <span className="text-xs font-semibold text-slate-400 dark:text-[#73827D] uppercase tracking-wider">
             Over the last 2 weeks, how often have you been bothered by:
           </span>
-          <h1 className="text-lg sm:text-xl font-bold text-[#19232D] leading-snug">
+          <h1 className="text-lg sm:text-xl font-bold text-[#19232D] dark:text-[#F1F3EF] leading-snug">
             {currentQuestion}
           </h1>
         </div>
@@ -145,16 +145,16 @@ export default function PHQ9ScreeningPage() {
                 onClick={() => handleSelectOption(option.value)}
                 className={`w-full p-4 rounded-xl border text-left transition-all flex items-center justify-between touch-target focus-accessible cursor-pointer select-none ${
                   isSelected
-                    ? 'border-[#0D5C56] bg-[#F0FDFA] text-[#0D5C56] ring-2 ring-[#0D5C56]/15 font-semibold shadow-2xs'
-                    : 'border-[#E6E4DD] bg-white hover:bg-stone-50 hover:border-slate-300 text-slate-700'
+                    ? 'border-[#0D5C56] dark:border-[#4FA79D] bg-[#F0FDFA] dark:bg-[#142725] text-[#0D5C56] dark:text-[#4FA79D] ring-2 ring-[#0D5C56]/15 dark:ring-[#4FA79D]/20 font-semibold shadow-2xs'
+                    : 'border-[#E6E4DD] dark:border-[#283632] bg-white dark:bg-[#18211F] hover:bg-stone-50 dark:hover:bg-[#202B28] hover:border-slate-300 dark:hover:border-slate-600 text-slate-700 dark:text-[#F1F3EF]'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <span
                     className={`w-5 h-5 rounded-full border flex items-center justify-center text-xs shrink-0 transition-colors ${
                       isSelected
-                        ? 'border-[#0D5C56] bg-[#0D5C56] text-white'
-                        : 'border-slate-300 bg-white'
+                        ? 'border-[#0D5C56] dark:border-[#4FA79D] bg-[#0D5C56] dark:bg-[#4FA79D] text-white dark:text-[#101817]'
+                        : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-[#18211F]'
                     }`}
                   >
                     {isSelected && (
@@ -165,7 +165,7 @@ export default function PHQ9ScreeningPage() {
                   </span>
                   <span className="text-xs sm:text-sm">{option.label}</span>
                 </div>
-                <span className="text-xs text-slate-400 font-normal">
+                <span className="text-xs text-slate-400 dark:text-[#73827D] font-normal">
                   {option.scoreText}
                 </span>
               </button>
@@ -175,13 +175,13 @@ export default function PHQ9ScreeningPage() {
 
         {/* Error message */}
         {errorMessage && (
-          <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 text-xs font-medium">
+          <div role="alert" className="p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl text-red-800 dark:text-red-200 text-xs font-medium">
             {errorMessage}
           </div>
         )}
 
         {/* Actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+        <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-[#283632]">
           <Button
             type="button"
             variant="ghost"

@@ -14,10 +14,10 @@ export default function ScreeningHubPage() {
             Evidence-Based Self Check-in
           </Badge>
         </div>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#19232D] tracking-tight">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#19232D] dark:text-[#F1F3EF] tracking-tight">
           Take a moment to understand how you&rsquo;ve been feeling
         </h1>
-        <p className="text-slate-600 text-xs sm:text-sm sm:leading-relaxed max-w-xl mx-auto">
+        <p className="text-slate-600 dark:text-[#AAB6B1] text-xs sm:text-sm sm:leading-relaxed max-w-xl mx-auto">
           Clinically validated self-assessments to help you gauge mood, stress, and anxiety over the last two weeks. Private, non-diagnostic, and completed in about 2 minutes.
         </p>
       </div>
@@ -28,31 +28,31 @@ export default function ScreeningHubPage() {
         <Card
           variant="interactive"
           padding="lg"
-          className="flex flex-col justify-between border-t-3 border-t-[#0D5C56] h-full"
+          className="flex flex-col justify-between border-t-3 border-t-[#0D5C56] dark:border-t-[#4FA79D] h-full"
         >
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#0D5C56] uppercase tracking-wider">
-                Mood & Energy Check-in
+              <span className="text-xs font-bold text-[#0D5C56] dark:text-[#4FA79D] uppercase tracking-wider">
+                Mood &amp; Energy Check-in
               </span>
               <Badge variant="brand" size="sm">
                 9 Questions &bull; ~2 mins
               </Badge>
             </div>
             <div className="space-y-1">
-              <h2 className="text-xl font-bold text-[#19232D]">
+              <h2 className="text-xl font-bold text-[#19232D] dark:text-[#F1F3EF]">
                 PHQ-9 Questionnaire
               </h2>
-              <p className="text-xs font-medium text-slate-500">
+              <p className="text-xs font-medium text-slate-500 dark:text-[#73827D]">
                 Patient Health Questionnaire &bull; Validated Worldwide
               </p>
             </div>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1] leading-relaxed">
               Assesses the frequency of mood-related symptoms such as low energy, loss of interest, sleep disruption, and sadness over the past 14 days.
             </p>
-            <div className="p-3.5 bg-[#FAF9F6] rounded-xl border border-[#E6E4DD] text-xs text-slate-600 space-y-1.5">
-              <p className="font-bold text-[#19232D]">What you will receive:</p>
-              <ul className="space-y-1 text-slate-500 list-disc list-inside">
+            <div className="p-3.5 bg-[#FAF9F6] dark:bg-[#141C1A] rounded-xl border border-[#E6E4DD] dark:border-[#283632] text-xs text-slate-600 dark:text-[#AAB6B1] space-y-1.5">
+              <p className="font-bold text-[#19232D] dark:text-[#F1F3EF]">What you will receive:</p>
+              <ul className="space-y-1 text-slate-500 dark:text-[#73827D] list-disc list-inside">
                 <li>Symptom score (0–27)</li>
                 <li>Severity band (Minimal to Significant)</li>
                 <li>Contextual self-care recommendations</li>
@@ -73,34 +73,34 @@ export default function ScreeningHubPage() {
         <Card
           variant="interactive"
           padding="lg"
-          className="flex flex-col justify-between border-t-3 border-t-[#4A6B62] h-full"
+          className="flex flex-col justify-between border-t-3 border-t-[#4A6B62] dark:border-t-[#86A69D] h-full"
         >
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#4A6B62] uppercase tracking-wider">
-                Anxiety & Tension Check-in
+              <span className="text-xs font-bold text-[#4A6B62] dark:text-[#86A69D] uppercase tracking-wider">
+                Anxiety &amp; Tension Check-in
               </span>
               <Badge variant="sage" size="sm">
                 7 Questions &bull; ~2 mins
               </Badge>
             </div>
             <div className="space-y-1">
-              <h2 className="text-xl font-bold text-[#19232D]">
+              <h2 className="text-xl font-bold text-[#19232D] dark:text-[#F1F3EF]">
                 GAD-7 Questionnaire
               </h2>
-              <p className="text-xs font-medium text-slate-500">
+              <p className="text-xs font-medium text-slate-500 dark:text-[#73827D]">
                 Generalized Anxiety Scale &bull; Validated Worldwide
               </p>
             </div>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1] leading-relaxed">
               Measures the presence and severity of anxiety, nervousness, uncontrollable worry, restlessness, and physical tension experienced over the past 14 days.
             </p>
-            <div className="p-3.5 bg-[#FAF9F6] rounded-xl border border-[#E6E4DD] text-xs text-slate-600 space-y-1.5">
-              <p className="font-bold text-[#19232D]">What you will receive:</p>
-              <ul className="space-y-1 text-slate-500 list-disc list-inside">
+            <div className="p-3.5 bg-[#FAF9F6] dark:bg-[#141C1A] rounded-xl border border-[#E6E4DD] dark:border-[#283632] text-xs text-slate-600 dark:text-[#AAB6B1] space-y-1.5">
+              <p className="font-bold text-[#19232D] dark:text-[#F1F3EF]">What you will receive:</p>
+              <ul className="space-y-1 text-slate-500 dark:text-[#73827D] list-disc list-inside">
                 <li>Anxiety score (0–21)</li>
                 <li>Severity band (Minimal to Significant)</li>
-                <li>Grounding & stress de-escalation tools</li>
+                <li>Grounding &amp; stress de-escalation tools</li>
               </ul>
             </div>
           </div>
@@ -116,14 +116,14 @@ export default function ScreeningHubPage() {
       </div>
 
       {/* 3. NON-DIAGNOSTIC & PRIVACY DISCLOSURE */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-white border border-[#E6E4DD] text-xs text-slate-600 space-y-1.5 shadow-2xs">
-        <p className="font-bold text-[#19232D]">
-          Important Medical & Privacy Notice:
+      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#18211F] border border-[#E6E4DD] dark:border-[#283632] text-xs text-slate-600 dark:text-[#AAB6B1] space-y-1.5 shadow-2xs">
+        <p className="font-bold text-[#19232D] dark:text-[#F1F3EF]">
+          Important Medical &amp; Privacy Notice:
         </p>
         <p className="leading-relaxed">
           These check-ins are self-reflection instruments designed to help you recognize personal patterns; they are <strong>not medical or psychiatric diagnoses</strong>. Only a licensed physician or mental health professional can provide a formal clinical evaluation.
         </p>
-        <p className="leading-relaxed text-slate-500">
+        <p className="leading-relaxed text-slate-500 dark:text-[#73827D]">
           Your individual questionnaire responses are calculated securely by the backend and not retained. Only summary metrics are associated with your anonymous session.
         </p>
       </div>

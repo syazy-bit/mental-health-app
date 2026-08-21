@@ -113,7 +113,7 @@ export const MobileNav: React.FC = () => {
   return (
     <nav
       aria-label="Mobile Bottom Navigation"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FAF9F6]/95 backdrop-blur-md border-t border-[#E6E4DD] px-2 py-1.5 shadow-[0_-4px_16px_rgba(25,35,45,0.04)]"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FAF9F6]/95 dark:bg-[#101817]/95 backdrop-blur-md border-t border-[#E6E4DD] dark:border-[#283632] px-2 py-1.5 shadow-[0_-4px_16px_rgba(25,35,45,0.04)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.3)]"
     >
       <div className="flex items-center justify-around max-w-md mx-auto">
         {navItems.map((item) => {
@@ -128,14 +128,14 @@ export const MobileNav: React.FC = () => {
               href={item.href}
               className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl touch-target focus-accessible transition-all select-none ${
                 isActive
-                  ? 'text-[#0D5C56] font-bold'
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? 'text-[#0D5C56] dark:text-[#4FA79D] font-bold'
+                  : 'text-slate-500 dark:text-[#73827D] hover:text-slate-800 dark:hover:text-[#F1F3EF]'
               }`}
               aria-current={isActive ? 'page' : undefined}
             >
               <div
                 className={`p-1 rounded-lg transition-transform ${
-                  isActive ? 'bg-[#0D5C56]/10 scale-105 text-[#0D5C56]' : ''
+                  isActive ? 'bg-[#0D5C56]/10 dark:bg-[#4FA79D]/15 scale-105 text-[#0D5C56] dark:text-[#4FA79D]' : ''
                 }`}
               >
                 {item.icon}
