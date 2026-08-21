@@ -50,7 +50,7 @@ export const DesktopHeader: React.FC = () => {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 focus-accessible ${
+                className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 active:scale-95 focus-accessible ${
                   isActive
                     ? 'bg-white dark:bg-[#1C2B28] text-[#0E5A54] dark:text-[#57ADA3] shadow-xs'
                     : 'text-[#5D6E77] dark:text-[#9EAEA9] hover:text-[#1A242B] dark:hover:text-[#F1F5F3] hover:bg-white/50 dark:hover:bg-white/5'

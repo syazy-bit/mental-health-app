@@ -33,25 +33,25 @@ export const Button: React.FC<ButtonProps> = ({
   const variantStyles = {
     // Primary CTA (Terracotta Warm Accent)
     primary:
-      'bg-[#D96B4F] dark:bg-[#E58A73] dark:text-[#101817] hover:bg-[#C4573C] dark:hover:bg-[#F09A83] active:bg-[#A8422A] dark:active:bg-[#D47760] text-white shadow-sm hover:shadow-md hover:shadow-[#D96B4F]/20',
+      'bg-[#CE674D] hover:bg-[#B9573E] active:bg-[#9A412A] text-white shadow-xs hover:shadow-md dark:bg-[#E58A73] dark:hover:bg-[#F09B85] dark:active:bg-[#D4755D] dark:text-[#0F1615]',
     // Secondary Outline (Spruce Teal Border)
     secondary:
-      'border-2 border-[#0D5C56] dark:border-[#4FA79D] text-[#0D5C56] dark:text-[#4FA79D] bg-transparent hover:bg-[#F0FDFA] dark:hover:bg-[#142725] active:bg-[#CCFBF1] dark:active:bg-[#1A3734]',
+      'border border-[#0E5A54] dark:border-[#57ADA3] text-[#0E5A54] dark:text-[#57ADA3] bg-transparent hover:bg-[#F0F9F8] dark:hover:bg-[#142825] active:bg-[#CEF0EB] dark:active:bg-[#193834]',
     // Brand Solid (Deep Spruce Teal)
     brand:
-      'bg-[#0D5C56] dark:bg-[#4FA79D] dark:text-[#101817] hover:bg-[#115E59] dark:hover:bg-[#61B8AE] active:bg-[#09403C] dark:active:bg-[#3D8F86] text-white shadow-sm hover:shadow-md hover:shadow-[#0D5C56]/20',
+      'bg-[#0E5A54] hover:bg-[#126D66] active:bg-[#09403B] text-white shadow-xs hover:shadow-md dark:bg-[#57ADA3] dark:hover:bg-[#69BFB5] dark:active:bg-[#45938A] dark:text-[#0F1615]',
     // Crisis Urgent (Warm Golden Amber)
     crisis:
-      'bg-[#D97706] dark:bg-[#E7A044] dark:text-[#101817] hover:bg-[#B45309] dark:hover:bg-[#F0B260] active:bg-[#92400E] text-white shadow-sm font-bold hover:shadow-md hover:shadow-[#D97706]/20',
+      'bg-[#D97706] hover:bg-[#B45309] active:bg-[#92400E] text-white shadow-xs font-bold hover:shadow-md dark:bg-[#ECA347] dark:hover:bg-[#F5B666] dark:text-[#0F1615]',
     // Clean Neutral Outline
     outline:
-      'border border-[#E6E4DD] dark:border-[#283632] bg-white dark:bg-[#18211F] text-[#19232D] dark:text-[#F1F3EF] hover:bg-stone-50 dark:hover:bg-[#202B28] hover:border-slate-400 dark:hover:border-slate-500 shadow-xs',
+      'border border-[#E8E5DC] dark:border-[#253633] bg-white dark:bg-[#162220] text-[#1A242B] dark:text-[#F1F5F3] hover:bg-[#FAF8F5] dark:hover:bg-[#1C2B28] hover:border-[#CAD8D1] dark:hover:border-[#37574E] shadow-xs',
     // Subtle Ghost
     ghost:
-      'text-slate-700 dark:text-[#AAB6B1] hover:text-slate-900 dark:hover:text-[#F1F3EF] hover:bg-slate-100/70 dark:hover:bg-white/5 active:bg-slate-200/70 dark:active:bg-white/10',
+      'text-[#5D6E77] dark:text-[#9EAEA9] hover:text-[#1A242B] dark:hover:text-[#F1F5F3] hover:bg-black/[0.04] dark:hover:bg-white/5 active:bg-black/[0.08] dark:active:bg-white/10',
     // Soft Pill Variant
     soft:
-      'bg-[#F0FDFA] dark:bg-[#142725] text-[#0D5C56] dark:text-[#4FA79D] hover:bg-[#CCFBF1] dark:hover:bg-[#1A3734] active:bg-[#99F6E4]/50 border border-[#CCFBF1] dark:border-[#28534E]',
+      'bg-[#F0F9F8] dark:bg-[#142825] text-[#0E5A54] dark:text-[#57ADA3] hover:bg-[#CEF0EB] dark:hover:bg-[#193834] border border-[#CEF0EB] dark:border-[#2B5751]',
   };
 
   return (

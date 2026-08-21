@@ -199,6 +199,48 @@ h1, h2, h3, h4, h5, h6 {
   animation: gentle-breathe 7s ease-in-out infinite;
 }
 
+/* Smooth Page Entrance Transition */
+@keyframes page-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-enter {
+  animation: page-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Subtle Icon Rotation / Pop */
+@keyframes icon-pop {
+  0% {
+    transform: rotate(0deg) scale(0.9);
+  }
+  50% {
+    transform: rotate(15deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+.animate-icon-pop {
+  animation: icon-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Smooth Theme Switching Transitions across UI */
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.25s ease, fill 0.25s ease, stroke 0.25s ease, box-shadow 0.3s ease !important;
+  transition-delay: 0s !important;
+}
+
 /* Ambient glow gradient circles */
 .ambient-glow-teal {
   position: absolute;

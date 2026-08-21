@@ -146,6 +146,27 @@ export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
 
   const buttonTitle = !mounted ? 'Theme' : `Theme: ${themeLabel}`;
 
+  const handleSetTheme = (mode: ThemeMode) => {
+    try {
+      document.documentElement.classList.add('theme-transitioning');
+      setTimeout(() => {
+        document.documentElement.classList.remove('theme-transitioning');
+      }, 350);
+    } catch {}
+    setTheme(mode);
+    setIsOpen(false);
+  };
+
+  const handleCycleTheme = () => {
+    try {
+      document.documentElement.classList.add('theme-transitioning');
+      setTimeout(() => {
+        document.documentElement.classList.remove('theme-transitioning');
+      }, 350);
+    } catch {}
+    cycleTheme();
+  };
+
   return (
     <div ref={dropdownRef} className={`relative inline-block ${className}`} onKeyDown={handleKeyDown}>
       <button
@@ -154,36 +175,37 @@ export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
         onClick={() => setIsOpen((prev) => !prev)}
         onDoubleClick={(e) => {
           e.preventDefault();
-          cycleTheme();
+          handleCycleTheme();
         }}
         aria-expanded={isOpen}
         aria-haspopup="menu"
         aria-label={buttonAriaLabel}
         title={buttonTitle}
-        className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-600 dark:text-[#AAB6B1] hover:text-[#19232D] dark:hover:text-[#F1F3EF] hover:bg-black/5 dark:hover:bg-white/5 border border-transparent hover:border-[#E6E4DD] dark:hover:border-[#283632] transition-colors focus-accessible touch-target cursor-pointer select-none"
+        className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-600 dark:text-[#AAB6B1] hover:text-[#19232D] dark:hover:text-[#F1F3EF] hover:bg-black/5 dark:hover:bg-white/5 border border-transparent hover:border-[#E8E5DC] dark:hover:border-[#253633] transition-all duration-200 active:scale-90 focus-accessible touch-target cursor-pointer select-none"
       >
-        {currentIcon}
+        <span key={resolvedTheme} className="animate-icon-pop">
+          {currentIcon}
+        </span>
       </button>
 
       {isOpen && (
         <div
           role="menu"
           aria-orientation="vertical"
-          className="absolute right-0 mt-1.5 w-36 rounded-xl bg-white dark:bg-[#18211F] border border-[#E6E4DD] dark:border-[#283632] shadow-lg p-1 z-50 animate-in fade-in zoom-in-95 duration-100"
+          className="absolute right-0 mt-1.5 w-36 rounded-2xl bg-white/95 dark:bg-[#162220]/95 backdrop-blur-xl border border-[#E8E5DC] dark:border-[#253633] shadow-lg p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
         >
           <button
             ref={(el) => { menuItemsRef.current[0] = el; }}
             type="button"
             role="menuitem"
             onClick={() => {
-              setTheme('light');
-              setIsOpen(false);
+              handleSetTheme('light');
               triggerRef.current?.focus();
             }}
-            className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-semibold cursor-pointer focus-accessible ${
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all duration-150 active:scale-95 focus-accessible ${
               mounted && theme === 'light'
-                ? 'bg-[#0D5C56]/10 text-[#0D5C56] dark:bg-[#4FA79D]/15 dark:text-[#4FA79D]'
-                : 'text-slate-700 dark:text-[#AAB6B1] hover:bg-black/5 dark:hover:bg-white/5'
+                ? 'bg-[#0E5A54]/10 text-[#0E5A54] dark:bg-[#57ADA3]/15 dark:text-[#57ADA3]'
+                : 'text-[#1A242B] dark:text-[#F1F5F3] hover:bg-black/5 dark:hover:bg-white/5'
             }`}
           >
             <span className="shrink-0">{SunIcon}</span>
@@ -194,14 +216,13 @@ export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
             type="button"
             role="menuitem"
             onClick={() => {
-              setTheme('dark');
-              setIsOpen(false);
+              handleSetTheme('dark');
               triggerRef.current?.focus();
             }}
-            className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-semibold cursor-pointer focus-accessible ${
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all duration-150 active:scale-95 focus-accessible ${
               mounted && theme === 'dark'
-                ? 'bg-[#0D5C56]/10 text-[#0D5C56] dark:bg-[#4FA79D]/15 dark:text-[#4FA79D]'
-                : 'text-slate-700 dark:text-[#AAB6B1] hover:bg-black/5 dark:hover:bg-white/5'
+                ? 'bg-[#0E5A54]/10 text-[#0E5A54] dark:bg-[#57ADA3]/15 dark:text-[#57ADA3]'
+                : 'text-[#1A242B] dark:text-[#F1F5F3] hover:bg-black/5 dark:hover:bg-white/5'
             }`}
           >
             <span className="shrink-0">{MoonIcon}</span>
@@ -212,14 +233,13 @@ export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
             type="button"
             role="menuitem"
             onClick={() => {
-              setTheme('system');
-              setIsOpen(false);
+              handleSetTheme('system');
               triggerRef.current?.focus();
             }}
-            className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-semibold cursor-pointer focus-accessible ${
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all duration-150 active:scale-95 focus-accessible ${
               mounted && theme === 'system'
-                ? 'bg-[#0D5C56]/10 text-[#0D5C56] dark:bg-[#4FA79D]/15 dark:text-[#4FA79D]'
-                : 'text-slate-700 dark:text-[#AAB6B1] hover:bg-black/5 dark:hover:bg-white/5'
+                ? 'bg-[#0E5A54]/10 text-[#0E5A54] dark:bg-[#57ADA3]/15 dark:text-[#57ADA3]'
+                : 'text-[#1A242B] dark:text-[#F1F5F3] hover:bg-black/5 dark:hover:bg-white/5'
             }`}
           >
             <span className="shrink-0">{SystemIcon}</span>

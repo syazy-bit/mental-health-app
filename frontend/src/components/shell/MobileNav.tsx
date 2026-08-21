@@ -113,7 +113,7 @@ export const MobileNav: React.FC = () => {
   return (
     <nav
       aria-label="Mobile Bottom Navigation"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FAF9F6]/95 dark:bg-[#101817]/95 backdrop-blur-md border-t border-[#E6E4DD] dark:border-[#283632] px-2 py-1.5 shadow-[0_-4px_16px_rgba(25,35,45,0.04)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.3)]"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FAF8F5]/90 dark:bg-[#0F1615]/90 backdrop-blur-xl border-t border-[#E8E5DC] dark:border-[#253633] px-2 py-1.5 shadow-[0_-4px_16px_rgba(26,36,43,0.04)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.3)] transition-colors duration-200"
     >
       <div className="flex items-center justify-around max-w-md mx-auto">
         {navItems.map((item) => {
@@ -126,16 +126,16 @@ export const MobileNav: React.FC = () => {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl touch-target focus-accessible transition-all select-none ${
+              className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl touch-target focus-accessible transition-all duration-150 active:scale-90 select-none ${
                 isActive
-                  ? 'text-[#0D5C56] dark:text-[#4FA79D] font-bold'
-                  : 'text-slate-500 dark:text-[#73827D] hover:text-slate-800 dark:hover:text-[#F1F3EF]'
+                  ? 'text-[#0E5A54] dark:text-[#57ADA3] font-bold'
+                  : 'text-[#5D6E77] dark:text-[#9EAEA9] hover:text-[#1A242B] dark:hover:text-[#F1F5F3]'
               }`}
               aria-current={isActive ? 'page' : undefined}
             >
               <div
-                className={`p-1 rounded-lg transition-transform ${
-                  isActive ? 'bg-[#0D5C56]/10 dark:bg-[#4FA79D]/15 scale-105 text-[#0D5C56] dark:text-[#4FA79D]' : ''
+                className={`p-1 rounded-lg transition-transform duration-200 ${
+                  isActive ? 'bg-[#0E5A54]/10 dark:bg-[#57ADA3]/15 scale-110 text-[#0E5A54] dark:text-[#57ADA3]' : ''
                 }`}
               >
                 {item.icon}

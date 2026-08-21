@@ -24,22 +24,22 @@ export const Card: React.FC<CardProps> = ({
   const variantStyles = {
     // Default Clean Card
     default:
-      'bg-white dark:bg-[#18211F] border border-[#E6E4DD] dark:border-[#283632] shadow-[0_1px_3px_rgba(25,35,45,0.04)] dark:shadow-none text-[#19232D] dark:text-[#F1F3EF]',
+      'bg-white dark:bg-[#162220] border border-[#E8E5DC] dark:border-[#253633] shadow-card text-[#1A242B] dark:text-[#F1F5F3]',
     // Elevated Card
     elevated:
-      'bg-white dark:bg-[#202B28] border border-[#E6E4DD]/80 dark:border-[#283632] shadow-[0_4px_16px_rgba(25,35,45,0.06)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.35)] text-[#19232D] dark:text-[#F1F3EF]',
+      'bg-white dark:bg-[#1C2B28] border border-[#E8E5DC] dark:border-[#253633] shadow-card text-[#1A242B] dark:text-[#F1F5F3]',
     // Interactive Hover Card
     interactive:
-      'bg-white dark:bg-[#18211F] border border-[#E6E4DD] dark:border-[#283632] shadow-[0_1px_3px_rgba(25,35,45,0.04)] hover:shadow-[0_10px_24px_-4px_rgba(25,35,45,0.08)] dark:hover:shadow-[0_10px_24px_-4px_rgba(0,0,0,0.4)] hover:border-[#0D5C56]/40 dark:hover:border-[#4FA79D]/40 cursor-pointer text-[#19232D] dark:text-[#F1F3EF] group',
+      'bg-white dark:bg-[#162220] border border-[#E8E5DC] dark:border-[#253633] shadow-card hover:shadow-card-hover hover:border-[#0E5A54]/40 dark:hover:border-[#57ADA3]/40 cursor-pointer text-[#1A242B] dark:text-[#F1F5F3] group',
     // Crisis / Safety Check-in Card (Calming Warm Amber)
     crisis:
-      'bg-[#FFFBEB] dark:bg-[#281F13] border-2 border-[#FDE68A] dark:border-[#5E421E] text-[#78350F] dark:text-[#FDE68A] shadow-[0_1px_3px_rgba(217,119,6,0.08)]',
+      'bg-[#FFFBEB] dark:bg-[#281D10] border border-[#FDE68A] dark:border-[#5C3F1C] text-[#78350F] dark:text-[#FDE68A] shadow-xs',
     // Sage Wellness Card
     sage:
-      'bg-[#F4F7F5] dark:bg-[#172320] border border-[#CBD5E1] dark:border-[#30443F] text-[#19232D] dark:text-[#F1F3EF]',
+      'bg-[#F1F6F4] dark:bg-[#162420] border border-[#CAD8D1] dark:border-[#2E4740] text-[#1A242B] dark:text-[#F1F5F3]',
     // Subtle Neutral Card
     subtle:
-      'bg-[#FAF8F5] dark:bg-[#141C1A] border border-[#E6E4DD] dark:border-[#283632] text-slate-700 dark:text-[#AAB6B1]',
+      'bg-[#FAF8F5] dark:bg-[#131D1B] border border-[#E8E5DC] dark:border-[#253633] text-[#5D6E77] dark:text-[#9EAEA9]',
   };
 
   return (

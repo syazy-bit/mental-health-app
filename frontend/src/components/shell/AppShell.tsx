@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { DisclaimerStrip } from './DisclaimerStrip';
 import { DesktopHeader } from './DesktopHeader';
 import { MobileNav } from './MobileNav';
@@ -9,6 +12,8 @@ interface AppShellProps {
 }
 
 export const AppShell: React.FC<AppShellProps> = ({ children }) => {
+  const pathname = usePathname();
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-[#CCFBF1] selection:text-[#0D5C56] dark:selection:bg-[#1A3734] dark:selection:text-[#4FA79D]">
       {/* Skip to Content Link for Accessibility */}
@@ -22,11 +27,12 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
       {/* Header */}
       <DesktopHeader />
 
-      {/* Main Content Area */}
+      {/* Main Content Area with Smooth Page Transition */}
       <main
         id="main-content"
+        key={pathname}
         tabIndex={-1}
-        className="flex-1 flex flex-col max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 md:pb-14 outline-none"
+        className="flex-1 flex flex-col max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 md:pb-14 outline-none animate-page-enter"
       >
         {children}
       </main>
