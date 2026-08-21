@@ -1,41 +1,51 @@
-# Safety Engine — Architecture & Data Model Proposal
+# Safety Engine — Current Implementation
 
-Status: **DRAFT — pending review.** The safety engine code exists and is tested
-(`backend/app/safety/`, `tests/test_safety.py`, **42 unit tests**). **No database
-tables or migrations for safety have been created yet.** This document
-proposes the data model for review before any schema work.
+Status: **IMPLEMENTED** — The safety engine is fully implemented, tested (42 unit tests),
+and integrated with the `safety_evaluations` database table (migration
+`13cda6c930c1_create_safety_evaluations_table.py`).
 
-## 1. Why this exists
+---
 
-The LLM must never decide whether a student is in crisis. Every message flows
-through a deterministic, independently testable engine before any AI/fallback
-conversation happens:
+## 1. Why This Exists
+
+**The LLM must never decide whether a student is in crisis.**
+
+Every chat message flows through a deterministic, independently testable engine
+**before** any AI/fallback conversation happens:
 
 ```
 student message
       ↓
-input validation (request layer)
+input validation (request layer: length, non-empty)
       ↓
-safety pre-check ──────────────── SafetyEngine (this milestone)
+rate limiting (10 messages/minute/session)
+      ↓
+safety pre-check ──────────────── SafetyEngine (authoritative)
       ↓
 risk decision
-      ├─ HIGH_RISK  → predetermined crisis flow  (no generative model)
-      └─ NORMAL / MODERATE → conversation pipeline (later milestones)
+      ├─ HIGH_RISK  → predetermined crisis flow  (NO generative model)
+      └─ NORMAL / MODERATE → conversation pipeline (AI provider or fallback)
       ↓
-(output safety post-check comes with the chat pipeline, M4/M10)
+output safety check (defense in depth on AI responses)
+      ↓
+persistence (safety_evaluations table — metadata only)
+      ↓
+response to student
 ```
 
-## 2. Risk levels and exact behavior
+---
 
-| Level | Meaning | Pipeline behavior |
+## 2. Risk Levels & Exact Behavior
+
+| Level | Meaning | Pipeline Behavior |
 |-------|---------|-------------------|
 | `NORMAL` | Everyday distress, no elevated risk | Normal conversation; topic category can steer self-help/resource suggestions |
 | `MODERATE` | Notable distress (hopelessness, depression, panic) but no imminent-harm signal | Normal conversation with supportive framing + screening/resources nudges; treated as a signal, not a crisis |
 | `HIGH_RISK` | Self-harm, suicide ideation (active or passive), abuse/safeguarding disclosure | **No normal conversation.** Immediate, predetermined crisis pathway: fixed warm message + verified helpline numbers + call-112/hospital guidance |
 
-Risk is never "decided by AI". Categories map deterministically to levels:
+**Risk is never "decided by AI."** Categories map deterministically to levels:
 
-| RiskCategory | Level | Example signal |
+| RiskCategory | Level | Example Signal |
 |---|---|---|
 | SUICIDE | HIGH_RISK | "want to end my life" |
 | SELF_HARM | HIGH_RISK | "thinking about hurting myself" |
@@ -47,7 +57,9 @@ Risk is never "decided by AI". Categories map deterministically to levels:
 | ANXIETY / STRESS / BURNOUT / SLEEP | NORMAL | topic only |
 | GENERAL | NORMAL | no signal matched |
 
-## 3. Engine design (deterministic, extensible)
+---
+
+## 3. Engine Design (Deterministic, Extensible)
 
 ```
 SafetyEngine.evaluate(text)
@@ -57,137 +69,189 @@ SafetyEngine.evaluate(text)
   → max severity → RiskAssessment{level, category, matched_patterns, sources}
 ```
 
-- **`RiskClassifier` protocol** (`safety/classifiers/base.py`): the engine
-  depends on the abstraction. Default = `KeywordClassifier` (regex groups,
-  offline, no model). Future classifiers (ML, provider-backed) plug in via the
-  constructor — no pipeline changes.
-- **P0-1 Unicode-aware normalization** (`safety/normalizers.py`):
-  - Preserves Devanagari (Hindi), Bengali/Assamese scripts
-  - Preserves mixed-script text (English + Hindi, English + Assamese)
-  - Case-folds only where scripts support it (Latin, Cyrillic, Greek)
-  - Normalizes Unicode whitespace, preserves contractions/hyphens/ZWJ/ZWNJ
-  - Never silently converts non-Latin input to empty string
-- **P0-2 Contextual negation handling** (`safety/classifiers/keyword_classifier.py`):
-  - Genuine negation words: `not`, `never`, `don't`, `won't`, `can't`, etc.
-  - **Exclusion patterns** prevent false negatives on:
-    - `can't stop` / `cannot stop` / `unable to stop` → ongoing intent (HIGH_RISK)
-    - `no one` / `nobody` / `no way` / `nothing` → fixed quantifiers
-    - `without help` / `without support` / `no one to help` → conditional lack
-    - `there is no` / `there's no` → existential
-    - `not sure` / `not certain` → uncertainty, not negation of intent
-  - Only suppresses when genuine grammatical negation of harmful verb is present
-- **P0-3 Input length limit**: 2000 characters enforced at engine boundary
-  (fail-fast with clear `ValueError`).
-- **Additional Safety Fix — Classifier failure handling**:
-  - Exceptions in classifiers are caught, logged via failure markers
-  - **Fail-closed policy**: if all classifiers fail, engine returns `HIGH_RISK`
-    with `classifier_failure` marker to prevent safety bypass
-  - Partial failures: valid classifiers still contribute; failure recorded in
-    `classifier_sources` for observability
-- **Crisis flow** (`safety/crisis.py`): HIGH_RISK selects a fixed
-  `CrisisResponse` per category (SI/self-harm/passive, abuse) with warm,
-  action-oriented copy and helplines (Tele-MANAS 14416, KIRAN, AASRA,
-  Vandrevala, 112; abuse adds Childline 1098 / Women's Helpline 181).
-  Unknown HIGH categories fall back to a generic crisis message (future-proof).
+### Key Components
+
+#### `RiskClassifier` Protocol (`safety/classifiers/base.py`)
+The engine depends on the abstraction. Default = `KeywordClassifier` (regex groups,
+offline, no model). Future classifiers (ML, provider-backed) plug in via the
+constructor — no pipeline changes.
+
+#### `normalize_text()` (`safety/normalizers.py`) — P0-1
+- Preserves Devanagari (Hindi), Bengali/Assamese scripts
+- Preserves mixed-script text (English + Hindi, English + Assamese)
+- Case-folds only where scripts support it (Latin, Cyrillic, Greek)
+- Normalizes Unicode whitespace, preserves contractions/hyphens/ZWJ/ZWNJ
+- **Never silently converts non-Latin input to empty string**
+
+#### Contextual Negation Handling (`safety/classifiers/keyword_classifier.py`) — P0-2
+- Genuine negation words: `not`, `never`, `don't`, `won't`, `can't`, etc.
+- **Exclusion patterns** prevent false negatives on:
+  - `can't stop` / `cannot stop` / `unable to stop` → ongoing intent (HIGH_RISK)
+  - `no one` / `nobody` / `no way` / `nothing` → fixed quantifiers
+  - `without help` / `without support` / `no one to help` → conditional lack
+  - `there is no` / `there's no` → existential
+  - `not sure` / `not certain` → uncertainty, not negation of intent
+- Only suppresses when genuine grammatical negation of harmful verb is present
+
+#### Input Length Limit — P0-3
+- 2000 characters enforced at engine boundary (fail-fast with clear `ValueError`)
+
+#### Classifier Failure Handling — Additional Safety Fix
+- Exceptions in classifiers are caught, logged via failure markers
+- **Fail-closed policy**: if all classifiers fail, engine returns `HIGH_RISK`
+  with `classifier_failure` marker to prevent safety bypass
+- Partial failures: valid classifiers still contribute; failure recorded in
+  `classifier_sources` for observability
+
+#### Crisis Flow (`safety/crisis.py`)
+`HIGH_RISK` selects a fixed `CrisisResponse` per category (SI/self-harm/passive,
+abuse) with warm, action-oriented copy and helplines:
+- Tele-MANAS 14416
+- KIRAN 1800-599-0019
+- AASRA 98204-66726
+- Vandrevala 1860-2662-345 / 1800-2333-330
+- Emergency 112
+- Abuse adds: Childline 1098, Women's Helpline 181
+- Unknown HIGH categories fall back to generic crisis message (future-proof)
 
 > ⚠ Helpline numbers are real, well-known Indian services but **must be
-> re-verified against official sources before production** (Milestone 6).
+> re-verified against official sources before production**.
 
-## 4. Data model proposal (NOT yet created)
+---
 
-### New table: `safety_evaluations`
-One row per evaluated message. **Metadata only — the raw message text is never
-stored** (privacy-by-design; a normalised-text hash allows dedup without
-storing content).
+## 4. Data Model — `safety_evaluations` Table
 
-```
+**Implemented in migration `13cda6c930c1`.**
+
+```sql
 safety_evaluations
-  id              uuid PK   gen_random_uuid()
-  session_id      uuid FK → sessions.id (NOT NULL)
-  message_index   int       sequence of the message within the session
-  risk_level      varchar(16)   NORMAL | MODERATE | HIGH_RISK   (CHECK)
-  category        varchar(32)   RiskCategory                     (CHECK)
-  matched_patterns jsonb     patterns that fired (transparency/debug)
-  classifier_sources jsonb   which classifiers contributed
-  language         varchar(16)
-  created_at       timestamptz  NOT NULL
+  id                  uuid PK       gen_random_uuid()
+  session_id          uuid FK       → sessions.id (NOT NULL, CASCADE)
+  message_index       int           sequence of the message within the session
+  risk_level          varchar(16)   NORMAL | MODERATE | HIGH_RISK   (CHECK)
+  category            varchar(32)   RiskCategory                     (CHECK)
+  matched_patterns    jsonb         patterns that fired (transparency/debug)
+  classifier_sources  jsonb         which classifiers contributed
+  language            varchar(16)
+  created_at          timestamptz   NOT NULL
 Indexes:
   (session_id, message_index)  unique   → message ordering per session
   (risk_level, created_at)              → aggregate risk-event analytics
   (created_at)                          → time trends
 ```
 
-**Privacy note (reviewer requirement):** No `text_hash` column. No raw message,
-no message excerpts, no raw matched phrases, no text hashes, no PII stored in
-safety evaluation persistence.
+**Privacy by Design:**
+- **No raw message text stored**
+- **No message excerpts**
+- **No raw matched phrases**
+- **No text hashes**
+- **No PII** stored in safety evaluation persistence
+- Only metadata: risk level, category, matched pattern identifiers, classifier sources
 
-### Explicitly NOT proposed right now
-- **No `risk_level` column on `sessions`.** A "current highest risk" snapshot
-  on the session could help dashboards, but it duplicates source-of-truth
-  history in `safety_evaluations`. Decision deferred to M4/M12 (analytics) —
-  add via a small migration only if a concrete query needs it.
-- **No `status` column.** Nothing in the current flow needs it.
+---
 
-### Open decisions for review
-1. Should `safety_evaluations.session_id` be nullable to support
-   pre-session evaluations (entry page) — or require a session for everything?
-2. Approval to add the `safety_evaluations` migration (M4) as proposed above,
-   including CHECK constraints and the three indexes?
+## 5. Output Safety Check (Defense in Depth)
 
-## 5. Test coverage (42 tests)
+Location: `backend/app/services/output_safety.py`
 
-**Unicode / normalization (7):**
-- English, Hindi (Devanagari), Assamese (Bengali script)
-- Mixed English+Hindi, English+Assamese
-- Unicode punctuation, empty input, contractions/hyphens
+Runs on **AI/fallback responses only** (crisis responses are trusted — they come
+from the deterministic crisis module).
 
-**Risk levels (10):**
-- Normal: stress, anxiety, ambiguous, empty
-- Moderate: hopelessness, depression, panic
-- High-risk: self-harm, suicide, passive SI, abuse
-- Override ordering (HIGH overrides MODERATE/NORMAL)
+### Checks Performed
 
-**P0-2 Negation logic (11):**
-- Genuine negations: "don't want to kill myself", "never want to hurt myself"
-- False-positive exclusions: "can't stop", "unable to stop", "no one to help",
-  "without help", "there is no way out", "no one cares", "if no one helps",
-  "not sure if I want to"
-- Legitimate benign: "don't want to harm my grades", "never hurt anyone"
-- Uncertainty: "not sure if I want to hurt myself" → HIGH_RISK
+1. **Unsafe pattern detection** — regex patterns for:
+   - Self-harm encouragement
+   - Dismissive of crisis
+   - Medical advice (prescribing)
+   - Dismissing professional help
+   - Medical diagnosis claims
+   - Prompt injection / roleplay attempts
 
-**False positives (4):**
-- Accidental injury, non-suicidal context, negation in help context, accidental self-harm
+2. **Hallucinated phone number / helpline detection**
+   - Crisis numbers are **SYSTEM-CONTROLLED** — AI must never output them
+   - Any phone-like pattern not in the authorized list → reject
 
-**P0-3 Input length (3):**
-- Exactly 2000 chars, 2001 chars (raises), 10000 chars (raises)
+3. **Crisis indicator leakage detection**
+   - If response contains multiple crisis indicators but risk ≠ HIGH_RISK → flag
 
-**Additional Safety Fix — Classifier failure (2):**
-- All classifiers fail → fail-closed HIGH_RISK with failure marker
-- Partial failure → valid classifiers contribute + failure recorded in sources
+### On Failure
+- **REJECT entire response** (don't sanitize)
+- Return guaranteed-safe fallback via `OutputSafetyCheck.get_safe_fallback()`
 
-**Extensibility (1):**
-- Custom classifier injection
+---
 
-**Crisis pathway (3):**
-- HIGH_RISK selection, abuse-specific helplines, rejection for non-HIGH_RISK
+## 6. Test Coverage (42 Tests, All Passing)
+
+| Category | Tests | Description |
+|---|---|---|
+| Unicode / normalization | 7 | English, Hindi (Devanagari), Assamese (Bengali), mixed scripts, Unicode punctuation, empty input, contractions/hyphens |
+| Risk levels | 10 | Normal (stress, anxiety, ambiguous, empty), Moderate (hopelessness, depression, panic), High-risk (self-harm, suicide, passive SI, abuse), Override ordering (HIGH overrides) |
+| P0-2 Negation logic | 11 | Genuine negations, false-positive exclusions (`can't stop`, `no one`, `without help`, `there is no`, `not sure`), legitimate benign, uncertainty |
+| False positives | 4 | Accidental injury, non-suicidal context, negation in help context, accidental self-harm |
+| P0-3 Input length | 3 | Exactly 2000 chars, 2001 chars (raises), 10000 chars (raises) |
+| Classifier failure | 2 | All fail → fail-closed HIGH_RISK; partial fail → valid contribute + failure recorded |
+| Extensibility | 1 | Custom classifier injection |
+| Crisis pathway | 3 | HIGH_RISK selection, abuse-specific helplines, rejection for non-HIGH_RISK |
 
 **Total: 42 tests, all passing.**
 
-## 6. Files
+---
 
-- `backend/app/safety/` — `models.py`, `normalizers.py`, `engine.py`,
-  `crisis.py`, `classifiers/{base,keyword_classifier}.py`
-- `backend/tests/test_safety.py`
-- No migration files were created.
+## 7. Files
 
-## 7. Summary of P0 fixes implemented
+```
+backend/app/safety/
+├── __init__.py
+├── models.py           # RiskLevel, RiskCategory, RiskAssessment
+├── normalizers.py      # normalize_text() — P0-1
+├── engine.py           # SafetyEngine — P0-3, classifier failure handling
+├── crisis.py           # CrisisResponse, select_crisis_response()
+└── classifiers/
+    ├── __init__.py
+    ├── base.py         # RiskClassifier protocol
+    └── keyword_classifier.py  # KeywordClassifier — P0-2 negation
 
-| Issue | Fix | Files changed |
-|-------|-----|---------------|
+backend/app/services/
+└── output_safety.py    # OutputSafetyCheck — defense in depth
+
+backend/tests/
+└── test_safety.py      # 42 tests
+
+backend/migrations/versions/
+└── 13cda6c930c1_create_safety_evaluations_table.py
+```
+
+---
+
+## 8. Summary of P0 Fixes Implemented
+
+| Issue | Fix | Files |
+|---|---|---|
 | **P0-1 Non-ASCII bypass** | Unicode-aware `normalize_text()` using NFC, casefold, Unicode whitespace, preserves all letters/marks/numbers, ZWJ/ZWNJ | `normalizers.py`, `test_safety.py` (7 new tests) |
 | **P0-2 Negation too broad** | Exclusion patterns for false-positive contexts (`can't stop`, `no one`, `without help`, `there is no`, `not sure`) | `keyword_classifier.py`, `test_safety.py` (11 new tests) |
 | **P0-3 Input length** | 2000-char limit at engine boundary with clear `ValueError` | `engine.py`, `test_safety.py` (3 new tests) |
 | **Classifier failure** | Fail-closed policy: catch exceptions, record failures, return HIGH_RISK if all fail | `engine.py`, `test_safety.py` (2 new tests) |
-| **Privacy** | `text_hash` removed from data model proposal | `safety-engine.md` |
+| **Privacy** | `text_hash` removed from data model; no raw text stored | `safety_evaluations` migration, `models.py` |
 
-All 56 tests pass (14 session + 42 safety). No regressions.
+**All 56 tests pass (14 session + 42 safety). No regressions.**
+
+---
+
+## 9. Critical Architectural Guarantees
+
+1. **SafetyEngine is authoritative** — Risk classification happens BEFORE any LLM call
+2. **HIGH_RISK never reaches the LLM** — Crisis pathway is completely deterministic
+3. **OutputSafetyCheck is defense in depth** — Catches any unsafe AI output
+4. **Fail-closed on classifier failure** — Safety bypass impossible
+5. **Privacy-preserving persistence** — Metadata only, no content
+6. **Extensible classifier protocol** — Can add ML classifiers without pipeline changes
+
+---
+
+## 10. What This Is NOT
+
+- The SafetyEngine is **not** an LLM-based classifier
+- It does **not** "understand" language semantically
+- It does **not** diagnose mental health conditions
+- It is a **deterministic pattern-matching system** with carefully designed
+  Unicode handling, negation logic, and fail-closed safety guarantees
