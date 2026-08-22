@@ -97,10 +97,10 @@ export default function GAD7ScreeningPage() {
           href="/screening"
           className="text-xs font-semibold text-slate-500 dark:text-[#AAB6B1] hover:text-[#0D5C56] dark:hover:text-[#4FA79D] focus-accessible p-1 -ml-1 transition-colors"
         >
-          &larr; Back to Check-ins
+          &larr; Back to Self-Assessments
         </Link>
         <Badge variant="sage" size="sm" dot>
-          GAD-7 Anxiety Check-in
+          GAD-7 Anxiety Assessment
         </Badge>
       </div>
 

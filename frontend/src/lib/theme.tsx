@@ -8,6 +8,7 @@ interface ThemeContextType {
   theme: ThemeMode;
   resolvedTheme: 'light' | 'dark';
   setTheme: (theme: ThemeMode) => void;
+  toggleTheme: () => void;
   cycleTheme: () => void;
   mounted: boolean;
 }
@@ -18,7 +19,7 @@ const STORAGE_KEY = 'mh_theme';
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Deterministic initial state for SSR and initial hydration pass
-  const [theme, setThemeState] = useState<ThemeMode>('system');
+  const [theme, setThemeState] = useState<ThemeMode>('light');
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
   const [mounted, setMounted] = useState(false);
   const [, startTransition] = useTransition();
@@ -29,15 +30,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       const saved = localStorage.getItem(STORAGE_KEY) as ThemeMode | null;
       const initialTheme: ThemeMode =
-        saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'system';
+        saved === 'light' || saved === 'dark' ? saved : 'light';
 
       setThemeState(initialTheme);
 
       const root = document.documentElement;
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
       const applyTheme = (currentMode: ThemeMode) => {
-        const active = currentMode === 'system' ? (mediaQuery.matches ? 'dark' : 'light') : currentMode;
+        const active = currentMode === 'dark' ? 'dark' : 'light';
         setResolvedTheme(active);
 
         if (active === 'dark') {
@@ -51,43 +50,22 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       applyTheme(initialTheme);
     });
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleMediaChange = () => {
-      const currentStored = (localStorage.getItem(STORAGE_KEY) as ThemeMode | null) || 'system';
-      if (currentStored === 'system') {
-        const active = mediaQuery.matches ? 'dark' : 'light';
-        setResolvedTheme(active);
-        const root = document.documentElement;
-        if (active === 'dark') {
-          root.classList.add('dark');
-          root.setAttribute('data-theme', 'dark');
-        } else {
-          root.classList.remove('dark');
-          root.setAttribute('data-theme', 'light');
-        }
-      }
-    };
-
-    mediaQuery.addEventListener('change', handleMediaChange);
-    return () => mediaQuery.removeEventListener('change', handleMediaChange);
   }, []);
 
   const setTheme = (newTheme: ThemeMode) => {
     startTransition(() => {
-      setThemeState(newTheme);
+      const mode = newTheme === 'dark' ? 'dark' : 'light';
+      setThemeState(mode);
       try {
-        localStorage.setItem(STORAGE_KEY, newTheme);
+        localStorage.setItem(STORAGE_KEY, mode);
       } catch {
         // Handle private mode or quota errors safely
       }
 
       const root = document.documentElement;
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const active = newTheme === 'system' ? (mediaQuery.matches ? 'dark' : 'light') : newTheme;
-      setResolvedTheme(active);
+      setResolvedTheme(mode);
 
-      if (active === 'dark') {
+      if (mode === 'dark') {
         root.classList.add('dark');
         root.setAttribute('data-theme', 'dark');
       } else {
@@ -97,17 +75,17 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     });
   };
 
+  const toggleTheme = () => {
+    const nextTheme = resolvedTheme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+  };
+
   const cycleTheme = () => {
-    const next: Record<ThemeMode, ThemeMode> = {
-      system: 'light',
-      light: 'dark',
-      dark: 'system',
-    };
-    setTheme(next[theme]);
+    toggleTheme();
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme, cycleTheme, mounted }}>
+    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme, toggleTheme, cycleTheme, mounted }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -117,9 +95,10 @@ export function useTheme(): ThemeContextType {
   const context = useContext(ThemeContext);
   if (!context) {
     return {
-      theme: 'system',
+      theme: 'light',
       resolvedTheme: 'light',
       setTheme: () => {},
+      toggleTheme: () => {},
       cycleTheme: () => {},
       mounted: false,
     };

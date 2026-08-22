@@ -11,7 +11,7 @@ export default function ScreeningHubPage() {
       <div className="text-center space-y-3 max-w-2xl mx-auto">
         <div className="inline-flex items-center justify-center">
           <Badge variant="sage" size="md" dot>
-            Evidence-Based Self Check-in
+            Evidence-Based Self-Assessment
           </Badge>
         </div>
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#19232D] dark:text-[#F1F3EF] tracking-tight">
@@ -33,7 +33,7 @@ export default function ScreeningHubPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-[#0D5C56] dark:text-[#4FA79D] uppercase tracking-wider">
-                Mood &amp; Energy Check-in
+                Mood &amp; Energy Assessment
               </span>
               <Badge variant="brand" size="sm">
                 9 Questions &bull; ~2 mins
@@ -62,7 +62,7 @@ export default function ScreeningHubPage() {
           <div className="pt-6">
             <Link href="/screening/phq9" className="block">
               <Button variant="brand" fullWidth size="md">
-                <span>Start PHQ-9 Check-in</span>
+                <span>Start PHQ-9 Assessment</span>
                 <span aria-hidden="true">&rarr;</span>
               </Button>
             </Link>
@@ -78,7 +78,7 @@ export default function ScreeningHubPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-[#4A6B62] dark:text-[#86A69D] uppercase tracking-wider">
-                Anxiety &amp; Tension Check-in
+                Anxiety &amp; Tension Assessment
               </span>
               <Badge variant="sage" size="sm">
                 7 Questions &bull; ~2 mins
@@ -107,7 +107,7 @@ export default function ScreeningHubPage() {
           <div className="pt-6">
             <Link href="/screening/gad7" className="block">
               <Button variant="secondary" fullWidth size="md">
-                <span>Start GAD-7 Check-in</span>
+                <span>Start GAD-7 Assessment</span>
                 <span aria-hidden="true">&rarr;</span>
               </Button>
             </Link>
@@ -121,7 +121,7 @@ export default function ScreeningHubPage() {
           Important Medical &amp; Privacy Notice:
         </p>
         <p className="leading-relaxed">
-          These check-ins are self-reflection instruments designed to help you recognize personal patterns; they are <strong>not medical or psychiatric diagnoses</strong>. Only a licensed physician or mental health professional can provide a formal clinical evaluation.
+          These self-assessments are self-reflection instruments designed to help you recognize personal patterns; they are <strong>not medical or psychiatric diagnoses</strong>. Only a licensed physician or mental health professional can provide a formal clinical evaluation.
         </p>
         <p className="leading-relaxed text-slate-500 dark:text-[#73827D]">
           Your individual questionnaire responses are calculated securely by the backend and not retained. Only summary metrics are associated with your anonymous session.

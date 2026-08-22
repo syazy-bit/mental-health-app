@@ -50,7 +50,7 @@ export const MobileNav: React.FC = () => {
     },
     {
       href: '/screening',
-      label: 'Check-in',
+      label: 'Assessments',
       icon: (
         <svg
           className="w-5 h-5"

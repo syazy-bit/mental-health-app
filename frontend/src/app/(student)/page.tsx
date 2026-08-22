@@ -1,334 +1,565 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
+import { useRouter } from 'next/navigation';
+import { ResetIllustration } from '@/components/illustrations/ResetIllustration';
+import { MeditationIllustration } from '@/components/illustrations/MeditationIllustration';
+import { BotanicalVaseIllustration } from '@/components/illustrations/BotanicalVaseIllustration';
+import {
+  MoodOkayIcon,
+  MoodAnxiousIcon,
+  MoodStressedIcon,
+  MoodDrainedIcon,
+  MoodLowIcon,
+  AcademicPressureIcon,
+  AnxietyTopicIcon,
+  SleepTopicIcon,
+  BurnoutTopicIcon,
+  NeedToTalkTopicIcon,
+  ChatBubblePathwayIcon,
+  AssessmentClipboardIcon,
+  ProfessionalSupportIcon,
+  ImmediateHelpPhoneIcon,
+  AnonymousShieldIcon,
+  LockKeyholeIcon,
+  NoJudgmentHeartShieldIcon,
+  GentleHandsIcon,
+} from '@/components/illustrations/MindBridgeIcons';
 import { BreathingWidget } from '@/components/ui/BreathingWidget';
 
 export default function HomePage() {
-  const guidedTopics = [
+  const router = useRouter();
+  const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const [showBreathing, setShowBreathing] = useState(false);
+
+  const moods = [
     {
-      category: 'Academics',
-      label: 'Exam & deadline pressure',
-      query: "I'm feeling completely overwhelmed with exam deadlines and pressure",
+      id: 'okay',
+      label: 'Okay',
+      desc: "I'm doing alright",
+      icon: <MoodOkayIcon className="w-10 h-10" />,
+      starter: "I'm doing alright today, just checking in and exploring tools for maintaining balance.",
     },
     {
-      category: 'Anxiety',
-      label: 'Racing thoughts & panic',
-      query: "I'm experiencing intense anxiety and need help calming down",
+      id: 'anxious',
+      label: 'Anxious',
+      desc: 'Feeling worried or overwhelmed',
+      icon: <MoodAnxiousIcon className="w-10 h-10" />,
+      starter: "I'm feeling worried and overwhelmed right now. Can we talk through what's making me anxious?",
     },
     {
-      category: 'Sleep',
-      label: 'Sleep disruption & insomnia',
-      query: "I'm having trouble sleeping because my mind won't stop racing",
+      id: 'stressed',
+      label: 'Stressed',
+      desc: 'Pressure, deadlines or tension',
+      icon: <MoodStressedIcon className="w-10 h-10" />,
+      starter: "I am feeling a lot of pressure from deadlines and academic stress. I'd like help breaking it down.",
     },
     {
-      category: 'Energy',
-      label: 'Burnout & emotional fatigue',
-      query: "I feel completely burnt out and have zero energy or motivation",
+      id: 'drainout',
+      label: 'Drainout',
+      desc: 'Mentally and physically tired',
+      icon: <MoodDrainedIcon className="w-10 h-10" />,
+      starter: "I'm completely drained and exhausted mentally and physically. I need gentle guidance to recover.",
     },
     {
-      category: 'Decompress',
-      label: 'Safe space to vent',
-      query: "I just need someone to listen to what's going on without judgment",
+      id: 'low',
+      label: 'Low',
+      desc: 'Feeling down or hopeless',
+      icon: <MoodLowIcon className="w-10 h-10" />,
+      starter: "I've been feeling quite low and unmotivated lately. I need a compassionate, quiet space to reflect.",
     },
   ];
 
-  const careTiers = [
+  const topics = [
     {
-      id: 'tier1',
-      tier: 'Tier 1',
-      badge: 'Immediate & Automated',
-      badgeVariant: 'brand' as const,
-      title: 'Active Listening & Grounding',
-      subtitle: '24/7 Ephemeral AI Reflection',
-      desc: 'Private, real-time conversational support to deconstruct daily stress, exam anxiety, and impostor feelings. Governed by a deterministic clinical safety classifier.',
-      href: '/chat',
-      actionText: 'Launch Anonymous Chat',
-      features: ['Zero registration required', 'Deterministic safety pre-check', 'In-memory session processing'],
+      title: 'Academic pressure',
+      desc: 'Exams, deadlines & expectations',
+      icon: <AcademicPressureIcon className="w-7 h-7 text-[#204E3F] dark:text-[#A3C9A8]" />,
+      href: '/chat?starter=' + encodeURIComponent('I am struggling with academic pressure, exam anxiety, and heavy workload.'),
     },
     {
-      id: 'tier2',
-      tier: 'Tier 2',
-      badge: 'Standardized Instruments',
-      badgeVariant: 'sage' as const,
-      title: 'Clinical Self-Assessment',
-      subtitle: 'PHQ-9 & GAD-7 Validated Scoring',
-      desc: 'Standardized psychological screening tools measuring depressive symptom severity and generalized anxiety levels with zero diagnostic stigmatization.',
+      title: 'Anxiety',
+      desc: 'Racing thoughts & panic',
+      icon: <AnxietyTopicIcon className="w-7 h-7 text-[#204E3F] dark:text-[#A3C9A8]" />,
+      href: '/chat?starter=' + encodeURIComponent('I have racing thoughts and feel panic creeping in. Can you help me ground myself?'),
+    },
+    {
+      title: 'Sleep',
+      desc: 'Rest, routine & insomnia',
+      icon: <SleepTopicIcon className="w-7 h-7 text-[#204E3F] dark:text-[#A3C9A8]" />,
+      href: '/resources',
+    },
+    {
+      title: 'Burnout',
+      desc: 'Exhaustion & emotional fatigue',
+      icon: <BurnoutTopicIcon className="w-7 h-7 text-[#204E3F] dark:text-[#A3C9A8]" />,
       href: '/screening',
-      actionText: 'Start 2-Min Assessment',
-      features: ['Kroenke PHQ-9 (9 items)', 'Spitzer GAD-7 (7 items)', 'Instant severity breakdown'],
     },
     {
-      id: 'tier3',
-      tier: 'Tier 3',
-      badge: 'Licensed Campus Staff',
-      badgeVariant: 'brand' as const,
-      title: '1-on-1 Campus Counseling',
-      subtitle: 'Direct Appointment Scheduling',
-      desc: 'Connect with verified university mental health practitioners for scheduled confidential sessions. Uses cryptographic confirmation codes for anonymous ownership.',
-      href: '/booking',
-      actionText: 'Browse Available Slots',
-      features: ['8-char confirmation code', 'Confidential appointment notes', 'Reschedule or cancel anytime'],
-    },
-    {
-      id: 'tier4',
-      tier: 'Tier 4',
-      badge: 'Emergency & Helplines',
-      badgeVariant: 'amber' as const,
-      title: '24/7 Crisis Intervention',
-      subtitle: 'National Toll-Free Hotlines',
-      desc: 'Immediate emergency support routing for acute distress, severe trauma, or suicidal ideation. Verified direct lines to Tele-MANAS, Vandrevala, and Kiran.',
-      href: '/support-now',
-      actionText: 'View Emergency Numbers',
-      features: ['Tele-MANAS (14416 / 1800 891 4416)', 'Vandrevala (9999 666 555)', '24/7 Toll-Free Access'],
+      title: 'Just need to talk',
+      desc: 'A safe space to let it out',
+      icon: <NeedToTalkTopicIcon className="w-7 h-7 text-[#C76D54] dark:text-[#EAA08C]" />,
+      href: '/chat',
     },
   ];
 
-  const complianceStandards = [
+  const pathwaySteps = [
     {
-      title: 'Zero Data Retention',
-      badge: 'Privacy Protocol',
-      desc: 'Student conversations are processed ephemerally in volatile memory. No text logs, IP addresses, or student identities are ever written to disk.',
+      num: '01',
+      title: 'Talk & Reflect',
+      desc: 'Private space with AI-guided reflection',
+      icon: <ChatBubblePathwayIcon className="w-5 h-5 text-[#204E3F] dark:text-[#A3C9A8]" />,
+      bg: 'bg-[#E3EEE7] dark:bg-[#1C2F27]',
+      href: '/chat',
     },
     {
-      title: 'Deterministic Safety Engine',
-      badge: 'Clinical Safeguard',
-      desc: 'Strict multi-lingual keyword and semantic classifiers intercept crisis risk before any AI generation, guaranteeing instant helpline redirection.',
+      num: '02',
+      title: 'Self-Assessment',
+      desc: 'PHQ-9 / GAD-7 self-assessments',
+      icon: <AssessmentClipboardIcon className="w-5 h-5 text-[#D97706] dark:text-[#FBBF24]" />,
+      bg: 'bg-[#FEF3C7] dark:bg-[#32230E]',
+      href: '/screening',
     },
     {
-      title: 'Standardized Clinical Metrics',
-      badge: 'Evidence-Based',
-      desc: 'Utilizes peer-reviewed instruments (PHQ-9 and GAD-7) with deterministic item scoring to provide clinical clarity without diagnostic labeling.',
+      num: '03',
+      title: 'Professional Support',
+      desc: 'Connect with licensed university counselors',
+      icon: <ProfessionalSupportIcon className="w-5 h-5 text-[#204E3F] dark:text-[#A3C9A8]" />,
+      bg: 'bg-[#E3EEE7] dark:bg-[#1C2F27]',
+      href: '/booking',
     },
     {
-      title: 'Anonymous Counselor Booking',
-      badge: 'Cryptographic Key',
-      desc: 'Appointments are reserved using random 8-character confirmation keys. No student email, phone number, or student ID is required.',
+      num: '04',
+      title: 'Immediate Help',
+      desc: '24/7 crisis resources when you need it',
+      icon: <ImmediateHelpPhoneIcon className="w-5 h-5 text-[#C76D54] dark:text-[#F87171]" />,
+      bg: 'bg-[#FFE4E6] dark:bg-[#34181E]',
+      href: '/support-now',
     },
   ];
+
+  const trustBadges = [
+    {
+      title: 'Anonymous by design',
+      desc: 'We collect the minimum necessary. You stay in control.',
+      icon: <AnonymousShieldIcon className="w-5 h-5 text-[#204E3F] dark:text-[#A3C9A8]" />,
+    },
+    {
+      title: 'Private & secure',
+      desc: 'Encryption, zero-trace gateway & strict data protection.',
+      icon: <LockKeyholeIcon className="w-5 h-5 text-[#204E3F] dark:text-[#A3C9A8]" />,
+    },
+    {
+      title: 'No judgment',
+      desc: 'A safe, welcoming space for every student.',
+      icon: <NoJudgmentHeartShieldIcon className="w-5 h-5 text-[#204E3F] dark:text-[#A3C9A8]" />,
+    },
+    {
+      title: "You're not alone",
+      desc: 'Support is available, whenever you need it.',
+      icon: <GentleHandsIcon className="w-5 h-5 text-[#204E3F] dark:text-[#A3C9A8]" />,
+    },
+  ];
+
+  const handleStartWithMood = () => {
+    if (!selectedMood) {
+      router.push('/chat');
+      return;
+    }
+    const moodObj = moods.find((m) => m.id === selectedMood);
+    if (moodObj) {
+      router.push(`/chat?starter=${encodeURIComponent(moodObj.starter)}`);
+    } else {
+      router.push('/chat');
+    }
+  };
 
   return (
-    <div className="relative space-y-12 sm:space-y-16 py-3 sm:py-6 max-w-6xl mx-auto w-full">
-      {/* Background ambient lighting blooms */}
-      <div className="ambient-glow-teal top-12 left-1/4 w-96 h-96 -translate-x-1/2 opacity-60" />
-      <div className="ambient-glow-amber top-36 right-1/4 w-80 h-80 translate-x-1/2 opacity-40" />
+    <div className="space-y-10 sm:space-y-14 py-2 sm:py-4 max-w-5xl mx-auto w-full">
+      {/* 1. HERO SECTION */}
+      <section className="relative overflow-hidden rounded-3xl bg-[#FAF6F0]/90 dark:bg-[#16231E]/90 border border-[#ECE5D8] dark:border-[#263730] p-6 sm:p-8 md:p-10 shadow-2xs">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center relative z-10">
+          {/* Left Column: Typography & CTAs */}
+          <div className="md:col-span-7 space-y-5 text-center md:text-left">
+            {/* Pill Tag */}
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-medium bg-[#E8F0EA] dark:bg-[#1F3329] text-[#1E4D3D] dark:text-[#A8CEB1] border border-[#D5E3D8] dark:border-[#2D493B]">
+              <span>University Student Well-being Service</span>
+              <span className="opacity-60">&bull;</span>
+              <span>Anonymous Care Gateway</span>
+            </div>
 
-      {/* SYSTEM TELEMETRY / STATUS HEADER BAR */}
-      <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-white/80 dark:bg-[#162220]/80 backdrop-blur-md border border-[#E8E5DC] dark:border-[#253633] text-xs shadow-xs">
-        <div className="flex items-center gap-2.5">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0E5A54] dark:bg-[#57ADA3] opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0E5A54] dark:bg-[#57ADA3]" />
-          </span>
-          <span className="font-semibold text-[#1A242B] dark:text-[#F1F5F3]">
-            System Operational
-          </span>
-          <span className="text-[#8A9CA5] dark:text-[#6D7F7A] hidden sm:inline">&bull;</span>
-          <span className="text-[#5D6E77] dark:text-[#9EAEA9] hidden sm:inline">
-            Zero-Trace Anonymous Gateway Active
-          </span>
-        </div>
-        <div className="flex items-center gap-3 text-[11px] text-[#5D6E77] dark:text-[#9EAEA9]">
-          <span>Safety Engine: <strong className="text-[#0E5A54] dark:text-[#57ADA3] font-semibold">Deterministic v1.0</strong></span>
-          <span>&bull;</span>
-          <span>Availability: <strong className="text-[#0E5A54] dark:text-[#57ADA3] font-semibold">24/7</strong></span>
-        </div>
-      </div>
+            {/* Headline */}
+            <h1 className="space-y-1">
+              <span className="block font-serif text-3xl sm:text-4xl lg:text-5xl text-[#182C24] dark:text-[#F3F7F5] font-bold tracking-tight leading-[1.12]">
+                Start where you are.
+              </span>
+              <span className="block font-serif text-3xl sm:text-4xl lg:text-5xl text-[#184D3D] dark:text-[#7EA68E] font-bold tracking-tight leading-[1.12]">
+                Find your next step.
+              </span>
+            </h1>
 
-      {/* 1. EDITORIAL INSTITUTIONAL HERO */}
-      <section className="relative z-10 text-center space-y-5 max-w-3xl mx-auto pt-2 sm:pt-6">
-        <div className="inline-flex items-center justify-center">
-          <Badge variant="brand" size="md" dot>
-            University Student Well-being Service &bull; Anonymous Care Gateway
-          </Badge>
-        </div>
+            {/* Subtitle */}
+            <p className="text-sm sm:text-base text-[#5C7067] dark:text-[#A3B8AF] font-normal leading-relaxed max-w-lg">
+              A private space to reflect, understand how you&apos;re feeling, and connect with the support you need.
+            </p>
 
-        <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-[3.35rem] font-extrabold text-[#1A242B] dark:text-[#F1F5F3] tracking-tight leading-[1.12]">
-          A structured, confidential space <br className="hidden sm:inline" />
-          <span className="bg-gradient-to-r from-[#0E5A54] via-[#126D66] to-[#456B61] dark:from-[#57ADA3] dark:via-[#69BFB5] dark:to-[#8CB1A7] bg-clip-text text-transparent">
-            for your mental health.
-          </span>
-        </h1>
-
-        <p className="text-base sm:text-lg text-[#5D6E77] dark:text-[#9EAEA9] leading-relaxed max-w-2xl mx-auto font-normal">
-          Access stepped-care support—from instant AI reflection and standardized clinical check-ins (PHQ-9/GAD-7) to licensed university counselor appointments and 24/7 crisis resources.
-        </p>
-
-        {/* Guided Symptom & State Capsules */}
-        <div className="pt-3 space-y-2.5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-[#8A9CA5] dark:text-[#6D7F7A]">
-            Select a common focus area to begin:
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-2 max-w-3xl mx-auto">
-            {guidedTopics.map((topic) => (
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-1">
               <Link
-                key={topic.label}
-                href={`/chat?starter=${encodeURIComponent(topic.query)}`}
-                className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 dark:bg-[#162220]/90 backdrop-blur-md border border-[#E8E5DC] dark:border-[#253633] hover:border-[#0E5A54] dark:hover:border-[#57ADA3] hover:bg-[#F0F9F8] dark:hover:bg-[#142825] text-xs font-medium text-[#1A242B] dark:text-[#F1F5F3] hover:text-[#0E5A54] dark:hover:text-[#57ADA3] transition-all duration-150 shadow-2xs hover:shadow-xs active:scale-[0.98] focus-accessible"
+                href="/chat"
+                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 sm:px-7 sm:py-3 rounded-full text-xs sm:text-sm font-semibold bg-[#143D32] hover:bg-[#1D4E41] active:bg-[#0F2F26] text-white shadow-2xs hover:shadow-xs transition-all duration-200 active:scale-95 focus-accessible"
               >
-                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-black/[0.04] dark:bg-white/[0.08] text-[#5D6E77] dark:text-[#9EAEA9]">
-                  {topic.category}
-                </span>
-                <span>{topic.label}</span>
-                <span className="text-[#8A9CA5] dark:text-[#6D7F7A] group-hover:text-[#0E5A54] dark:group-hover:text-[#57ADA3] transition-transform group-hover:translate-x-0.5" aria-hidden="true">
-                  &rarr;
-                </span>
+                <span>Start a conversation</span>
+                <span aria-hidden="true">&rarr;</span>
               </Link>
-            ))}
+              <Link
+                href="/screening"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-full text-xs sm:text-sm font-medium bg-white dark:bg-[#1A2822] text-[#182C24] dark:text-[#E2EBE5] border border-[#D8D1C4] dark:border-[#2E4239] hover:bg-[#F2ECE1] dark:hover:bg-[#20312A] transition-all duration-200 active:scale-95 focus-accessible"
+              >
+                <span>Explore support</span>
+                <span aria-hidden="true">&rarr;</span>
+              </Link>
+            </div>
+
+            {/* Privacy Guarantee Note */}
+            <div className="flex items-center justify-center md:justify-start gap-2 pt-1 text-[11px] sm:text-xs text-[#6F8279] dark:text-[#8E9F98]">
+              <span className="p-1 rounded-md bg-[#ECE5D8] dark:bg-[#20312A] text-[#1E4D3D] dark:text-[#A8CEB1]">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </span>
+              <div>
+                <strong className="font-semibold text-[#182C24] dark:text-[#E2EBE5]">Your privacy is our promise.</strong>{' '}
+                <span>100% anonymous &bull; Confidential &bull; No judgment</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Meditation Illustration */}
+          <div className="md:col-span-5 flex items-center justify-center">
+            <div className="relative w-full max-w-[260px] sm:max-w-[300px] md:max-w-[340px] transition-transform duration-300 hover:scale-[1.03]">
+              <MeditationIllustration className="w-full h-auto drop-shadow-xs" />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 2. SOMATIC GROUNDING STATION (4-7-8 RHYTHM) */}
-      <section aria-label="Somatic Grounding Station" className="relative z-10">
-        <BreathingWidget />
+      {/* 2. PROMINENT UNIVERSITY COUNSELING HIGHLIGHT BANNER */}
+      <section aria-labelledby="counseling-highlight-heading" className="overflow-hidden rounded-3xl bg-gradient-to-br from-[#143D32] to-[#1D5445] text-white p-6 sm:p-8 shadow-md">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-2.5 text-center md:text-left max-w-xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-[#A3C9A8]/20 text-[#A3C9A8] border border-[#A3C9A8]/30">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <span>University Counseling Service</span>
+            </div>
+
+            <h2 id="counseling-highlight-heading" className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-white">
+              Confidential Support with Campus Counselors
+            </h2>
+
+            <p className="text-xs sm:text-sm text-[#D1E5D8] leading-relaxed">
+              Every enrolled student has access to free, 1-on-1 confidential counseling sessions with licensed university mental health professionals. Choose in-person campus appointments or secure telehealth.
+            </p>
+
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-1 text-[11px] sm:text-xs text-[#B2D4BD]">
+              <span className="flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-[#A3C9A8]" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                100% Free &amp; Confidential
+              </span>
+              <span className="flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-[#A3C9A8]" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Zero Academic Record Sharing
+              </span>
+              <span className="flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-[#A3C9A8]" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Flexible Scheduling
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row md:flex-col items-center gap-2.5 shrink-0 w-full sm:w-auto">
+            <Link
+              href="/booking"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 sm:px-7 sm:py-3 rounded-full text-xs sm:text-sm font-semibold bg-[#C5592D] hover:bg-[#B34D23] active:bg-[#9B411C] text-white shadow-xs transition-all duration-200 active:scale-95 text-center focus-accessible"
+            >
+              <span>Schedule a Session</span>
+              <span aria-hidden="true">&rarr;</span>
+            </Link>
+            <Link
+              href="/booking"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium text-[#D1E5D8] hover:text-white hover:bg-white/10 transition-all text-center focus-accessible"
+            >
+              <span>Meet Counselors &rarr;</span>
+            </Link>
+          </div>
+        </div>
       </section>
 
-      {/* 3. STEPPED-CARE PATHWAY MATRIX (TIERS 1 TO 4) */}
-      <section aria-labelledby="care-pathways-heading" className="relative z-10 space-y-6">
-        <div className="pb-2 border-b border-[#E8E5DC] dark:border-[#253633]">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#0E5A54] dark:text-[#57ADA3]">
-            Clinical Care Model
-          </span>
-          <h2 id="care-pathways-heading" className="font-heading text-2xl sm:text-3xl font-bold text-[#1A242B] dark:text-[#F1F5F3]">
-            Stepped-Care Support Pathway
+      {/* 3. HOW ARE YOU FEELING TODAY? (MOOD SELECTOR) */}
+      <section aria-labelledby="mood-heading" className="space-y-5 text-center">
+        <div className="space-y-1">
+          <h2 id="mood-heading" className="font-serif text-2xl sm:text-3xl text-[#182C24] dark:text-[#F3F7F5] font-bold">
+            How are you feeling today?
           </h2>
+          <p className="text-xs sm:text-sm text-[#5C7067] dark:text-[#A3B8AF]">
+            There&apos;s no right or wrong answer. We&apos;re here for whatever you&apos;re going through.
+          </p>
         </div>
 
-        {/* Pathway Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {careTiers.map((tier) => (
-            <Card
-              key={tier.id}
-              variant="interactive"
-              padding="lg"
-              className="flex flex-col justify-between rounded-3xl border border-[#E8E5DC] dark:border-[#253633] hover:border-[#0E5A54]/50 dark:hover:border-[#57ADA3]/50 transition-all duration-200"
-            >
-              <div className="space-y-4">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-extrabold uppercase tracking-wider text-[#0E5A54] dark:text-[#57ADA3] bg-[#F0F9F8] dark:bg-[#142825] px-2.5 py-1 rounded-md border border-[#CEF0EB] dark:border-[#28534E]">
-                    {tier.tier}
-                  </span>
-                  <Badge variant={tier.badgeVariant} size="sm">
-                    {tier.badge}
-                  </Badge>
-                </div>
+        {/* Mood Options Row with Right Decorative Vase */}
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-5 pt-1">
+          {/* 5 Mood Circular Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 w-full max-w-3xl">
+            {moods.map((mood) => {
+              const isSelected = selectedMood === mood.id;
+              return (
+                <button
+                  key={mood.id}
+                  type="button"
+                  onClick={() => setSelectedMood(mood.id)}
+                  className={`p-3.5 sm:p-4 rounded-3xl transition-all duration-200 flex flex-col items-center justify-center text-center space-y-1.5 cursor-pointer focus-accessible ${
+                    isSelected
+                      ? 'bg-white dark:bg-[#1E2E27] ring-2 ring-[#143D32] dark:ring-[#7EA68E] shadow-md -translate-y-0.5'
+                      : 'bg-white/70 dark:bg-[#16231E]/70 hover:bg-white dark:hover:bg-[#1A2923] border border-[#ECE5D8] dark:border-[#263730] shadow-2xs hover:shadow-xs hover:-translate-y-0.5'
+                  }`}
+                >
+                  <div className="p-0.5 transition-transform duration-200">
+                    {mood.icon}
+                  </div>
+                  <div>
+                    <h3 className="font-serif font-bold text-sm text-[#182C24] dark:text-[#F3F7F5]">
+                      {mood.label}
+                    </h3>
+                    <p className="text-[11px] text-[#6E8078] dark:text-[#90A29A] leading-tight mt-0.5">
+                      {mood.desc}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
 
-                <div className="space-y-1">
-                  <h3 className="font-heading text-xl font-bold text-[#1A242B] dark:text-[#F1F5F3]">
-                    {tier.title}
+          {/* Decorative Botanical Vase (Desktop side accent) */}
+          <div className="hidden lg:flex items-center justify-center shrink-0 pl-1">
+            <BotanicalVaseIllustration className="w-24 h-auto opacity-95" />
+          </div>
+        </div>
+
+        {/* Start with Mood Button */}
+        <div className="pt-1">
+          <button
+            type="button"
+            onClick={handleStartWithMood}
+            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-[#D7E8DB] hover:bg-[#C9DEC3] active:bg-[#BCD2BE] text-[#143D32] dark:bg-[#223B2E] dark:hover:bg-[#2C4A3A] dark:text-[#D7E8DB] transition-all duration-200 active:scale-95 shadow-2xs cursor-pointer focus-accessible"
+          >
+            <span>Let&apos;s start there</span>
+            <span aria-hidden="true">&rarr;</span>
+          </button>
+        </div>
+      </section>
+
+      {/* 4. FIND SUPPORT FOR WHAT MATTERS TO YOU (5 TOPIC CARDS) */}
+      <section aria-labelledby="topics-heading" className="space-y-5 text-center">
+        <div className="space-y-1">
+          <h2 id="topics-heading" className="font-serif text-2xl sm:text-3xl text-[#182C24] dark:text-[#F3F7F5] font-bold">
+            Find support for what matters to you
+          </h2>
+          <p className="text-xs sm:text-sm text-[#5C7067] dark:text-[#A3B8AF]">
+            Choose a topic that feels closest to what you&apos;re going through.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 text-left">
+          {topics.map((topic) => (
+            <Link
+              key={topic.title}
+              href={topic.href}
+              className="group p-4 sm:p-5 rounded-3xl bg-white dark:bg-[#16231E] border border-[#ECE5D8] dark:border-[#263730] shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between space-y-3.5 focus-accessible"
+            >
+              <div className="space-y-2.5">
+                <div className="p-2.5 w-fit rounded-2xl bg-[#FAF7F2] dark:bg-[#121B17] border border-[#EFE9DF] dark:border-[#20312A] group-hover:scale-105 transition-transform duration-200">
+                  {topic.icon}
+                </div>
+                <div className="space-y-0.5">
+                  <h3 className="font-serif font-bold text-sm text-[#182C24] dark:text-[#F3F7F5] group-hover:text-[#143D32] dark:group-hover:text-[#A3C9A8] transition-colors">
+                    {topic.title}
                   </h3>
-                  <p className="text-xs font-semibold text-[#5D6E77] dark:text-[#9EAEA9]">
-                    {tier.subtitle}
+                  <p className="text-[11px] text-[#6E8078] dark:text-[#90A29A] leading-relaxed">
+                    {topic.desc}
                   </p>
                 </div>
-
-                <p className="text-xs sm:text-sm text-[#5D6E77] dark:text-[#9EAEA9] leading-relaxed">
-                  {tier.desc}
-                </p>
-
-                {/* Feature checklist */}
-                <ul className="space-y-1.5 pt-2 border-t border-black/[0.04] dark:border-white/[0.05]">
-                  {tier.features.map((feat, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-xs text-[#5D6E77] dark:text-[#9EAEA9]">
-                      <svg className="w-3.5 h-3.5 text-[#0E5A54] dark:text-[#57ADA3] shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <span>{feat}</span>
-                    </li>
-                  ))}
-                </ul>
               </div>
 
-              <div className="pt-6">
-                <Link href={tier.href} className="block w-full">
-                  <Button
-                    variant={tier.id === 'tier4' ? 'crisis' : tier.id === 'tier1' ? 'brand' : 'outline'}
-                    size="md"
-                    fullWidth
-                    className="rounded-xl shadow-2xs hover:shadow-xs"
-                  >
-                    <span>{tier.actionText}</span>
-                    <span aria-hidden="true">&rarr;</span>
-                  </Button>
-                </Link>
+              <div className="flex justify-end pt-0.5">
+                <span className="text-xs text-[#143D32] dark:text-[#A3C9A8] font-medium group-hover:translate-x-1 transition-transform duration-200">
+                  &rarr;
+                </span>
               </div>
-            </Card>
+            </Link>
           ))}
         </div>
       </section>
 
-      {/* 4. SECURITY & CLINICAL COMPLIANCE PROTOCOL SPEC */}
-      <section aria-labelledby="compliance-heading" className="relative z-10 space-y-6 pt-4">
-        <div className="text-center space-y-1.5 max-w-2xl mx-auto">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#0E5A54] dark:text-[#57ADA3]">
-            Security &amp; Institutional Governance
-          </span>
-          <h2 id="compliance-heading" className="font-heading text-2xl font-bold text-[#1A242B] dark:text-[#F1F5F3]">
-            Clinical Governance &amp; Anonymity Guarantees
+      {/* 5. TAKE A MINUTE FOR YOURSELF (60-SECOND RESET BANNER) */}
+      <section aria-labelledby="reset-heading" className="overflow-hidden rounded-3xl bg-[#E6F0EA] dark:bg-[#162820] border border-[#D2E4D8] dark:border-[#254034] p-6 sm:p-8 text-[#182C24] dark:text-[#F3F7F5] shadow-2xs">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+          {/* Left Illustration */}
+          <div className="md:col-span-4 flex items-center justify-center">
+            <ResetIllustration className="w-44 sm:w-52 h-auto" />
+          </div>
+
+          {/* Right Content */}
+          <div className="md:col-span-8 space-y-5 text-center md:text-left">
+            <div className="space-y-1">
+              <h2 id="reset-heading" className="font-serif text-2xl sm:text-3xl font-bold text-[#143D32] dark:text-[#E2EBE5]">
+                Take a minute for yourself.
+              </h2>
+              <p className="text-xs sm:text-sm text-[#4E675D] dark:text-[#A3B8AF]">
+                You don&apos;t have to solve everything right now.
+              </p>
+            </div>
+
+            {/* 3 Step Sequence with clean SVG indicators */}
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 sm:gap-3 text-xs font-medium">
+              {/* Step 1 */}
+              <div className="flex items-center gap-2 p-2 px-3 rounded-2xl bg-white/80 dark:bg-[#1C3228] border border-[#D5E5DB] dark:border-[#2D4C3E] shadow-2xs">
+                <span className="w-5 h-5 rounded-full bg-[#143D32] text-white flex items-center justify-center text-[10px] font-bold">1</span>
+                <div>
+                  <p className="font-bold text-[11px] text-[#143D32] dark:text-[#E2EBE5]">01:00</p>
+                  <p className="text-[10px] text-[#5C7067] dark:text-[#9FB1A9]">Slow down</p>
+                </div>
+              </div>
+
+              <span className="text-[#88A696] dark:text-[#4A685A]">&rarr;</span>
+
+              {/* Step 2 */}
+              <div className="flex items-center gap-2 p-2 px-3 rounded-2xl bg-white/80 dark:bg-[#1C3228] border border-[#D5E5DB] dark:border-[#2D4C3E] shadow-2xs">
+                <span className="w-5 h-5 rounded-full bg-[#143D32] text-white flex items-center justify-center text-[10px] font-bold">2</span>
+                <div>
+                  <p className="font-bold text-[11px] text-[#143D32] dark:text-[#E2EBE5]">Notice</p>
+                  <p className="text-[10px] text-[#5C7067] dark:text-[#9FB1A9]">How you feel</p>
+                </div>
+              </div>
+
+              <span className="text-[#88A696] dark:text-[#4A685A]">&rarr;</span>
+
+              {/* Step 3 */}
+              <div className="flex items-center gap-2 p-2 px-3 rounded-2xl bg-white/80 dark:bg-[#1C3228] border border-[#D5E5DB] dark:border-[#2D4C3E] shadow-2xs">
+                <span className="w-5 h-5 rounded-full bg-[#143D32] text-white flex items-center justify-center text-[10px] font-bold">3</span>
+                <div>
+                  <p className="font-bold text-[11px] text-[#143D32] dark:text-[#E2EBE5]">Reset</p>
+                  <p className="text-[10px] text-[#5C7067] dark:text-[#9FB1A9]">Give yourself grace</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Trigger & Evidence Subtext */}
+            <div className="space-y-2 pt-0.5">
+              <button
+                type="button"
+                onClick={() => setShowBreathing((prev) => !prev)}
+                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 sm:px-7 sm:py-3 rounded-full text-xs sm:text-sm font-semibold bg-[#143D32] hover:bg-[#1C4E40] active:bg-[#0E2E25] text-white shadow-xs transition-all duration-200 active:scale-95 cursor-pointer focus-accessible"
+              >
+                <span>{showBreathing ? 'Close reset tool' : 'Start 60-second reset'}</span>
+                <span aria-hidden="true">{showBreathing ? '▲' : '→'}</span>
+              </button>
+
+              <p className="text-[11px] text-[#557065] dark:text-[#9FB1A9] flex items-center justify-center md:justify-start gap-1.5">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-[#507565]" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                <span>Exercises backed by evidence-based practices</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Expandable Guided Breathing Tool */}
+        {showBreathing && (
+          <div className="mt-6 pt-5 border-t border-[#D0E2D6] dark:border-[#243F33] animate-page-enter">
+            <BreathingWidget />
+          </div>
+        )}
+      </section>
+
+      {/* 6. SUPPORT THAT GROWS WITH YOU (4-STEP PROGRESSION PATHWAY) */}
+      <section aria-labelledby="pathway-heading" className="space-y-6 text-center">
+        <div className="space-y-1">
+          <h2 id="pathway-heading" className="font-serif text-2xl sm:text-3xl text-[#182C24] dark:text-[#F3F7F5] font-bold">
+            Support that grows with you
           </h2>
-          <p className="text-xs sm:text-sm text-[#5D6E77] dark:text-[#9EAEA9]">
-            Engineered from ground up to satisfy stringent institutional confidentiality and mental health safety requirements.
+          <p className="text-xs sm:text-sm text-[#5C7067] dark:text-[#A3B8AF]">
+            Start wherever you&apos;re comfortable. Move at your own pace.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {complianceStandards.map((std) => (
-            <div
-              key={std.title}
-              className="p-5 rounded-2xl bg-white/90 dark:bg-[#162220]/90 backdrop-blur-md border border-[#E8E5DC] dark:border-[#253633] shadow-2xs space-y-2.5 flex flex-col justify-between"
-            >
-              <div className="space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#0E5A54] dark:text-[#57ADA3] bg-[#F0F9F8] dark:bg-[#142825] px-2 py-0.5 rounded border border-[#CEF0EB] dark:border-[#28534E]">
-                  {std.badge}
-                </span>
-                <h3 className="font-heading text-sm font-bold text-[#1A242B] dark:text-[#F1F5F3]">
-                  {std.title}
+        {/* 4 Connected Circular Steps */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 relative">
+          {pathwaySteps.map((step, idx) => (
+            <div key={step.num} className="relative flex flex-col items-center text-center space-y-2.5">
+              {/* Connector line (desktop) */}
+              {idx < pathwaySteps.length - 1 && (
+                <div className="hidden lg:block absolute top-7 left-[65%] w-[70%] border-t-2 border-dashed border-[#CCD8D2] dark:border-[#2D453B] z-0 pointer-events-none" />
+              )}
+
+              {/* Circular Node */}
+              <Link
+                href={step.href}
+                className={`relative z-10 w-13 h-13 rounded-full ${step.bg} border border-[#D5E3D9] dark:border-[#30483C] flex items-center justify-center shadow-xs hover:scale-105 transition-transform duration-200 focus-accessible`}
+              >
+                {step.icon}
+              </Link>
+
+              {/* Step Info */}
+              <div className="space-y-0.5 max-w-[200px]">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-[#8A9C94] dark:text-[#7D9188]">
+                  {step.num}
+                </p>
+                <h3 className="font-serif font-bold text-sm text-[#182C24] dark:text-[#F3F7F5]">
+                  <Link href={step.href} className="hover:underline focus-accessible">
+                    {step.title}
+                  </Link>
                 </h3>
-                <p className="text-xs text-[#5D6E77] dark:text-[#9EAEA9] leading-relaxed">
-                  {std.desc}
+                <p className="text-[11px] text-[#6E8078] dark:text-[#90A29A] leading-relaxed">
+                  {step.desc}
                 </p>
               </div>
             </div>
           ))}
         </div>
-
-        <div className="text-center pt-2">
-          <Link
-            href="/about"
-            className="text-xs font-semibold text-[#0E5A54] dark:text-[#57ADA3] hover:text-[#126D66] dark:hover:text-[#69BFB5] underline underline-offset-4 focus-accessible"
-          >
-            Review Detailed Architecture &amp; Clinical Safety Whitepaper &rarr;
-          </Link>
-        </div>
       </section>
 
-      {/* 5. 24/7 CRISIS DISPATCH NOTICE */}
-      <div className="relative z-10 p-5 rounded-2xl bg-[#FFFBEB] dark:bg-[#281D10] border border-[#FDE68A] dark:border-[#5C3F1C] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-[#78350F] dark:text-[#FDE68A]">
-        <div className="flex items-center gap-3 text-center sm:text-left">
-          <div className="w-10 h-10 rounded-xl bg-[#FEF3C7] dark:bg-[#342410] border border-[#FDE68A] dark:border-[#5C3F1C] flex items-center justify-center shrink-0 text-[#92400E] dark:text-[#ECA347]">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-            </svg>
-          </div>
-          <div>
-            <p className="font-bold text-[#92400E] dark:text-[#FDE68A]">
-              Experiencing Acute Crisis or Severe Emotional Distress?
-            </p>
-            <p className="text-amber-900/90 dark:text-amber-200/90 text-xs">
-              National Tele-MANAS toll-free crisis counselors are on standby 24/7: Dial <strong className="font-bold">14416</strong> or <strong className="font-bold">1800 891 4416</strong>.
-            </p>
-          </div>
+      {/* 7. TRUST & PRIVACY GUARANTEES (4 PILLARS) */}
+      <section aria-label="Trust principles and data security" className="p-5 sm:p-7 rounded-3xl bg-[#F6F2EA]/80 dark:bg-[#16231E]/80 border border-[#ECE5D8] dark:border-[#263730] shadow-2xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 text-left">
+          {trustBadges.map((badge) => (
+            <div key={badge.title} className="flex items-start gap-3">
+              <div className="p-2 rounded-2xl bg-white dark:bg-[#1D2E27] border border-[#E8E1D4] dark:border-[#2B4036] shadow-2xs shrink-0">
+                {badge.icon}
+              </div>
+              <div className="space-y-0.5">
+                <h4 className="font-serif font-bold text-xs sm:text-sm text-[#182C24] dark:text-[#F3F7F5]">
+                  {badge.title}
+                </h4>
+                <p className="text-[11px] text-[#6E8078] dark:text-[#90A29A] leading-relaxed">
+                  {badge.desc}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
-        <Link href="/support-now" className="shrink-0">
-          <Button variant="crisis" size="sm" className="rounded-xl font-bold">
-            Emergency Contacts Directory
-          </Button>
-        </Link>
-      </div>
+      </section>
     </div>
   );
 }

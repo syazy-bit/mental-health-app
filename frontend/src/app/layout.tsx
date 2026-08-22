@@ -1,43 +1,43 @@
 import type { Metadata, Viewport } from 'next';
-import { Plus_Jakarta_Sans, Inter } from 'next/font/google';
+import { Playfair_Display, Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/lib/theme';
 
-const fontHeading = Plus_Jakarta_Sans({
+const fontHeading = Playfair_Display({
   subsets: ['latin'],
   variable: '--font-heading',
   display: 'swap',
-  weight: ['500', '600', '700', '800'],
+  weight: ['400', '500', '600', '700'],
 });
 
 const fontBody = Inter({
   subsets: ['latin'],
   variable: '--font-body',
   display: 'swap',
-  weight: ['400', '500', '600', '700'],
+  weight: ['300', '400', '500', '600'],
 });
 
 export const metadata: Metadata = {
-  title: 'MindBridge — Student Mental Health & Emotional Support',
+  title: 'MindBridge — Find Your Calm',
   description:
-    'Confidential, anonymous mental health support for university students. Empathetic AI listening, evidence-based PHQ-9 & GAD-7 screenings, verified crisis resources, and licensed counseling booking.',
+    'Simple, confidential tools for a balanced mind. Empathetic AI listening, evidence-based PHQ-9 & GAD-7 screenings, verified crisis resources, and licensed counseling booking.',
   applicationName: 'MindBridge',
   authors: [{ name: 'University Well-being Service' }],
   keywords: [
     'student mental health',
     'university counseling',
     'anonymous support',
+    'mindfulness',
     'PHQ-9 screening',
     'GAD-7 screening',
     'crisis helplines',
-    'emotional listening',
   ],
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#FAF8F5' },
-    { media: '(prefers-color-scheme: dark)', color: '#0F1615' },
+    { media: '(prefers-color-scheme: light)', color: '#F9F6F0' },
+    { media: '(prefers-color-scheme: dark)', color: '#121A17' },
   ],
   width: 'device-width',
   initialScale: 1,
