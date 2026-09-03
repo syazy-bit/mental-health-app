@@ -2,8 +2,70 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
+import { useAuth } from '@/components/auth/AuthProvider';
+
+const AuthControls: React.FC = () => {
+  const { user, status, logout } = useAuth();
+  const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = React.useState(false);
+
+  // While auth is initializing, render nothing extra so logged-in users
+  // never see a flash of the anonymous sign-in links.
+  if (status === 'initializing' || status === 'authenticating') {
+    return null;
+  }
+
+  if (user) {
+    const label = user.display_name || user.email;
+    const handleLogout = async () => {
+      if (isLoggingOut) return;
+      setIsLoggingOut(true);
+      try {
+        await logout();
+      } finally {
+        setIsLoggingOut(false);
+        router.replace('/');
+      }
+    };
+    return (
+      <div className="flex items-center gap-2 shrink-0">
+        <span
+          className="hidden sm:inline max-w-32 truncate text-xs sm:text-sm font-medium text-[#5A6D65] dark:text-[#9FB1A9]"
+          title={user.email}
+        >
+          {label}
+        </span>
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="inline-flex items-center justify-center px-4 py-2 rounded-full text-xs sm:text-sm font-semibold border border-[#E5DEC7] dark:border-[#283C33] text-[#5A6D65] dark:text-[#9FB1A9] hover:text-[#182C24] dark:hover:text-[#F3F7F5] hover:bg-black/5 dark:hover:bg-white/5 transition-all focus-accessible select-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+        >
+          {isLoggingOut ? 'Logging out…' : 'Log out'}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2 shrink-0">
+      <Link
+        href="/login"
+        className="hidden sm:inline-flex items-center justify-center px-4 py-2 rounded-full text-xs sm:text-sm font-semibold text-[#0E5A54] dark:text-[#57ADA3] hover:bg-[#F0F9F8] dark:hover:bg-[#142825] transition-all focus-accessible select-none"
+      >
+        Log in
+      </Link>
+      <Link
+        href="/register"
+        className="inline-flex items-center justify-center px-4 py-2 rounded-full text-xs sm:text-sm font-semibold border border-[#0E5A54] dark:border-[#57ADA3] text-[#0E5A54] dark:text-[#57ADA3] hover:bg-[#F0F9F8] dark:hover:bg-[#142825] transition-all focus-accessible select-none"
+      >
+        Sign up
+      </Link>
+    </div>
+  );
+};
 
 export const DesktopHeader: React.FC = () => {
   const pathname = usePathname();
@@ -65,8 +127,9 @@ export const DesktopHeader: React.FC = () => {
           })}
         </nav>
 
-        {/* Action Controls: Theme Switcher & Terracotta Pill CTA */}
+        {/* Action Controls: Auth, Theme Switcher & Terracotta Pill CTA */}
         <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+          <AuthControls />
           <ThemeSwitcher />
           <Link
             href="/support-now"
