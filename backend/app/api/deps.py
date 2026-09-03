@@ -8,7 +8,10 @@ from sqlalchemy.orm import Session
 from app.core.config import ADMIN_AUTH_ALGORITHM, settings
 from app.core.db import get_db
 from app.models.admin import Admin as AdminModel
+from app.models.user import User as UserModel
 from app.services.admin import AdminService
+from app.services.student_auth import StudentAuthService
+from app.security.tokens import StudentTokenError, decode_student_access_token
 
 
 security = HTTPBearer(auto_error=False)
@@ -17,6 +20,11 @@ security = HTTPBearer(auto_error=False)
 def get_admin_service(db: Session = Depends(get_db)) -> AdminService:
     """Dependency to get AdminService instance."""
     return AdminService(db)
+
+
+def get_student_auth_service(db: Session = Depends(get_db)) -> StudentAuthService:
+    """Dependency to get StudentAuthService instance."""
+    return StudentAuthService(db)
 
 
 async def get_current_admin(
@@ -66,3 +74,42 @@ async def get_current_admin(
         raise credentials_exception
 
     return admin
+
+
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(security),
+    auth_service: StudentAuthService = Depends(get_student_auth_service),
+) -> UserModel:
+    """Extract and validate a student access JWT, return the authenticated user.
+
+    Accepts ONLY tokens minted for students (`type=student_access`, student
+    secret, student issuer): admin tokens and foreign JWTs are rejected by
+    decode_student_access_token before any database access.
+
+    Raises HTTPException 401 if:
+    - No Authorization header
+    - Invalid token format / signature / algorithm
+    - Expired token
+    - Wrong token type or issuer
+    - User not found
+    - User soft-deleted (deleted_at IS NOT NULL)
+    """
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    if credentials is None:
+        raise credentials_exception
+
+    try:
+        user_id = decode_student_access_token(credentials.credentials)
+    except StudentTokenError:
+        raise credentials_exception
+
+    user = auth_service.get_active_user(user_id)
+    if user is None:
+        raise credentials_exception
+
+    return user

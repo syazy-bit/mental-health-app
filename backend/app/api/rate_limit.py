@@ -1,7 +1,8 @@
-"""Application-level login throttling for the admin auth endpoint.
+"""Application-level login throttling for the admin and student auth endpoints.
 
-Protects POST /api/admin/auth/login against rapid brute-force attempts without
-adding a large external rate-limiting framework.
+Protects POST /api/admin/auth/login and the Phase 1B student endpoints
+(/api/auth/register, /api/auth/login, /api/auth/refresh) against rapid
+brute-force attempts without adding a large external rate-limiting framework.
 
 Strategy
 --------
@@ -136,3 +137,23 @@ login_throttle = LoginThrottle(
 def get_login_throttle() -> LoginThrottle:
     """FastAPI dependency exposing the login throttle singleton."""
     return login_throttle
+
+
+# Phase 1B: separate throttle instance for student authentication.
+#
+# The LoginThrottle class is reused (same fixed-window semantics), but the
+# instance, buckets, and settings are fully separate from the admin throttle:
+# student brute force can neither trigger nor evade admin lockouts.
+# The `username` slot carries the email for login, or the endpoint name
+# ("register", "refresh") for endpoints without an account identifier.
+student_throttle = LoginThrottle(
+    max_failures=settings.student_login_max_failures,
+    ip_max_failures=settings.student_login_ip_max_failures,
+    window_seconds=settings.student_login_window_seconds,
+    lockout_seconds=settings.student_login_lockout_seconds,
+)
+
+
+def get_student_throttle() -> LoginThrottle:
+    """FastAPI dependency exposing the student throttle singleton."""
+    return student_throttle

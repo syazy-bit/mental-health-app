@@ -13,6 +13,7 @@ from app.api.routes import (
     sessions,
     chat,
     screenings,
+    auth,
     admin_auth,
     admin,
     counselors,
@@ -42,6 +43,7 @@ def create_app() -> FastAPI:
     app.include_router(sessions.router)
     app.include_router(chat.router)
     app.include_router(screenings.router)
+    app.include_router(auth.router)
     app.include_router(admin_auth.router)
     app.include_router(admin.router)
     app.include_router(counselors.router)

@@ -97,12 +97,13 @@ def _clean_tables(db_session):
 
 @pytest.fixture(autouse=True)
 def _reset_login_throttle():
-    """Reset the in-memory admin login throttle between tests.
+    """Reset the in-memory admin + student login throttles between tests.
 
-    The throttle is a process-wide singleton; without a reset, failed-login
+    The throttles are process-wide singletons; without a reset, failed-login
     tests would accumulate counters and trip the lockout for unrelated tests.
     """
-    from app.api.rate_limit import login_throttle
+    from app.api.rate_limit import login_throttle, student_throttle
 
     login_throttle.reset()
+    student_throttle.reset()
     yield

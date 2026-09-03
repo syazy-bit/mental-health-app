@@ -14,6 +14,13 @@ from app.schemas.admin import (
     AdminResponse,
     AdminCreateInternal,
 )
+from app.schemas.student_auth import (
+    StudentRegisterRequest,
+    StudentLoginRequest,
+    StudentTokenResponse,
+    StudentResponse,
+    RefreshRequest,
+)
 from app.schemas.booking import (
     CounselorCreate,
     CounselorResponse,
@@ -37,6 +44,11 @@ __all__ = [
     "AdminTokenResponse",
     "AdminResponse",
     "AdminCreateInternal",
+    "StudentRegisterRequest",
+    "StudentLoginRequest",
+    "StudentTokenResponse",
+    "StudentResponse",
+    "RefreshRequest",
     "CounselorCreate",
     "CounselorResponse",
     "CounselorSlotCreate",
