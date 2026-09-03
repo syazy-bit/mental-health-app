@@ -3,6 +3,9 @@
 from app.core.db import Base
 from app.models.session import Session
 from app.models.safety_evaluation import SafetyEvaluation
+from app.models.screening import Screening
+from app.models.user import User
+from app.models.refresh_token import RefreshToken
 from app.models.admin import Admin
 from app.models.counselor import Counselor
 from app.models.counselor_slot import CounselorSlot
@@ -12,6 +15,9 @@ __all__ = [
     "Base",
     "Session",
     "SafetyEvaluation",
+    "Screening",
+    "User",
+    "RefreshToken",
     "Admin",
     "Counselor",
     "CounselorSlot",

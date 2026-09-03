@@ -28,6 +28,12 @@ class Screening(Base):
         ForeignKey("sessions.id", ondelete="CASCADE"),
         nullable=False,
     )
+    # Phase 1A: optional owner. NULL = anonymous screening (default, unchanged).
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
     instrument: Mapped[str] = mapped_column(
         String(16),
         nullable=False,
@@ -59,6 +65,8 @@ class Screening(Base):
         Index("ix_screenings_session_created", "session_id", "created_at"),
         # Index for instrument-based queries
         Index("ix_screenings_instrument", "instrument"),
+        # Index for owner history queries (Phase 1A)
+        Index("ix_screenings_user_id", "user_id"),
         # Check constraints
         CheckConstraint(
             "instrument IN ('PHQ9', 'GAD7')",

@@ -7,7 +7,7 @@ No conversation content, name, email, or phone number is stored.
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, String, func, text
+from sqlalchemy import DateTime, ForeignKey, Index, String, func, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import Uuid
 
@@ -28,6 +28,12 @@ class Session(Base):
         nullable=False,
         server_default="en",
     )
+    # Phase 1A: optional owner. NULL = anonymous session (default, unchanged).
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -45,4 +51,8 @@ class Session(Base):
         back_populates="session",
         cascade="all, delete-orphan",
         order_by="SafetyEvaluation.message_index",
+    )
+
+    __table_args__ = (
+        Index("ix_sessions_user_id", "user_id"),
     )

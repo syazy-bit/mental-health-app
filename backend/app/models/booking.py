@@ -52,6 +52,13 @@ class Booking(Base):
         ForeignKey("sessions.id", ondelete="SET NULL"),
         nullable=True,
     )
+    # Phase 1A: optional owner. NULL = anonymous booking (default, unchanged).
+    # Existing session_id/confirmation-code ownership is unaffected.
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
     confirmation_code: Mapped[str] = mapped_column(
         String(8),
         nullable=False,
@@ -90,6 +97,8 @@ class Booking(Base):
     __table_args__ = (
         Index("ix_bookings_session_id", "session_id"),
         Index("ix_bookings_status", "status"),
+        # Index for owner history queries (Phase 1A)
+        Index("ix_bookings_user_id", "user_id"),
         # Partial unique index: at most one active (PENDING/CONFIRMED) booking
         # per slot. CANCELLED/COMPLETED bookings do not block new bookings.
         Index(
