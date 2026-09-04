@@ -154,3 +154,26 @@ export interface BookingCreateRequest {
   contact_phone?: string;
   reason?: string;
 }
+
+// --- Phase 3C: My Check-ins (owned screening history) ---
+//
+// Mirrors backend ScreeningHistoryItem / ScreeningHistoryResponse.
+// Deliberately has no session_id, no raw answers, no safety records,
+// no booking data — the backend never sends them for history.
+
+export interface ScreeningHistoryItem {
+  id: string;
+  instrument: string;
+  total_score: number;
+  severity: string;
+  safety_flag: boolean;
+  item9_score?: number | null;
+  created_at: string;
+}
+
+export interface ScreeningHistoryResponse {
+  items: ScreeningHistoryItem[];
+  total: number;
+  limit: number;
+  offset: number;
+}

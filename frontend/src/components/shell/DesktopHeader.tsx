@@ -71,11 +71,14 @@ const AuthControls: React.FC = () => {
 
 export const DesktopHeader: React.FC = () => {
   const pathname = usePathname();
+  const { user } = useAuth();
 
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/chat', label: 'Talk & Reflect' },
     { href: '/screening', label: 'Self-Assessment' },
+    // Authenticated-only: anonymous visitors never see account history nav.
+    ...(user ? [{ href: '/check-ins', label: 'My Check-ins' }] : []),
     { href: '/booking', label: 'Counseling' },
     { href: '/resources', label: 'Resources' },
     { href: '/about', label: 'About & Privacy' },
@@ -105,7 +108,11 @@ export const DesktopHeader: React.FC = () => {
         </Link>
 
         {/* Centered Navigation Links with Pill Style */}
-        <nav aria-label="Main Navigation" className="hidden md:flex items-center gap-1.5 lg:gap-2 bg-[#EFEAE1]/60 dark:bg-[#192721]/60 p-1.5 rounded-full border border-[#E5DEC7]/50 dark:border-[#283C33]/50">
+        {/* overflow-x-auto (resources pill-row pattern): the pill bar shrinks
+            and scrolls instead of pushing brand/actions off-screen when
+            signed-in links plus account state exceed the width. Rendering is
+            unchanged wherever everything already fits. */}
+        <nav aria-label="Main Navigation" className="hidden md:flex items-center gap-1.5 lg:gap-2 overflow-x-auto bg-[#EFEAE1]/60 dark:bg-[#192721]/60 p-1.5 rounded-full border border-[#E5DEC7]/50 dark:border-[#283C33]/50">
           {navLinks.map((link) => {
             const isActive =
               link.href === '/'

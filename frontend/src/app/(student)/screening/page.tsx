@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { CheckinsPromoCard } from '@/components/checkins/CheckinsPromoCard';
 
 export default function ScreeningHubPage() {
   return (
@@ -23,6 +24,8 @@ export default function ScreeningHubPage() {
       </div>
 
       {/* 2. INSTRUMENTS CARDS */}
+      {/* Signed-in-only "My Check-ins" entry (renders nothing when anonymous) */}
+      <CheckinsPromoCard />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* PHQ-9 Card */}
         <Card

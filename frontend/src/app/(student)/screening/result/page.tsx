@@ -9,6 +9,12 @@ import { Button } from '@/components/ui/Button';
 import { ScreeningResponse } from '@/lib/types';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { submitWellbeingFollowup } from '@/lib/wellbeing';
+import {
+  getSeverityBadgeVariant,
+  getSeverityDescription,
+  getSpectrumTier,
+  spectrumBandsFor,
+} from '@/lib/screening-display';
 
 export default function ScreeningResultPage() {
   const router = useRouter();
@@ -50,54 +56,9 @@ export default function ScreeningResultPage() {
   const maxScore = isPHQ9 ? 27 : 21;
   const hasSafetyFlag = screening.safety_flag || (screening.item9_score ?? 0) > 0;
 
-  const getSeverityBadgeVariant = (sev: string): 'brand' | 'sage' | 'amber' | 'coral' | 'neutral' => {
-    const lower = sev.toLowerCase();
-    if (lower.includes('minimal')) return 'sage';
-    if (lower.includes('mild')) return 'sage';
-    if (lower.includes('moderately severe') || lower.includes('severe')) return 'coral';
-    if (lower.includes('moderate')) return 'amber';
-    return 'neutral';
-  };
-
-  const getSeverityDescription = (severity: string) => {
-    const sev = severity.toLowerCase();
-    if (sev.includes('minimal')) {
-      return 'Your responses reflect minimal to no significant symptoms over the past 2 weeks. Continuing everyday healthy habits (consistent sleep, movement, and study breaks) helps maintain baseline wellness.';
-    }
-    if (sev.includes('mild')) {
-      return 'Your responses suggest mild symptoms. While these may not severely interfere with your daily routine, engaging in proactive self-care, mindfulness, and talking through thoughts with supportive friends or our listening assistant can be very helpful.';
-    }
-    if (sev.includes('moderately severe') || sev.includes('severe')) {
-      return 'Your responses indicate significant symptom intensity that may be heavily impacting academic focus, sleep, or daily routines. We strongly recommend scheduling a conversation with a campus counselor or healthcare provider.';
-    }
-    // Moderate
-    return 'Your responses reflect moderate symptom levels. Consider exploring structured stress-reduction techniques, speaking with a university counselor, or discussing your feelings with someone you trust.';
-  };
-
-  // Determine active spectrum tier (0: Minimal, 1: Mild, 2: Moderate, 3: Severe)
-  const getSpectrumTier = (sev: string): number => {
-    const lower = sev.toLowerCase();
-    if (lower.includes('minimal')) return 0;
-    if (lower.includes('mild')) return 1;
-    if (lower.includes('moderately severe') || lower.includes('severe')) return 3;
-    return 2; // Moderate
-  };
-
   const activeTier = getSpectrumTier(screening.severity);
 
-  const spectrumBands = isPHQ9
-    ? [
-        { label: 'Minimal', range: '0–4' },
-        { label: 'Mild', range: '5–9' },
-        { label: 'Moderate', range: '10–14' },
-        { label: 'Significant', range: '15–27' },
-      ]
-    : [
-        { label: 'Minimal', range: '0–4' },
-        { label: 'Mild', range: '5–9' },
-        { label: 'Moderate', range: '10–14' },
-        { label: 'Significant', range: '15–21' },
-      ];
+  const spectrumBands = spectrumBandsFor(isPHQ9);
 
   const handleEscalateCrisis = async () => {
     setIsFollowupLoading(true);
