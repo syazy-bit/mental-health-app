@@ -32,7 +32,7 @@ const AuthControls: React.FC = () => {
     };
     return (
       <div className="flex items-center gap-2 shrink-0">
-        <SessionModeBadge className="hidden lg:inline-flex" />
+        <SessionModeBadge className="max-lg:hidden" />
         <span
           className="hidden sm:inline max-w-32 truncate text-xs sm:text-sm font-medium text-[#5A6D65] dark:text-[#9FB1A9]"
           title={user.email}
@@ -71,18 +71,23 @@ const AuthControls: React.FC = () => {
 
 export const DesktopHeader: React.FC = () => {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { status: authStatus } = useAuth();
 
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/chat', label: 'Talk & Reflect' },
     { href: '/screening', label: 'Self-Assessment' },
-    // Authenticated-only: anonymous visitors never see account history nav.
-    ...(user ? [{ href: '/check-ins', label: 'My Check-ins' }] : []),
     { href: '/booking', label: 'Counseling' },
     { href: '/resources', label: 'Resources' },
     { href: '/about', label: 'About & Privacy' },
   ];
+
+  // The pill bar only renders for visitors without an account session.
+  // Signed-in students use the compact header (account indicator + actions)
+  // with My Check-ins in the bottom navigation and screening hub: the full
+  // 7-pill account bar cannot fit the capped container at any width, and the
+  // bar must never clip, overlap, or scroll. Shown while auth is resolving
+  // so anonymous visitors see no layout shift on load.
 
   return (
     <header className="sticky top-0 z-40 bg-[#FAF7F2]/90 dark:bg-[#121B17]/90 backdrop-blur-md border-b border-[#E8E2D5]/80 dark:border-[#24342C]/80 transition-colors duration-200">
@@ -107,12 +112,15 @@ export const DesktopHeader: React.FC = () => {
           </div>
         </Link>
 
-        {/* Centered Navigation Links with Pill Style */}
-        {/* overflow-x-auto (resources pill-row pattern): the pill bar shrinks
-            and scrolls instead of pushing brand/actions off-screen when
-            signed-in links plus account state exceed the width. Rendering is
-            unchanged wherever everything already fits. */}
-        <nav aria-label="Main Navigation" className="hidden md:flex items-center gap-1.5 lg:gap-2 overflow-x-auto bg-[#EFEAE1]/60 dark:bg-[#192721]/60 p-1.5 rounded-full border border-[#E5DEC7]/50 dark:border-[#283C33]/50">
+        {/* Centered Navigation Links with Pill Style.
+            Anonymous-only and xl+: measured 6-pill content (~1166px with
+            settled typography) needs viewport >= ~1170px, so the bar renders
+            only at xl where it fits cleanly. Below xl the existing bottom
+            navigation takes over; the bar never clips, overlaps, or scrolls.
+            Signed-in students use the compact header (account indicator +
+            actions) with My Check-ins in the bottom nav and screening hub. */}
+        {authStatus !== 'authenticated' && (
+        <nav aria-label="Main Navigation" className="hidden xl:flex items-center gap-1.5 lg:gap-2 bg-[#EFEAE1]/60 dark:bg-[#192721]/60 p-1.5 rounded-full border border-[#E5DEC7]/50 dark:border-[#283C33]/50">
           {navLinks.map((link) => {
             const isActive =
               link.href === '/'
@@ -135,6 +143,7 @@ export const DesktopHeader: React.FC = () => {
             );
           })}
         </nav>
+        )}
 
         {/* Action Controls: Auth, Theme Switcher & Terracotta Pill CTA */}
         <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">

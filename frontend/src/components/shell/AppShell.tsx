@@ -36,7 +36,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
         id="main-content"
         key={pathname}
         tabIndex={-1}
-        className="flex-1 flex flex-col max-w-6xl w-full mx-auto px-4 sm:px-6 py-4 pb-28 md:pb-16 outline-none animate-page-enter"
+        className="flex-1 flex flex-col max-w-6xl w-full mx-auto px-4 sm:px-6 py-4 pb-28 xl:pb-20 outline-none animate-page-enter"
       >
         {children}
       </main>

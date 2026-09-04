@@ -3,9 +3,12 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 export const MobileNav: React.FC = () => {
   const pathname = usePathname();
+  const { status: authStatus, user: authUser } = useAuth();
+  const isAuthed = authStatus === 'authenticated' && !!authUser;
 
   const navItems = [
     {
@@ -108,12 +111,43 @@ export const MobileNav: React.FC = () => {
         </svg>
       ),
     },
+    // Account history entry, signed-in only: anonymous visitors keep the
+    // exact 5-tab bar. (The desktop pill bar cannot fit the account bar at
+    // any width, so this tab plus the screening-hub card are the entry.)
+    ...(isAuthed
+      ? [
+          {
+            href: '/check-ins',
+            label: 'Check-ins',
+            icon: (
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8m0-5v5h5M12 7v5l4 2"
+                />
+              </svg>
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (
     <nav
       aria-label="Mobile Bottom Navigation"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FAF8F5]/90 dark:bg-[#0F1615]/90 backdrop-blur-xl border-t border-[#E8E5DC] dark:border-[#253633] px-2 py-1.5 shadow-[0_-4px_16px_rgba(26,36,43,0.04)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.3)] transition-colors duration-200"
+      // Below xl the desktop pill bar is hidden, so this bar is the
+      // navigation. Account sessions keep it at every width: their seven
+      // destinations plus account state cannot fit the capped top bar
+      // anywhere, and navigation must never disappear.
+      className={`${isAuthed ? '' : 'xl:hidden '}fixed bottom-0 left-0 right-0 z-40 bg-[#FAF8F5]/90 dark:bg-[#0F1615]/90 backdrop-blur-xl border-t border-[#E8E5DC] dark:border-[#253633] px-2 py-1.5 shadow-[0_-4px_16px_rgba(26,36,43,0.04)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.3)] transition-colors duration-200`}
     >
       <div className="flex items-center justify-around max-w-md mx-auto">
         {navItems.map((item) => {
