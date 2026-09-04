@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { SessionModeBadge } from '@/components/auth/SessionModeBadge';
 
 const AuthControls: React.FC = () => {
   const { user, status, logout } = useAuth();
@@ -31,6 +32,7 @@ const AuthControls: React.FC = () => {
     };
     return (
       <div className="flex items-center gap-2 shrink-0">
+        <SessionModeBadge className="hidden lg:inline-flex" />
         <span
           className="hidden sm:inline max-w-32 truncate text-xs sm:text-sm font-medium text-[#5A6D65] dark:text-[#9FB1A9]"
           title={user.email}

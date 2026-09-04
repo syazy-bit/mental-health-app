@@ -6,8 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { ensureSession } from '@/lib/session';
-import { createBooking } from '@/lib/api';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { createWellbeingBooking } from '@/lib/wellbeing';
 
 function formatSlotLabel(startsIso: string, endsIso: string): string {
   const start = new Date(startsIso);
@@ -30,6 +30,7 @@ function formatSlotLabel(startsIso: string, endsIso: string): string {
 
 function BookingConfirmContent() {
   const router = useRouter();
+  const { status: authStatus, user: authUser } = useAuth();
   const searchParams = useSearchParams();
   const counselorId = searchParams?.get('counselor') || '';
   const counselorName = searchParams?.get('name') || 'Your counselor';
@@ -58,15 +59,16 @@ function BookingConfirmContent() {
     setErrorMessage(null);
     setIsSubmitting(true);
     try {
-      const sessionId = await ensureSession();
-      const booking = await createBooking({
-        slot_id: slotId,
-        session_id: sessionId,
-        student_name: studentName.trim() || undefined,
-        contact_email: contactEmail.trim() || undefined,
-        contact_phone: contactPhone.trim() || undefined,
-        reason: reason.trim() || undefined,
-      });
+      const booking = await createWellbeingBooking(
+        { status: authStatus, user: authUser },
+        {
+          slot_id: slotId,
+          student_name: studentName.trim() || undefined,
+          contact_email: contactEmail.trim() || undefined,
+          contact_phone: contactPhone.trim() || undefined,
+          reason: reason.trim() || undefined,
+        }
+      );
 
       const params = new URLSearchParams({
         code: booking.confirmation_code,

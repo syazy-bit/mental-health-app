@@ -7,10 +7,12 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { ScreeningResponse } from '@/lib/types';
-import { submitFollowup } from '@/lib/api';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { submitWellbeingFollowup } from '@/lib/wellbeing';
 
 export default function ScreeningResultPage() {
   const router = useRouter();
+  const { status: authStatus, user: authUser } = useAuth();
   const [screening] = useState<ScreeningResponse | null>(() => {
     if (typeof window !== 'undefined') {
       const stored = sessionStorage.getItem('mh_last_screening');
@@ -100,11 +102,14 @@ export default function ScreeningResultPage() {
   const handleEscalateCrisis = async () => {
     setIsFollowupLoading(true);
     try {
-      await submitFollowup({
-        session_id: screening.session_id,
-        screening_id: screening.id,
-        action: 'ESCALATE_CRISIS',
-      });
+      await submitWellbeingFollowup(
+        { status: authStatus, user: authUser },
+        {
+          sessionId: screening.session_id,
+          screeningId: screening.id,
+          action: 'ESCALATE_CRISIS',
+        }
+      );
       router.push('/support-now');
     } catch {
       router.push('/support-now');
@@ -116,11 +121,14 @@ export default function ScreeningResultPage() {
   const handleSupportiveCare = async () => {
     setIsFollowupLoading(true);
     try {
-      const resp = await submitFollowup({
-        session_id: screening.session_id,
-        screening_id: screening.id,
-        action: 'SUPPORTIVE_CARE',
-      });
+      const resp = await submitWellbeingFollowup(
+        { status: authStatus, user: authUser },
+        {
+          sessionId: screening.session_id,
+          screeningId: screening.id,
+          action: 'SUPPORTIVE_CARE',
+        }
+      );
       setFollowupStatus(resp.supportive_guidance || 'Supportive care pathway confirmed.');
     } catch {
       setFollowupStatus('Thank you for sharing. We encourage you to explore our counseling and self-care resources.');

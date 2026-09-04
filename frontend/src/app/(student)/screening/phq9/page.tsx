@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { ensureSession } from '@/lib/session';
-import { submitScreening } from '@/lib/api';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { submitWellbeingScreening } from '@/lib/wellbeing';
 
 const PHQ9_QUESTIONS = [
   'Little interest or pleasure in doing things',
@@ -30,6 +30,7 @@ const RESPONSE_OPTIONS = [
 
 export default function PHQ9ScreeningPage() {
   const router = useRouter();
+  const { status: authStatus, user: authUser } = useAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [responses, setResponses] = useState<number[]>(new Array(9).fill(-1));
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,12 +61,13 @@ export default function PHQ9ScreeningPage() {
       setErrorMessage(null);
 
       try {
-        const sessionId = await ensureSession();
-        const result = await submitScreening({
-          session_id: sessionId,
-          instrument: 'PHQ9',
-          responses,
-        });
+        const result = await submitWellbeingScreening(
+          { status: authStatus, user: authUser },
+          {
+            instrument: 'PHQ9',
+            responses,
+          }
+        );
 
         // Store result in sessionStorage for display on /screening/result
         if (typeof window !== 'undefined') {

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Alert } from '@/components/ui/Alert';
+import { SessionDisclosure } from '@/components/auth/SessionDisclosure';
 
 function LoginContent() {
   const router = useRouter();
@@ -74,6 +75,10 @@ function LoginContent() {
               <Alert variant="error">{error}</Alert>
             </div>
           )}
+
+          <div className="mb-4">
+            <SessionDisclosure />
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <Input

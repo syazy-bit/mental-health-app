@@ -85,31 +85,43 @@ async function request<T>(
 }
 
 /**
- * Creates a new anonymous session.
+ * Creates a new session. Without extra init it creates an anonymous
+ * session (existing behavior). Phase 2C passes `{ headers: { Authorization } }`
+ * so the backend branches an account-owned session instead.
  */
-export async function createSession(language = 'en'): Promise<SessionResponse> {
+export async function createSession(
+  language = 'en',
+  init: RequestInit = {}
+): Promise<SessionResponse> {
   return request<SessionResponse>('/api/sessions', {
     method: 'POST',
     body: JSON.stringify({ language }),
+    ...init,
   });
 }
 
 /**
- * Retrieves an existing anonymous session.
+ * Retrieves an existing session. Phase 2C passes the Bearer header to
+ * validate/resume an account-owned session (backend owner-checks it).
  */
-export async function getSession(sessionId: string): Promise<SessionResponse> {
-  return request<SessionResponse>(`/api/sessions/${sessionId}`);
+export async function getSession(
+  sessionId: string,
+  init: RequestInit = {}
+): Promise<SessionResponse> {
+  return request<SessionResponse>(`/api/sessions/${sessionId}`, { ...init });
 }
 
 /**
  * Sends a message to the AI emotional support chat endpoint.
  */
 export async function sendChatMessage(
-  payload: ChatMessageRequest
+  payload: ChatMessageRequest,
+  init: RequestInit = {}
 ): Promise<ChatMessageResponse> {
   return request<ChatMessageResponse>('/api/chat/message', {
     method: 'POST',
     body: JSON.stringify(payload),
+    ...init,
   });
 }
 
@@ -117,11 +129,13 @@ export async function sendChatMessage(
  * Submits a completed PHQ-9 or GAD-7 screening.
  */
 export async function submitScreening(
-  payload: ScreeningRequest
+  payload: ScreeningRequest,
+  init: RequestInit = {}
 ): Promise<ScreeningResponse> {
   return request<ScreeningResponse>('/api/screenings', {
     method: 'POST',
     body: JSON.stringify(payload),
+    ...init,
   });
 }
 
@@ -129,11 +143,13 @@ export async function submitScreening(
  * Submits a safety follow-up action for a PHQ-9 positive Item 9 screening.
  */
 export async function submitFollowup(
-  payload: ScreeningFollowUpRequest
+  payload: ScreeningFollowUpRequest,
+  init: RequestInit = {}
 ): Promise<ScreeningFollowUpResponse> {
   return request<ScreeningFollowUpResponse>('/api/screenings/followup', {
     method: 'POST',
     body: JSON.stringify(payload),
+    ...init,
   });
 }
 
@@ -154,10 +170,14 @@ export async function listCounselorSlots(counselorId: string): Promise<Counselor
 /**
  * Requests an appointment (anonymous-first; all contact fields optional).
  */
-export async function createBooking(payload: BookingCreateRequest): Promise<Booking> {
+export async function createBooking(
+  payload: BookingCreateRequest,
+  init: RequestInit = {}
+): Promise<Booking> {
   return request<Booking>('/api/bookings', {
     method: 'POST',
     body: JSON.stringify(payload),
+    ...init,
   });
 }
 
@@ -167,13 +187,16 @@ export async function createBooking(payload: BookingCreateRequest): Promise<Book
  */
 export async function getBooking(
   bookingId: string,
-  params: { sessionId?: string; code?: string } = {}
+  params: { sessionId?: string; code?: string } = {},
+  init: RequestInit = {}
 ): Promise<Booking> {
   const query = new URLSearchParams();
   if (params.sessionId) query.set('session_id', params.sessionId);
   if (params.code) query.set('code', params.code);
   const qs = query.toString();
-  return request<Booking>(`/api/bookings/${bookingId}${qs ? `?${qs}` : ''}`);
+  return request<Booking>(`/api/bookings/${bookingId}${qs ? `?${qs}` : ''}`, {
+    ...init,
+  });
 }
 
 /**
@@ -181,7 +204,8 @@ export async function getBooking(
  */
 export async function cancelBooking(
   bookingId: string,
-  params: { sessionId?: string; code?: string } = {}
+  params: { sessionId?: string; code?: string } = {},
+  init: RequestInit = {}
 ): Promise<Booking> {
   const query = new URLSearchParams();
   if (params.sessionId) query.set('session_id', params.sessionId);
@@ -189,6 +213,7 @@ export async function cancelBooking(
   const qs = query.toString();
   return request<Booking>(`/api/bookings/${bookingId}/cancel${qs ? `?${qs}` : ''}`, {
     method: 'PATCH',
+    ...init,
   });
 }
 

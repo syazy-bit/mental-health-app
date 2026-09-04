@@ -7,8 +7,10 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { ChatMessage } from '@/lib/types';
-import { ensureSession } from '@/lib/session';
-import { sendChatMessage, ApiError } from '@/lib/api';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { SessionModeBadge } from '@/components/auth/SessionModeBadge';
+import { ApiError } from '@/lib/api';
+import { getWellbeingMode, sendWellbeingChatMessage } from '@/lib/wellbeing';
 
 const CONVERSATION_STARTERS = [
   {
@@ -36,6 +38,8 @@ const CONVERSATION_STARTERS = [
 function ChatContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { status: authStatus, user: authUser } = useAuth();
+  const isSignedIn = getWellbeingMode({ status: authStatus, user: authUser }) === 'authenticated';
   const initialStarter = searchParams?.get('starter') || '';
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState(initialStarter);
@@ -46,12 +50,9 @@ function ChatContent() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Initial session check
+  // Session warm-up is lazy: the active wellbeing session (anonymous A or
+  // account B) is ensured when the first message is sent, never on mount.
   useEffect(() => {
-    ensureSession().catch((err) => {
-      console.warn('Session initialization warning:', err);
-    });
-
     if (initialStarter) {
       inputRef.current?.focus();
     }
@@ -100,19 +101,21 @@ function ChatContent() {
     setIsLoading(true);
 
     try {
-      const sessionId = await ensureSession();
-
       // Build transient history (last 8 messages max)
       const historyPayload = messages.slice(-8).map((m) => ({
         role: m.role,
         content: m.content,
       }));
 
-      const response = await sendChatMessage({
-        session_id: sessionId,
-        message: trimmed,
-        history: historyPayload.length > 0 ? historyPayload : undefined,
-      });
+      // Central resolver pairs the active session with its auth mode:
+      // account session B + Bearer when signed in, anonymous A otherwise.
+      const response = await sendWellbeingChatMessage(
+        { status: authStatus, user: authUser },
+        {
+          message: trimmed,
+          history: historyPayload.length > 0 ? historyPayload : undefined,
+        }
+      );
 
       // CRITICAL SAFETY CHECK:
       // If the backend indicates HIGH_RISK or crisis, IMMEDIATELY route to /support-now
@@ -139,10 +142,10 @@ function ChatContent() {
           const waitTime = err.retryAfter || 60;
           setRateLimitTimer(waitTime);
           setErrorMessage(`You've sent several messages quickly. Please take a pause for ${waitTime}s.`);
+        } else if (err.status === 401) {
+          setErrorMessage('Your sign-in has expired. Please log in again to continue.');
         } else if (err.status === 404) {
-          ensureSession().then(() => {
-            setErrorMessage('Your session was refreshed. Please send your message again.');
-          });
+          setErrorMessage('Your session was refreshed. Please send your message again.');
         } else {
           setErrorMessage(err.message || 'An error occurred while connecting to the assistant.');
         }
@@ -192,9 +195,13 @@ function ChatContent() {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <Badge variant="brand" size="sm" dot>
-            Anonymous &bull; Not Stored
-          </Badge>
+          {isSignedIn ? (
+            <SessionModeBadge />
+          ) : (
+            <Badge variant="brand" size="sm" dot>
+              Anonymous &bull; Not Stored
+            </Badge>
+          )}
         </div>
       </div>
 

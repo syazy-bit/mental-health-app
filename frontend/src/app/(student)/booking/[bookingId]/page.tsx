@@ -7,7 +7,8 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Booking } from '@/lib/types';
-import { cancelBooking, getBooking } from '@/lib/api';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { cancelWellbeingBooking, getWellbeingBooking } from '@/lib/wellbeing';
 
 function formatDateTime(iso: string): string {
   const date = new Date(iso);
@@ -32,6 +33,7 @@ const STATUS_VARIANTS: Record<Booking['status'], 'amber' | 'sage' | 'neutral'> =
 function BookingDetailContent() {
   const params = useParams<{ bookingId: string }>();
   const searchParams = useSearchParams();
+  const { status: authStatus, user: authUser } = useAuth();
   const bookingId = params?.bookingId || '';
   const code = searchParams?.get('code') || '';
 
@@ -43,8 +45,11 @@ function BookingDetailContent() {
 
   useEffect(() => {
     if (!bookingId) return;
+    // Signed-in requests also carry the Bearer token so account-owned
+    // bookings resolve; anonymous bookings ignore it server-side.
+    const auth = { status: authStatus, user: authUser };
     let cancelled = false;
-    getBooking(bookingId, { code: code || undefined })
+    getWellbeingBooking(auth, bookingId, { code: code || undefined })
       .then((data) => {
         if (!cancelled) setBooking(data);
       })
@@ -63,7 +68,7 @@ function BookingDetailContent() {
     return () => {
       cancelled = true;
     };
-  }, [bookingId, code]);
+  }, [bookingId, code, authStatus, authUser]);
 
   const handleCopyCode = async () => {
     if (!booking?.confirmation_code) return;
@@ -83,9 +88,13 @@ function BookingDetailContent() {
     setIsCancelling(true);
     setErrorMessage(null);
     try {
-      const updated = await cancelBooking(booking.id, {
-        code: booking.confirmation_code,
-      });
+      const updated = await cancelWellbeingBooking(
+        { status: authStatus, user: authUser },
+        booking.id,
+        {
+          code: booking.confirmation_code,
+        }
+      );
       setBooking(updated);
     } catch (err) {
       setErrorMessage(

@@ -2,8 +2,16 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 export const DisclaimerStrip: React.FC = () => {
+  // Signed-in users get account-associated sessions, so the anonymous
+  // wording must not be shown while authenticated. Structure and styling
+  // are unchanged — only the messaging is mode-dependent. This component
+  // always renders inside AuthProvider (student layout → AppShell).
+  const { status } = useAuth();
+  const isSignedIn = status === 'authenticated';
+
   return (
     <aside
       aria-label="Emergency and confidential support notice"
@@ -16,10 +24,21 @@ export const DisclaimerStrip: React.FC = () => {
             <path d="M13.73 21a2 2 0 0 1-3.46 0" />
           </svg>
           <p className="leading-tight text-[11px] sm:text-xs">
-            <strong className="font-semibold text-[#6E2E12] dark:text-[#F8BFA3]">100% Anonymous &amp; Confidential.</strong>{' '}
-            <span className="text-[#964E2D] dark:text-[#D99A7A]">
-              If you are in immediate distress or crisis, free support is available 24/7.
-            </span>
+            {isSignedIn ? (
+              <>
+                <strong className="font-semibold text-[#6E2E12] dark:text-[#F8BFA3]">Signed in &amp; Confidential.</strong>{' '}
+                <span className="text-[#964E2D] dark:text-[#D99A7A]">
+                  New activity is saved to your account. If you are in immediate distress or crisis, free support is available 24/7.
+                </span>
+              </>
+            ) : (
+              <>
+                <strong className="font-semibold text-[#6E2E12] dark:text-[#F8BFA3]">100% Anonymous &amp; Confidential.</strong>{' '}
+                <span className="text-[#964E2D] dark:text-[#D99A7A]">
+                  If you are in immediate distress or crisis, free support is available 24/7.
+                </span>
+              </>
+            )}
           </p>
         </div>
         <Link
