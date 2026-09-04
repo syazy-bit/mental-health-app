@@ -67,6 +67,9 @@ class Screening(Base):
         Index("ix_screenings_instrument", "instrument"),
         # Index for owner history queries (Phase 1A)
         Index("ix_screenings_user_id", "user_id"),
+        # Composite index for owned timeline reads (Phase 3B):
+        # WHERE user_id = ? ORDER BY created_at DESC.
+        Index("ix_screenings_user_created", "user_id", "created_at"),
         # Check constraints
         CheckConstraint(
             "instrument IN ('PHQ9', 'GAD7')",

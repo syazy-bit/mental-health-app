@@ -80,3 +80,37 @@ class ScreeningCreateInternal(BaseModel):
     severity: str
     safety_flag: bool
     item9_score: Optional[int] = None
+
+
+class ScreeningHistoryItem(BaseModel):
+    """One owned screening summary in history (Phase 3B: My Check-ins).
+
+    Deliberately excludes `session_id` (internal linkage) and `safety_info`
+    (point-in-time follow-up context, not history data). Raw answers are
+    never stored and therefore never exposed.
+    """
+
+    id: uuid.UUID
+    instrument: str
+    total_score: int
+    severity: str
+    safety_flag: bool
+    item9_score: Optional[int] = None
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ScreeningHistoryResponse(BaseModel):
+    """Paginated owned screening history, newest first (fixed ordering)."""
+
+    items: list[ScreeningHistoryItem]
+    total: int
+    limit: int
+    offset: int
+
+
+class LatestScreeningResponse(BaseModel):
+    """Most recent owned screening, or null when history is empty."""
+
+    item: Optional[ScreeningHistoryItem] = None

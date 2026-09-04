@@ -1,14 +1,18 @@
-"""Screening endpoints: submit screenings and safety follow-up."""
+"""Screening endpoints: submit screenings, safety follow-up, owned history."""
 
 import uuid
+from typing import Annotated, Literal, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session as DbSession
 
-from app.api.deps import get_optional_student
+from app.api.deps import get_current_user, get_optional_student
 from app.core.db import get_db
 from app.models.user import User as UserModel
 from app.schemas.screening import (
+    LatestScreeningResponse,
+    ScreeningHistoryItem,
+    ScreeningHistoryResponse,
     ScreeningRequest,
     ScreeningResponse,
     ScreeningFollowUpRequest,
@@ -17,9 +21,55 @@ from app.schemas.screening import (
 )
 from app.screening.instruments import InstrumentID, FollowUpAction
 from app.services.screenings import ScreeningService
+from app.services.user_history import UserHistoryService
 
 
 router = APIRouter(prefix="/api/screenings", tags=["screenings"])
+
+HISTORY_MAX_LIMIT = 50
+HISTORY_DEFAULT_LIMIT = 20
+
+
+@router.get("/history", response_model=ScreeningHistoryResponse)
+def screening_history(
+    db: DbSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_user),
+    instrument: Annotated[Optional[Literal["PHQ9", "GAD7"]], Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=HISTORY_MAX_LIMIT)] = HISTORY_DEFAULT_LIMIT,
+    offset: Annotated[int, Query(ge=0)] = 0,
+) -> ScreeningHistoryResponse:
+    """List the authenticated student's own screening summaries, newest first.
+
+    Phase 3B (My Check-ins): ownership comes exclusively from the verified
+    JWT (`get_current_user` rejects missing/invalid tokens, admin tokens,
+    and soft-deleted users). The query filters `WHERE user_id = sub`, so
+    anonymous rows and other users' rows can never appear. No `user_id`
+    parameter exists; ordering is fixed server-side.
+    """
+    page = UserHistoryService(db).get_screening_history(
+        current_user, instrument=instrument, limit=limit, offset=offset
+    )
+    return ScreeningHistoryResponse(
+        items=[ScreeningHistoryItem.model_validate(s) for s in page.items],
+        total=page.total,
+        limit=page.limit,
+        offset=page.offset,
+    )
+
+
+@router.get("/history/latest", response_model=LatestScreeningResponse)
+def latest_screening(
+    db: DbSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_user),
+    instrument: Annotated[Optional[Literal["PHQ9", "GAD7"]], Query()] = None,
+) -> LatestScreeningResponse:
+    """Most recent owned screening summary (null when history is empty)."""
+    screening = UserHistoryService(db).get_latest_screening(
+        current_user, instrument=instrument
+    )
+    return LatestScreeningResponse(
+        item=ScreeningHistoryItem.model_validate(screening) if screening else None
+    )
 
 
 @router.post("", response_model=ScreeningResponse, status_code=status.HTTP_201_CREATED)

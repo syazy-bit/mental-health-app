@@ -6,7 +6,7 @@ Repository methods only stage changes. Transaction boundaries are owned by the s
 import uuid
 from typing import Optional
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models.screening import Screening as ScreeningModel
@@ -75,3 +75,50 @@ class ScreeningRepository:
             )
             .order_by(ScreeningModel.created_at.desc())
         ).scalar_one_or_none()
+
+    def list_by_user(
+        self,
+        user_id: uuid.UUID,
+        instrument: str | None = None,
+        limit: int = 20,
+        offset: int = 0,
+    ) -> list[ScreeningModel]:
+        """Owned screening history, newest first (Phase 3B).
+
+        The `user_id` equality is the ownership boundary: anonymous rows
+        (`user_id IS NULL`) can never match a real user UUID. Ordering is
+        fixed server-side; callers cannot choose it.
+        """
+        stmt = (
+            select(ScreeningModel)
+            .where(ScreeningModel.user_id == user_id)
+            .order_by(ScreeningModel.created_at.desc(), ScreeningModel.id.desc())
+        )
+        if instrument is not None:
+            stmt = stmt.where(ScreeningModel.instrument == instrument)
+        return list(
+            self.db.execute(stmt.limit(limit).offset(offset)).scalars()
+        )
+
+    def count_by_user(
+        self, user_id: uuid.UUID, instrument: str | None = None
+    ) -> int:
+        """Total owned screenings for pagination (same ownership filter)."""
+        stmt = select(func.count()).where(ScreeningModel.user_id == user_id)
+        if instrument is not None:
+            stmt = stmt.where(ScreeningModel.instrument == instrument)
+        return int(self.db.execute(stmt).scalar_one())
+
+    def get_latest_by_user(
+        self, user_id: uuid.UUID, instrument: str | None = None
+    ) -> Optional[ScreeningModel]:
+        """Most recent owned screening, optionally per instrument."""
+        stmt = (
+            select(ScreeningModel)
+            .where(ScreeningModel.user_id == user_id)
+            .order_by(ScreeningModel.created_at.desc(), ScreeningModel.id.desc())
+            .limit(1)
+        )
+        if instrument is not None:
+            stmt = stmt.where(ScreeningModel.instrument == instrument)
+        return self.db.execute(stmt).scalar_one_or_none()
