@@ -6,10 +6,12 @@ from time import time
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session as DbSession
 
+from app.api.deps import get_optional_student
 from app.core.db import get_db
+from app.models.user import User as UserModel
 from app.services.chat import ChatService
 from app.services.chat_providers import create_provider_from_env
 from app.safety.engine import SafetyEngine
@@ -53,6 +55,10 @@ def _check_rate_limit(session_id: uuid.UUID) -> None:
 
 
 class ChatMessageRequest(BaseModel):
+    # Phase 2B: extra="forbid" so a smuggled user_id is rejected (422)
+    # instead of silently ignored; ownership always comes from the JWT.
+    model_config = ConfigDict(extra="forbid")
+
     session_id: uuid.UUID
     message: str = Field(..., min_length=1, max_length=2000)
     # M6: Optional conversation history (max 8 messages, 4 turns)
@@ -78,11 +84,15 @@ async def send_message(
     request: Request,
     payload: ChatMessageRequest,
     db: DbSession = Depends(get_db),
+    current_user: UserModel | None = Depends(get_optional_student),
 ) -> ChatMessageResponse:
     """Process a student message through the safety pipeline.
 
+    Phase 2B: anonymous sessions keep public behavior; account-owned
+    sessions require the authenticated owner (401/404 via the service).
+
     Pipeline:
-    1. Session validation (404 if not found)
+    1. Session validation (404 if not found) + ownership gate
     2. Input validation (length, non-empty)
     3. Rate limiting (10 messages/minute/session)
     4. Safety pre-check via SafetyEngine
@@ -114,6 +124,7 @@ async def send_message(
             session_id=payload.session_id,
             message=payload.message,
             history=payload.history,
+            current_user=current_user,
         )
     except HTTPException:
         raise

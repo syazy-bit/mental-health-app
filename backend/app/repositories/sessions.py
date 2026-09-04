@@ -16,8 +16,12 @@ class SessionRepository:
     def __init__(self, db: Session) -> None:
         self.db = db
 
-    def create(self, language: str) -> SessionModel:
-        session = SessionModel(language=language)
+    def create(
+        self, language: str, user_id: uuid.UUID | None = None
+    ) -> SessionModel:
+        # Phase 2B: user_id is server-derived (JWT.sub or None). Callers must
+        # never forward a client-supplied user_id here.
+        session = SessionModel(language=language, user_id=user_id)
         self.db.add(session)
         return session
 

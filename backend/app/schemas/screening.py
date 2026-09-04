@@ -9,6 +9,10 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 class ScreeningRequest(BaseModel):
     """Request to submit a screening."""
+
+    # Phase 2B: extra="forbid" so a smuggled user_id is rejected (422).
+    model_config = ConfigDict(extra="forbid")
+
     session_id: uuid.UUID
     instrument: Annotated[Literal["PHQ9", "GAD7"], Field(description="Screening instrument")]
     responses: Annotated[list[int], Field(min_length=1, description="Item responses (0-3)")]
@@ -47,6 +51,10 @@ class ScreeningResponse(BaseModel):
 
 class ScreeningFollowUpRequest(BaseModel):
     """Request to submit safety follow-up action."""
+
+    # Phase 2B: extra="forbid" so a smuggled user_id is rejected (422).
+    model_config = ConfigDict(extra="forbid")
+
     session_id: uuid.UUID
     screening_id: uuid.UUID
     action: Annotated[Literal["ESCALATE_CRISIS", "SUPPORTIVE_CARE"], Field(description="Follow-up action")]

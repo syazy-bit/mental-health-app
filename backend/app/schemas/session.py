@@ -9,6 +9,10 @@ from app.core.languages import normalize_language
 
 
 class SessionCreate(BaseModel):
+    # Phase 2B: extra="forbid" so a smuggled user_id is rejected (422).
+    # Ownership always comes from the verified JWT, never the client.
+    model_config = ConfigDict(extra="forbid")
+
     language: str = "en"
 
     @field_validator("language")

@@ -24,7 +24,10 @@ class ScreeningRepository:
         severity: str,
         safety_flag: bool,
         item9_score: int | None = None,
+        user_id: uuid.UUID | None = None,
     ) -> ScreeningModel:
+        # Phase 2B: user_id mirrors the owning session (server-derived).
+        # Callers must never forward a client-supplied user_id here.
         screening = ScreeningModel(
             session_id=session_id,
             instrument=instrument,
@@ -32,6 +35,7 @@ class ScreeningRepository:
             severity=severity,
             safety_flag=safety_flag,
             item9_score=item9_score,
+            user_id=user_id,
         )
         self.db.add(screening)
         return screening

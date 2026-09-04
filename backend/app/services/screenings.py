@@ -12,8 +12,10 @@ from sqlalchemy.orm import Session
 
 from app.models.session import Session as SessionModel
 from app.models.screening import Screening as ScreeningModel
+from app.models.user import User as UserModel
 from app.repositories.sessions import SessionRepository
 from app.repositories.screenings import ScreeningRepository
+from app.services.session_ownership import require_session_access
 from app.screening.instruments import (
     InstrumentID,
     ScreeningScoreResult,
@@ -50,16 +52,22 @@ class ScreeningService:
         session_id: uuid.UUID,
         instrument: InstrumentID,
         responses: list[int],
+        current_user: UserModel | None = None,
     ) -> ScreeningResult:
         """Submit a screening for a session.
-        
+
         Validates session, instrument, responses, scores, assesses safety,
         persists, and commits.
-        
+
+        Phase 2B: the session ownership gate applies first; the persisted
+        ``screening.user_id`` mirrors the owning session (server-derived,
+        never from the client).
+
         Args:
-            session_id: Anonymous session UUID
+            session_id: Session UUID (anonymous or account-owned)
             instrument: PHQ9 or GAD7
             responses: List of integer responses (0-3)
+            current_user: Verified student identity, if authenticated
             
         Returns:
             ScreeningResult with persisted screening and assessments
@@ -69,11 +77,10 @@ class ScreeningService:
         """
         from fastapi import HTTPException, status
         
-        # 1. Validate session exists
+        # 1. Validate session exists and enforce ownership (Phase 2B).
         session = self.session_repo.get_by_id(session_id)
-        if session is None:
-            raise HTTPException(status_code=404, detail="Session not found")
-        
+        require_session_access(session, current_user)
+
         # 2. Get instrument and validate/score
         try:
             inst = get_instrument(instrument)
@@ -90,7 +97,7 @@ class ScreeningService:
             instrument, score_result.item9_score
         )
         
-        # 4. Persist screening
+        # 4. Persist screening (owner mirrors the session, server-derived).
         screening = self.screening_repo.create(
             session_id=session_id,
             instrument=instrument.value,
@@ -98,6 +105,7 @@ class ScreeningService:
             severity=score_result.severity,
             safety_flag=score_result.safety_flag,
             item9_score=score_result.item9_score,
+            user_id=session.user_id,
         )
         
         # 5. Commit transaction
@@ -119,15 +127,20 @@ class ScreeningService:
         session_id: uuid.UUID,
         screening_id: uuid.UUID,
         action: FollowUpAction,
+        current_user: UserModel | None = None,
     ) -> ScreeningSafetyAssessment:
         """Submit safety follow-up action for a PHQ-9 screening.
-        
+
         Validates session, screening ownership, and processes follow-up.
-        
+
+        Phase 2B: the session ownership gate applies before the screening
+        lookup so follow-up cannot probe another user's session.
+
         Args:
-            session_id: Anonymous session UUID (must match screening)
+            session_id: Session UUID (must match screening)
             screening_id: Screening UUID
             action: ESCALATE_CRISIS or SUPPORTIVE_CARE
+            current_user: Verified student identity, if authenticated
             
         Returns:
             Updated ScreeningSafetyAssessment
@@ -137,11 +150,10 @@ class ScreeningService:
         """
         from fastapi import HTTPException, status
         
-        # 1. Validate session exists
+        # 1. Validate session exists and enforce ownership (Phase 2B).
         session = self.session_repo.get_by_id(session_id)
-        if session is None:
-            raise HTTPException(status_code=404, detail="Session not found")
-        
+        require_session_access(session, current_user)
+
         # 2. Validate screening exists and belongs to session
         screening = self.screening_repo.get_by_id(screening_id)
         if screening is None:

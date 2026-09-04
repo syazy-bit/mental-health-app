@@ -24,10 +24,16 @@ from sqlalchemy.orm import Session
 from app.models.booking import Booking as BookingModel
 from app.models.counselor import Counselor as CounselorModel
 from app.models.counselor_slot import CounselorSlot as CounselorSlotModel
+from app.models.user import User as UserModel
 from app.repositories.bookings import BookingRepository
 from app.repositories.counselor_slots import CounselorSlotRepository
 from app.repositories.counselors import CounselorRepository
 from app.repositories.sessions import SessionRepository
+from app.services.session_ownership import (
+    anonymous_booking_owns,
+    require_booking_access,
+    require_session_access,
+)
 from app.schemas.booking import (
     AdminCounselorSlotResponse,
     BookingCreate,
@@ -91,17 +97,9 @@ class BookingService:
         session_id: Optional[uuid.UUID],
         confirmation_code: Optional[str],
     ) -> bool:
-        if (
-            booking.session_id is not None
-            and session_id is not None
-            and booking.session_id == session_id
-        ):
-            return True
-        if confirmation_code is not None and confirmation_code.upper() == (
-            booking.confirmation_code or ""
-        ).upper():
-            return True
-        return False
+        # Pre-existing anonymous ownership rule, centralized in
+        # session_ownership (kept here for backward compatibility).
+        return anonymous_booking_owns(booking, session_id, confirmation_code)
 
     # --- Counselors (admin) ---
 
@@ -268,8 +266,22 @@ class BookingService:
 
     # --- Bookings (student) ---
 
-    def create_booking(self, data: BookingCreate) -> BookingModel:
+    def create_booking(
+        self, data: BookingCreate, current_user: UserModel | None = None
+    ) -> BookingModel:
+        """Create a booking, deriving ownership server-side (Phase 2B).
+
+        - Booking references a session: ``booking.user_id`` mirrors the
+          owning session (NULL for anonymous). Owned sessions require the
+          authenticated owner; a session identifier alone is not enough.
+        - Authenticated request without a session (R3): ``booking.user_id``
+          is stamped from the verified JWT.
+        - Anonymous request without a session: ``booking.user_id`` stays NULL.
+        """
         # Validate session ownership reference if provided (optional, anonymous-first).
+        booking_owner_id: Optional[uuid.UUID] = (
+            current_user.id if current_user is not None else None
+        )
         if data.session_id is not None:
             session = self.session_repo.get_by_id(data.session_id)
             if session is None:
@@ -277,6 +289,10 @@ class BookingService:
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Session not found",
                 )
+            # Owned sessions require the authenticated owner (401/404);
+            # anonymous sessions keep existing public behavior.
+            require_session_access(session, current_user)
+            booking_owner_id = session.user_id
 
         # Lock the slot row to serialize concurrent booking attempts for it.
         slot = self.slot_repo.get_by_id_for_update(data.slot_id)
@@ -315,6 +331,7 @@ class BookingService:
             contact_email=data.contact_email,
             contact_phone=data.contact_phone,
             reason=data.reason,
+            user_id=booking_owner_id,
         )
 
         try:
@@ -363,23 +380,30 @@ class BookingService:
         booking_id: uuid.UUID,
         session_id: Optional[uuid.UUID] = None,
         confirmation_code: Optional[str] = None,
+        current_user: UserModel | None = None,
     ) -> BookingModel:
+        """View a booking.
+
+        Phase 2B: owned bookings require the authenticated owner (a
+        booking/session identifier alone is NOT sufficient, R4). Anonymous
+        bookings keep the pre-existing session/code ownership rule.
+        Unknown bookings are 404 (not 403) so existence is not revealed.
+        """
         booking = self.booking_repo.get_by_id(booking_id)
-        if booking is None or not self._owns(booking, session_id, confirmation_code):
-            # 404 (not 403) so booking existence is not revealed.
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Booking not found",
-            )
-        return booking
+        return require_booking_access(
+            booking, current_user, session_id, confirmation_code
+        )
 
     def cancel_booking(
         self,
         booking_id: uuid.UUID,
         session_id: Optional[uuid.UUID] = None,
         confirmation_code: Optional[str] = None,
+        current_user: UserModel | None = None,
     ) -> BookingModel:
-        booking = self.get_booking(booking_id, session_id, confirmation_code)
+        booking = self.get_booking(
+            booking_id, session_id, confirmation_code, current_user
+        )
         if booking.status not in _ACTIVE_BOOKING_STATUSES:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,

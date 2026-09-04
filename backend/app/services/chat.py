@@ -28,7 +28,9 @@ from sqlalchemy.orm import Session
 from app.core.languages import normalize_language
 from app.models.session import Session as SessionModel
 from app.models.safety_evaluation import SafetyEvaluation as SafetyEvaluationModel
+from app.models.user import User as UserModel
 from app.repositories.sessions import SessionRepository
+from app.services.session_ownership import require_session_access
 from app.repositories.safety_evaluations import SafetyEvaluationRepository
 from app.safety.engine import SafetyEngine
 from app.safety.crisis import select_crisis_response, CrisisResponse
@@ -92,6 +94,7 @@ class ChatService:
         session_id: uuid.UUID,
         message: str,
         history: Optional[list[dict]] = None,
+        current_user: UserModel | None = None,
     ) -> ChatResult:
         """Process a student message synchronously.
 
@@ -109,6 +112,7 @@ class ChatService:
                     session_id=session_id,
                     message=message,
                     history=history,
+                    current_user=current_user,
                 )
             )
         raise RuntimeError(
@@ -121,6 +125,7 @@ class ChatService:
         session_id: uuid.UUID,
         message: str,
         history: Optional[list[dict]] = None,
+        current_user: UserModel | None = None,
     ) -> ChatResult:
         """Process a student message through the complete safety pipeline.
 
@@ -152,11 +157,12 @@ class ChatService:
         """
         start_time = time.perf_counter()
 
-        # 1. Session validation (outside transaction for fast 404)
+        # 1. Session validation (outside transaction for fast 404) plus
+        # Phase 2B ownership gate: anonymous sessions keep public behavior;
+        # owned sessions require the authenticated owner (401/404).
+        # Ownership never influences safety classification itself.
         session = self.session_repo.get_by_id(session_id)
-        if session is None:
-            from fastapi import HTTPException, status
-            raise HTTPException(status_code=404, detail="Session not found")
+        require_session_access(session, current_user)
 
         # 2. Input validation
         if not message or not message.strip():

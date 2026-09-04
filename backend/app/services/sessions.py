@@ -18,9 +18,17 @@ class SessionService:
         self.db = db
         self.repository = SessionRepository(db)
 
-    def create(self, language: str) -> SessionModel:
+    def create(
+        self, language: str, user_id: uuid.UUID | None = None
+    ) -> SessionModel:
+        """Create a session, optionally owned.
+
+        Phase 2B: ``user_id`` must be the verified JWT subject (or None for
+        anonymous). There is intentionally no path that assigns ownership to
+        a pre-existing session: old anonymous sessions stay anonymous.
+        """
         normalized = normalize_language(language)
-        session = self.repository.create(normalized)
+        session = self.repository.create(normalized, user_id=user_id)
         self.db.commit()
         self.db.refresh(session)
         return session

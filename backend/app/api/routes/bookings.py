@@ -11,7 +11,9 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.api.deps import get_optional_student
 from app.core.db import get_db
+from app.models.user import User as UserModel
 from app.schemas.booking import (
     BookingCreate,
     BookingResponse,
@@ -30,8 +32,10 @@ def get_booking_service(db: Session = Depends(get_db)) -> BookingService:
 def create_booking(
     payload: BookingCreate,
     booking_service: BookingService = Depends(get_booking_service),
+    current_user: UserModel | None = Depends(get_optional_student),
 ):
-    return booking_service.create_booking(payload)
+    # Phase 2B: ownership is derived server-side (owning session or JWT).
+    return booking_service.create_booking(payload, current_user=current_user)
 
 
 @router.get("/status/{confirmation_code}", response_model=BookingStatusResponse)
@@ -55,13 +59,18 @@ def get_booking(
     session_id: Optional[uuid.UUID] = None,
     code: Optional[str] = None,
     booking_service: BookingService = Depends(get_booking_service),
+    current_user: UserModel | None = Depends(get_optional_student),
 ):
     """View a booking.
 
-    Ownership requires the matching session_id (if the booking was linked to
-    one) OR the booking's confirmation_code. Otherwise 404.
+    Anonymous bookings: ownership requires the matching session_id (if the
+    booking was linked to one) OR the booking's confirmation_code.
+    Account-owned bookings: the authenticated owner is required (a booking
+    or session identifier alone is not sufficient). Otherwise 404.
     """
-    return booking_service.get_booking(booking_id, session_id, code)
+    return booking_service.get_booking(
+        booking_id, session_id, code, current_user=current_user
+    )
 
 
 @router.patch("/{booking_id}/cancel", response_model=BookingResponse)
@@ -70,6 +79,9 @@ def cancel_booking(
     session_id: Optional[uuid.UUID] = None,
     code: Optional[str] = None,
     booking_service: BookingService = Depends(get_booking_service),
+    current_user: UserModel | None = Depends(get_optional_student),
 ):
     """Cancel a booking (only PENDING or CONFIRMED bookings)."""
-    return booking_service.cancel_booking(booking_id, session_id, code)
+    return booking_service.cancel_booking(
+        booking_id, session_id, code, current_user=current_user
+    )

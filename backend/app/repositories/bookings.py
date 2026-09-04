@@ -25,7 +25,10 @@ class BookingRepository:
         contact_email: str | None = None,
         contact_phone: str | None = None,
         reason: str | None = None,
+        user_id: uuid.UUID | None = None,
     ) -> BookingModel:
+        # Phase 2B: user_id is server-derived (owning session or JWT.sub).
+        # Callers must never forward a client-supplied user_id here.
         booking = BookingModel(
             slot_id=slot_id,
             session_id=session_id,
@@ -35,6 +38,7 @@ class BookingRepository:
             contact_phone=contact_phone,
             reason=reason,
             status="PENDING",
+            user_id=user_id,
         )
         self.db.add(booking)
         return booking

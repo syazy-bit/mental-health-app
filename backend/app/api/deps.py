@@ -113,3 +113,39 @@ async def get_current_user(
         raise credentials_exception
 
     return user
+
+
+async def get_optional_student(
+    credentials: HTTPAuthorizationCredentials | None = Depends(security),
+    auth_service: StudentAuthService = Depends(get_student_auth_service),
+) -> UserModel | None:
+    """Best-effort student identity for endpoints supporting anonymous use.
+
+    - No Authorization header -> None (anonymous request, existing behavior).
+    - Valid student JWT for an active (non-deleted) user -> the user.
+    - Present-but-invalid Bearer credential (bad signature/expiry, wrong
+      type/issuer such as an admin token, unknown or soft-deleted user) ->
+      401. An explicitly authenticated request must never silently degrade
+      to anonymous: that would let a broken/expired client write anonymous
+      rows it believes are account-associated, and would hide token
+      confusion (e.g. admin token sent as student identity).
+    """
+    if credentials is None:
+        return None
+
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        user_id = decode_student_access_token(credentials.credentials)
+    except StudentTokenError:
+        raise credentials_exception
+
+    user = auth_service.get_active_user(user_id)
+    if user is None:
+        raise credentials_exception
+
+    return user

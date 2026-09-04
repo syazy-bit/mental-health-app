@@ -5,7 +5,9 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session as DbSession
 
+from app.api.deps import get_optional_student
 from app.core.db import get_db
+from app.models.user import User as UserModel
 from app.schemas.screening import (
     ScreeningRequest,
     ScreeningResponse,
@@ -24,11 +26,15 @@ router = APIRouter(prefix="/api/screenings", tags=["screenings"])
 def submit_screening(
     payload: ScreeningRequest,
     db: DbSession = Depends(get_db),
+    current_user: UserModel | None = Depends(get_optional_student),
 ) -> ScreeningResponse:
     """Submit a PHQ-9 or GAD-7 screening.
-    
+
+    Phase 2B: anonymous sessions keep public behavior; account-owned
+    sessions require the authenticated owner. Ownership is server-derived.
+
     Validates:
-    - Session exists
+    - Session exists (+ ownership gate)
     - Instrument supported (PHQ9, GAD7)
     - Exact item count (9 for PHQ-9, 7 for GAD-7)
     - Every response is integer 0-3
@@ -52,6 +58,7 @@ def submit_screening(
             session_id=payload.session_id,
             instrument=instrument,
             responses=payload.responses,
+            current_user=current_user,
         )
     except HTTPException:
         raise
@@ -94,6 +101,7 @@ def submit_screening(
 def submit_followup(
     payload: ScreeningFollowUpRequest,
     db: DbSession = Depends(get_db),
+    current_user: UserModel | None = Depends(get_optional_student),
 ) -> ScreeningFollowUpResponse:
     """Submit safety follow-up action for PHQ-9 positive Item 9 screen.
     
@@ -120,6 +128,7 @@ def submit_followup(
             session_id=payload.session_id,
             screening_id=payload.screening_id,
             action=action,
+            current_user=current_user,
         )
     except HTTPException:
         raise
