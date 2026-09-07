@@ -6,6 +6,7 @@ milestones and will be mounted here as routers.
 """
 
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import (
@@ -20,6 +21,7 @@ from app.api.routes import (
     bookings,
     admin_bookings,
     analytics,
+    moments,
 )
 from app.core.config import settings
 
@@ -50,6 +52,11 @@ def create_app() -> FastAPI:
     app.include_router(bookings.router)
     app.include_router(admin_bookings.router)
     app.include_router(analytics.router)
+    app.include_router(moments.router)
+
+    # Moments 422s never echo submitted text; the handler delegates every
+    # other route to FastAPI's default, so existing error contracts hold.
+    app.add_exception_handler(RequestValidationError, moments.moments_validation_handler)
 
     return app
 

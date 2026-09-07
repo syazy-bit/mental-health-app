@@ -31,6 +31,13 @@ from app.schemas.booking import (
     AdminBookingResponse,
     BookingStatusUpdate,
 )
+from app.schemas.moment import (
+    MomentCreateRequest,
+    MomentCreateResponse,
+    MomentListResponse,
+    MomentResponse,
+    MomentSafety,
+)
 
 __all__ = [
     "SessionCreate",
@@ -57,4 +64,9 @@ __all__ = [
     "BookingResponse",
     "AdminBookingResponse",
     "BookingStatusUpdate",
+    "MomentCreateRequest",
+    "MomentCreateResponse",
+    "MomentListResponse",
+    "MomentResponse",
+    "MomentSafety",
 ]
