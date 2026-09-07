@@ -8,9 +8,10 @@ import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/components/auth/AuthProvider';
 
 /**
- * Signed-in-only entry point to "My Check-ins" on the screening hub.
+ * Signed-in-only entry point to My Story on the screening hub.
  * Returns null for anonymous visitors, so the anonymous screening
- * experience renders exactly as before.
+ * experience renders exactly as before. Screening itself stays
+ * reachable for everyone via My Story's New check-in action.
  */
 export const CheckinsPromoCard: React.FC = () => {
   const { status, user } = useAuth();
@@ -30,16 +31,16 @@ export const CheckinsPromoCard: React.FC = () => {
           Signed in &bull; Private to you
         </Badge>
         <h2 className="text-lg font-bold text-[#19232D] dark:text-[#F1F3EF]">
-          My Check-ins
+          My Story
         </h2>
         <p className="text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1] leading-relaxed max-w-xl">
           Review your past PHQ-9 and GAD-7 check-ins, completed while signed in. Anonymous
           check-ins never appear here.
         </p>
       </div>
-      <Link href="/check-ins" className="shrink-0">
+      <Link href="/story" className="shrink-0">
         <Button variant="brand" size="md">
-          <span>View My Check-ins</span>
+          <span>View My Story</span>
           <span aria-hidden="true">&rarr;</span>
         </Button>
       </Link>

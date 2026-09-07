@@ -4,7 +4,7 @@
  * The screening hub is the highest-traffic anonymous surface touched by
  * Phase 3C. These tests pin the core guarantee: anonymous visitors see
  * byte-identical hub output (promo renders null, zero network), while
- * signed-in students get the /check-ins entry point.
+ * signed-in students get the My Story entry point.
  */
 
 import { describe, expect, it, vi } from 'vitest';
@@ -40,7 +40,7 @@ describe('CheckinsPromoCard (review verification)', () => {
     authState.value = { status: 'anonymous', user: null };
     const { container } = render(<CheckinsPromoCard />);
     expect(container.innerHTML).toBe('');
-    expect(screen.queryByText('My Check-ins')).toBeNull();
+    expect(screen.queryByText('My Story')).toBeNull();
   });
 
   it('renders nothing while auth is initializing (no flash)', () => {
@@ -52,10 +52,10 @@ describe('CheckinsPromoCard (review verification)', () => {
   it('renders the entry point for signed-in students', () => {
     authState.value = { status: 'authenticated', user: { id: 'u-1' } };
     render(<CheckinsPromoCard />);
-    expect(screen.getByText('My Check-ins')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /View My Check-ins/ })).toHaveAttribute(
+    expect(screen.getByText('My Story')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /View My Story/ })).toHaveAttribute(
       'href',
-      '/check-ins'
+      '/story'
     );
   });
 });

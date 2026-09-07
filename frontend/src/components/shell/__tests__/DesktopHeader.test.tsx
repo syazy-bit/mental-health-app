@@ -1,11 +1,10 @@
 /**
- * Tests for the L1 responsive header transition (Phase 3C final polish).
+ * Tests for the finalized five-destination desktop header.
  *
- * Strategy under test: the desktop pill bar renders for visitors without an
- * account session at xl+ only (measured settled content needs viewport >=
- * ~1170px); signed-in students get the compact header (account indicator +
- * actions) with My Check-ins in the bottom navigation and screening hub.
- * The bar never clips, overlaps, or scrolls.
+ * The pill bar holds exactly Home / Talk / My Story / Tools / Counseling
+ * at xl+ for every auth state (including while auth resolves, so there is
+ * no layout shift). Support Now is a separate persistent action, never a
+ * pill. The bar never clips, overlaps, or scrolls.
  */
 
 import { describe, expect, it, vi } from 'vitest';
@@ -22,13 +21,15 @@ const authState = vi.hoisted(() => ({
   },
 }));
 
+const navState = vi.hoisted(() => ({ pathname: '/' }));
+
 vi.mock('@/components/auth/AuthProvider', () => ({
   useAuth: () => authState.value,
 }));
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace: vi.fn() }),
-  usePathname: () => '/',
+  usePathname: () => navState.pathname,
 }));
 
 vi.mock('next/link', () => ({
@@ -55,46 +56,97 @@ function nav() {
   return screen.queryByRole('navigation', { name: 'Main Navigation' });
 }
 
-describe('DesktopHeader responsive transition (L1)', () => {
-  it('anonymous visitors get the 6-pill bar at xl+ with no scroll or clipping utilities', () => {
+function expectFivePills() {
+  const bar = nav();
+  expect(bar).toBeInTheDocument();
+  expect(bar?.className).toMatch(/hidden xl:flex/);
+  expect(bar?.className).not.toMatch(/overflow-x-auto/);
+  const pills = within(bar as HTMLElement).getAllByRole('link');
+  expect(pills).toHaveLength(5);
+  expect(pills.map((p) => p.getAttribute('href'))).toEqual([
+    '/',
+    '/chat',
+    '/story',
+    '/resources',
+    '/booking',
+  ]);
+  expect(pills.map((p) => p.textContent)).toEqual([
+    'Home',
+    'Talk',
+    'My Story',
+    'Tools',
+    'Counseling',
+  ]);
+  return bar as HTMLElement;
+}
+
+describe('DesktopHeader five-destination IA', () => {
+  it('anonymous visitors get the 5-pill bar with no scroll or clipping utilities', () => {
     authState.value = { status: 'anonymous', user: null, logout: vi.fn() };
+    navState.pathname = '/';
     renderHeader();
-    const bar = nav();
-    expect(bar).toBeInTheDocument();
-    expect(bar?.className).toMatch(/hidden xl:flex/);
-    expect(bar?.className).not.toMatch(/overflow-x-auto/);
-    const pills = within(bar as HTMLElement).getAllByRole('link');
-    expect(pills).toHaveLength(6);
-    expect(
-      within(bar as HTMLElement).queryByRole('link', { name: 'My Check-ins' })
-    ).toBeNull();
-    for (const pill of pills) {
-      expect(pill.getAttribute('href')).toMatch(/^\//);
-    }
+    expectFivePills();
   });
 
-  it('shows the bar while auth resolves (no layout shift for anonymous load)', () => {
+  it('shows the identical 5-pill bar while auth resolves (no layout shift)', () => {
     authState.value = { status: 'initializing', user: null, logout: vi.fn() };
+    navState.pathname = '/';
     renderHeader();
-    expect(nav()).toBeInTheDocument();
+    expectFivePills();
   });
 
-  it('signed-in students get the compact header: no pill bar, controls usable', () => {
+  it('signed-in students get the same 5-pill bar plus account controls', () => {
     authState.value = {
       status: 'authenticated',
       user: { id: 'u-1', email: 's@example.com' },
       logout: vi.fn(),
     };
+    navState.pathname = '/story';
     renderHeader();
-    // No pill bar at any width for account sessions (it cannot fit).
-    expect(nav()).toBeNull();
-    // Brand, account indicator, auth controls, and Support Now remain.
+    const bar = expectFivePills();
+    expect(
+      within(bar).getByRole('link', { name: 'My Story' })
+    ).toHaveAttribute('aria-current', 'page');
+    // Account indicator, auth controls, and Support Now remain alongside.
     expect(screen.getByRole('link', { name: /MindBridge/ })).toHaveAttribute('href', '/');
     expect(screen.getByText(/Signed in/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Log out' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Support Now' })).toHaveAttribute(
       'href',
       '/support-now'
+    );
+  });
+
+  it('has no Check-ins, Assessments, Resources, or About pills', () => {
+    authState.value = { status: 'anonymous', user: null, logout: vi.fn() };
+    navState.pathname = '/';
+    renderHeader();
+    const bar = nav() as HTMLElement;
+    for (const name of ['Check-ins', 'Assessments', 'Resources', 'About & Privacy']) {
+      expect(within(bar).queryByRole('link', { name })).toBeNull();
+    }
+  });
+
+  it('keeps Support Now outside the pill bar', () => {
+    authState.value = { status: 'anonymous', user: null, logout: vi.fn() };
+    navState.pathname = '/';
+    renderHeader();
+    const bar = nav() as HTMLElement;
+    expect(within(bar).queryByRole('link', { name: 'Support Now' })).toBeNull();
+    expect(screen.getByRole('link', { name: 'Support Now' })).toHaveAttribute(
+      'href',
+      '/support-now'
+    );
+  });
+
+  it('marks Tools active on the resources route (label-only rename)', () => {
+    authState.value = { status: 'anonymous', user: null, logout: vi.fn() };
+    navState.pathname = '/resources';
+    renderHeader();
+    const bar = nav() as HTMLElement;
+    expect(within(bar).getByRole('link', { name: 'Tools' })).toHaveAttribute(
+      'aria-current',
+      'page'
     );
   });
 });

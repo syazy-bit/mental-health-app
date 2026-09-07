@@ -44,13 +44,18 @@ export const InstitutionalFooter: React.FC = () => {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/story" className="hover:text-[#143D32] dark:hover:text-[#F3F7F5] transition-colors focus-accessible">
+                    My Story
+                  </Link>
+                </li>
+                <li>
                   <Link href="/booking" className="hover:text-[#143D32] dark:hover:text-[#F3F7F5] transition-colors focus-accessible">
                     Counseling
                   </Link>
                 </li>
                 <li>
                   <Link href="/resources" className="hover:text-[#143D32] dark:hover:text-[#F3F7F5] transition-colors focus-accessible">
-                    Resources
+                    Tools
                   </Link>
                 </li>
               </ul>

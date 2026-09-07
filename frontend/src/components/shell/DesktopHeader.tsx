@@ -71,23 +71,19 @@ const AuthControls: React.FC = () => {
 
 export const DesktopHeader: React.FC = () => {
   const pathname = usePathname();
-  const { status: authStatus } = useAuth();
 
+  // The five primary student destinations (approved IA). Identical for
+  // anonymous and authenticated users; only the content inside each
+  // destination varies by auth state. Five short labels fit the capped
+  // container at xl where the bar renders; it never clips, overlaps, or
+  // scrolls. Support Now stays a separate persistent action, never a pill.
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/chat', label: 'Talk & Reflect' },
-    { href: '/screening', label: 'Self-Assessment' },
+    { href: '/chat', label: 'Talk' },
+    { href: '/story', label: 'My Story' },
+    { href: '/resources', label: 'Tools' },
     { href: '/booking', label: 'Counseling' },
-    { href: '/resources', label: 'Resources' },
-    { href: '/about', label: 'About & Privacy' },
   ];
-
-  // The pill bar only renders for visitors without an account session.
-  // Signed-in students use the compact header (account indicator + actions)
-  // with My Check-ins in the bottom navigation and screening hub: the full
-  // 7-pill account bar cannot fit the capped container at any width, and the
-  // bar must never clip, overlap, or scroll. Shown while auth is resolving
-  // so anonymous visitors see no layout shift on load.
 
   return (
     <header className="sticky top-0 z-40 bg-[#FAF7F2]/90 dark:bg-[#121B17]/90 backdrop-blur-md border-b border-[#E8E2D5]/80 dark:border-[#24342C]/80 transition-colors duration-200">
@@ -113,13 +109,10 @@ export const DesktopHeader: React.FC = () => {
         </Link>
 
         {/* Centered Navigation Links with Pill Style.
-            Anonymous-only and xl+: measured 6-pill content (~1166px with
-            settled typography) needs viewport >= ~1170px, so the bar renders
-            only at xl where it fits cleanly. Below xl the existing bottom
-            navigation takes over; the bar never clips, overlaps, or scrolls.
-            Signed-in students use the compact header (account indicator +
-            actions) with My Check-ins in the bottom nav and screening hub. */}
-        {authStatus !== 'authenticated' && (
+            Five short labels fit cleanly at xl; below xl the bottom
+            navigation takes over. Rendered for every auth state (including
+            while auth resolves) so there is never a layout shift on load
+            and never a missing primary navigation. */}
         <nav aria-label="Main Navigation" className="hidden xl:flex items-center gap-1.5 lg:gap-2 bg-[#EFEAE1]/60 dark:bg-[#192721]/60 p-1.5 rounded-full border border-[#E5DEC7]/50 dark:border-[#283C33]/50">
           {navLinks.map((link) => {
             const isActive =
@@ -143,7 +136,6 @@ export const DesktopHeader: React.FC = () => {
             );
           })}
         </nav>
-        )}
 
         {/* Action Controls: Auth, Theme Switcher & Terracotta Pill CTA */}
         <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
