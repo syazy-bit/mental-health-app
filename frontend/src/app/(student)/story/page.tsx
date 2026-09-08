@@ -15,6 +15,7 @@ import { AuthApiError } from '@/lib/auth-api';
 import { fetchCheckinHistory } from '@/lib/checkins';
 import type { ScreeningHistoryItem } from '@/lib/types';
 import { CheckinHistorySection } from '@/components/checkins/CheckinHistorySection';
+import { MomentsSection } from '@/components/moments/MomentsSection';
 
 type LoadState =
   | { status: 'loading' }
@@ -166,7 +167,7 @@ const StoryContent: React.FC = () => {
         badge={{ label: 'Private to your account', variant: 'brand' }}
       />
 
-      {/* Entry actions: New check-in is real; Write a moment is coming soon. */}
+      {/* Entry actions: New check-in is real; Moments manages its own composer. */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card variant="default" padding="md" className="flex flex-col justify-between gap-4">
           <div className="space-y-1">
@@ -185,23 +186,27 @@ const StoryContent: React.FC = () => {
           </Link>
         </Card>
 
-        <Card variant="subtle" padding="md" className="flex flex-col justify-between gap-4">
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-sm font-bold text-[#19232D] dark:text-[#F1F3EF]">
-                Write a moment
-              </h2>
-              <Badge variant="neutral" size="sm">
-                Coming soon
-              </Badge>
-            </div>
+        <Card variant="default" padding="md" className="flex flex-col justify-between gap-4">
+          <div className="space-y-1">
+            <h2 className="text-sm font-bold text-[#19232D] dark:text-[#F1F3EF]">
+              Write a moment
+            </h2>
             <p className="text-xs text-slate-600 dark:text-[#AAB6B1] leading-relaxed">
-              A short note in your own words, kept only in your Story. Not available yet —
-              nothing here sends or saves anything.
+              A short note in your own words, kept only in your Story.
             </p>
           </div>
-          <Button variant="secondary" size="md" fullWidth disabled>
-            Write a moment
+          <Button
+            variant="secondary"
+            size="md"
+            fullWidth
+            onClick={() => {
+              const heading = document.getElementById('moments-heading');
+              heading?.scrollIntoView?.({ block: 'start' });
+              document.getElementById('moment-composer')?.focus({ preventScroll: true });
+            }}
+          >
+            <span>Write a moment</span>
+            <span aria-hidden="true">&rarr;</span>
           </Button>
         </Card>
       </div>
@@ -218,6 +223,8 @@ const StoryContent: React.FC = () => {
           <CheckinHistorySection instrument="GAD7" items={gad7Items} />
         </div>
       )}
+
+      <MomentsSection auth={{ status: authStatus, user: authUser }} />
 
       {/* What helped: future section — copy only, no fake rows, no actions. */}
       <Card variant="subtle" padding="lg" className="space-y-3">

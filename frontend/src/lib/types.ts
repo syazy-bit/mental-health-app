@@ -177,3 +177,33 @@ export interface ScreeningHistoryResponse {
   limit: number;
   offset: number;
 }
+
+// --- Moments (owned user-authored notes in My Story) ---
+//
+// Mirrors backend moment schemas. Plaintext body only: no title, mood, tags,
+// summaries, or safety metadata. The transient safety level exists only on
+// the create response so the client can show the right immediate support UI.
+
+export type MomentSafetyLevel = 'normal' | 'moderate' | 'high_risk';
+
+export interface MomentItem {
+  id: string;
+  body: string;
+  created_at: string;
+}
+
+export interface MomentCreateResponse {
+  id: string;
+  body: string;
+  created_at: string;
+  safety: {
+    level: MomentSafetyLevel;
+  };
+}
+
+export interface MomentListResponse {
+  items: MomentItem[];
+  total: number;
+  limit: number;
+  offset: number;
+}

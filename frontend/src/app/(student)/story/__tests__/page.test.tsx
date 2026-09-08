@@ -3,10 +3,11 @@
  *
  * Covers: auth gating (anonymous never fetches, redirects to login with
  * next=%2Fstory), loading skeleton, empty state, PHQ-9/GAD-7 sections via
- * the existing CheckinHistorySection, honest coming-soon UI (Write a moment
- * is disabled and performs no request; What helped shows copy only), error
+ * the existing CheckinHistorySection, Moments section integration (composer
+ * entry action focuses the composer; What helped shows copy only), error
  * + retry, and 401 login redirect. Bearer-token behavior itself is covered
- * in lib/__tests__/checkins.
+ * in lib/__tests__/checkins. Moments behavior itself is covered in the
+ * MomentsSection suite; the moments client is mocked here.
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -24,6 +25,12 @@ const authState = vi.hoisted(() => ({
 }));
 
 const checkinsMock = vi.hoisted(() => ({ fn: vi.fn() }));
+const momentsMock = vi.hoisted(() => ({
+  fetch: vi.fn(),
+  create: vi.fn(),
+  remove: vi.fn(),
+  restore: vi.fn(),
+}));
 const nav = vi.hoisted(() => ({ replace: vi.fn(), pathname: '/story' }));
 
 vi.mock('@/components/auth/AuthProvider', () => ({
@@ -33,6 +40,17 @@ vi.mock('@/components/auth/AuthProvider', () => ({
 vi.mock('@/lib/checkins', () => ({
   fetchCheckinHistory: (...args: unknown[]) => checkinsMock.fn(...args),
 }));
+
+vi.mock('@/lib/moments', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/moments')>();
+  return {
+    ...actual,
+    fetchMoments: (...args: unknown[]) => momentsMock.fetch(...args),
+    createMoment: (...args: unknown[]) => momentsMock.create(...args),
+    deleteMoment: (...args: unknown[]) => momentsMock.remove(...args),
+    restoreMoment: (...args: unknown[]) => momentsMock.restore(...args),
+  };
+});
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace: nav.replace }),
@@ -78,10 +96,20 @@ beforeEach(() => {
   authState.value = { status: 'anonymous', user: null };
   nav.replace.mockClear();
   checkinsMock.fn.mockReset();
+  momentsMock.fetch.mockReset();
+  momentsMock.create.mockReset();
+  momentsMock.remove.mockReset();
+  momentsMock.restore.mockReset();
+  momentsMock.fetch.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
 });
 
 afterEach(() => {
-  vi.restoreAllMocks();
+  // NOTE: no vi.restoreAllMocks() here on purpose. beforeEach resets and
+  // re-arms every mock; a restore in afterEach would wipe implementations
+  // while React may still be flushing passive effects (e.g. the Moments
+  // section mounting after check-ins resolve), turning a settled test
+  // into a TypeError on the next effect run.
+  vi.unstubAllGlobals();
 });
 
 describe('auth gating', () => {
@@ -136,20 +164,22 @@ describe('history content', () => {
   });
 });
 
-describe('honest future UI (no backend, no fake actions)', () => {
-  it('Write a moment is visibly disabled and performs no request', async () => {
+describe('moments integration (composer live, What helped still future)', () => {
+  it('Write a moment entry action focuses the Moments composer', async () => {
     authed();
     checkinsMock.fn.mockResolvedValue(historyResponse([]));
     render(<StoryPage />);
     await waitFor(() =>
       expect(screen.getByText('Your Story starts here')).toBeInTheDocument()
     );
-    const momentButton = screen.getByRole('button', { name: 'Write a moment' });
-    expect(momentButton).toBeDisabled();
-    expect(screen.getAllByText('Coming soon').length).toBeGreaterThan(0);
-    fireEvent.click(momentButton);
-    // Only the initial history load ever fires; the disabled action adds none.
-    expect(checkinsMock.fn).toHaveBeenCalledTimes(1);
+    // Wait for the Moments section to settle so both actions are present.
+    await waitFor(() => expect(screen.getByText('No moments yet.')).toBeInTheDocument());
+    // Entry-card action (first) and the Moments empty-state action (second)
+    // coexist once the section loads; the entry action jumps to the composer.
+    const actions = screen.getAllByRole('button', { name: 'Write a moment' });
+    expect(actions).toHaveLength(2);
+    fireEvent.click(actions[0]);
+    expect(document.activeElement?.id).toBe('moment-composer');
     expect(nav.replace).not.toHaveBeenCalled();
   });
 
@@ -160,9 +190,7 @@ describe('honest future UI (no backend, no fake actions)', () => {
     await waitFor(() =>
       expect(screen.getByText('What you said helped')).toBeInTheDocument()
     );
-    expect(
-      screen.getAllByText(/nothing here\s*sends or saves anything/i)
-    ).toHaveLength(2);
+    expect(screen.getByText('Coming soon')).toBeInTheDocument();
   });
 });
 
