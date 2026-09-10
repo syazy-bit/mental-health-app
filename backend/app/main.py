@@ -22,6 +22,7 @@ from app.api.routes import (
     admin_bookings,
     analytics,
     moments,
+    helpful_marks,
 )
 from app.core.config import settings
 
@@ -53,6 +54,7 @@ def create_app() -> FastAPI:
     app.include_router(admin_bookings.router)
     app.include_router(analytics.router)
     app.include_router(moments.router)
+    app.include_router(helpful_marks.router)
 
     # Moments 422s never echo submitted text; the handler delegates every
     # other route to FastAPI's default, so existing error contracts hold.

@@ -1,15 +1,85 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { MarkHelpfulButton } from '@/components/tools/MarkHelpfulButton';
+import { TOOL_REGISTRY } from '@/lib/tools';
+import type { HelpfulToolId } from '@/lib/types';
 
 type NeedCategory = 'calm' | 'ground' | 'focus' | 'explore' | 'talk';
 
-export default function ResourcesPage() {
-  const [activeNeed, setActiveNeed] = useState<NeedCategory>('calm');
+// Validated stable tool id from ?tool=, or null when absent/unknown.
+// Accepts the string-or-array shape Next.js searchParams values take;
+// arrays use the first entry. Never trust the query.
+function toolIdFromParam(value: string | string[] | undefined | null): HelpfulToolId | null {
+  const raw = Array.isArray(value) ? (value[0] ?? null) : (value ?? null);
+  if (typeof raw !== 'string') return null;
+  const match = (Object.keys(TOOL_REGISTRY) as HelpfulToolId[]).find((id) => id === raw);
+  return match ?? null;
+}
+
+// Tab for an already-validated tool id (null when there is no target).
+function needFromToolId(toolId: HelpfulToolId | null): NeedCategory | null {
+  if (toolId === null) return null;
+  return TOOL_REGISTRY[toolId].need;
+}
+
+type ResourcesSearchParams = { [key: string]: string | string[] | undefined };
+
+export default function ResourcesPage({
+  searchParams,
+}: {
+  searchParams: Promise<ResourcesSearchParams>;
+}) {
+  // Unwrap Next.js App Router searchParams with React use(). The resolved
+  // value is identical on server and client, so the initial tab/card tree
+  // matches and hydration stays clean. Never read window.location here:
+  // browser-only state is invisible to the server and caused the mismatch.
+  const resolvedParams = use(searchParams);
+  const rawTool = resolvedParams.tool;
+  const initialToolId = toolIdFromParam(rawTool ?? null);
+  return <ResourcesContent initialToolId={initialToolId} />;
+}
+
+function ResourcesContent({ initialToolId }: { initialToolId: HelpfulToolId | null }) {
+  // Deep links from My Story ("Try again") open the tab hosting the tool.
+  // Derived once from the already-validated prop; unknown values fall back
+  // to the default tab. Identical on server and client by construction.
+  const [activeNeed, setActiveNeed] = useState<NeedCategory>(
+    () => needFromToolId(initialToolId) ?? 'calm'
+  );
+  // Validated deep-link target (?tool=<stable id>), or null when the
+  // parameter is absent/unknown. Used once on mount to bring the exact
+  // tool into view; never drives tool state beyond the initial tab.
+  const [targetToolId] = useState<HelpfulToolId | null>(initialToolId);
+
+  // Bring a deep-linked tool into view after first render: smooth-scroll
+  // to its card, apply a brief highlight, and move keyboard focus there
+  // (non-disruptively, without scrolling again). Runs at most once; DOM
+  // mutations only, so no lint-triggering setState-in-effect.
+  useEffect(() => {
+    if (targetToolId === null) return;
+    const el = document.getElementById(`tool-${targetToolId}`);
+    if (!(el instanceof HTMLElement)) return;
+    const reducedMotion =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (typeof el.scrollIntoView === 'function') {
+      el.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+    }
+    el.style.boxShadow = '0 0 0 3px rgba(14, 90, 84, 0.35)';
+    el.focus({ preventScroll: true });
+    const timer = window.setTimeout(() => {
+      el.style.boxShadow = '';
+    }, 2500);
+    return () => {
+      window.clearTimeout(timer);
+      el.style.boxShadow = '';
+    };
+  }, [targetToolId]);
 
   // --- TOOL 1: 4-4-4-4 BOX BREATHING ---
   const [breathingActive, setBreathingActive] = useState(false);
@@ -241,7 +311,9 @@ export default function ResourcesPage() {
           <Card
             variant="elevated"
             padding="lg"
-            className="space-y-6"
+            className="space-y-6 scroll-mt-24"
+            id="tool-box_breathing"
+            tabIndex={-1}
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E6E4DD] dark:border-[#283632] pb-4">
               <div className="space-y-1">
@@ -322,6 +394,11 @@ export default function ResourcesPage() {
                 )}
               </div>
             </div>
+
+            {/* What Helped entry point */}
+            <div className="pt-4 border-t border-[#E6E4DD] dark:border-[#283632]">
+              <MarkHelpfulButton toolId="box_breathing" toolName="Box Breathing Exercise" />
+            </div>
           </Card>
         )}
 
@@ -330,7 +407,9 @@ export default function ResourcesPage() {
           <Card
             variant="elevated"
             padding="lg"
-            className="space-y-6"
+            className="space-y-6 scroll-mt-24"
+            id="tool-sensory_grounding"
+            tabIndex={-1}
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E6E4DD] dark:border-[#283632] pb-4">
               <div className="space-y-1">
@@ -420,6 +499,11 @@ export default function ResourcesPage() {
                 </Button>
               )}
             </div>
+
+            {/* What Helped entry point */}
+            <div className="pt-4 border-t border-[#E6E4DD] dark:border-[#283632]">
+              <MarkHelpfulButton toolId="sensory_grounding" toolName="5-4-3-2-1 Sensory Grounding" />
+            </div>
           </Card>
         )}
 
@@ -428,7 +512,9 @@ export default function ResourcesPage() {
           <Card
             variant="elevated"
             padding="lg"
-            className="space-y-6"
+            className="space-y-6 scroll-mt-24"
+            id="tool-study_reset"
+            tabIndex={-1}
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E6E4DD] dark:border-[#283632] pb-4">
               <div className="space-y-1">
@@ -501,6 +587,11 @@ export default function ResourcesPage() {
                 Reset Checklist
               </Button>
             </div>
+
+            {/* What Helped entry point */}
+            <div className="pt-4 border-t border-[#E6E4DD] dark:border-[#283632]">
+              <MarkHelpfulButton toolId="study_reset" toolName="Study Pause & Deliberate Rest" />
+            </div>
           </Card>
         )}
 
@@ -509,7 +600,9 @@ export default function ResourcesPage() {
           <Card
             variant="elevated"
             padding="lg"
-            className="space-y-6"
+            className="space-y-6 scroll-mt-24"
+            id="tool-grounding_hunt"
+            tabIndex={-1}
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E6E4DD] dark:border-[#283632] pb-4">
               <div className="space-y-1">
@@ -590,6 +683,11 @@ export default function ResourcesPage() {
                 </div>
               </div>
             )}
+
+            {/* What Helped entry point */}
+            <div className="pt-4 border-t border-[#E6E4DD] dark:border-[#283632]">
+              <MarkHelpfulButton toolId="grounding_hunt" toolName="Grounding Hunt" />
+            </div>
           </Card>
         )}
       </div>

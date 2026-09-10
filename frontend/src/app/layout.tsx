@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { Playfair_Display, Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/lib/theme';
@@ -72,7 +73,9 @@ export default function RootLayout({
       className={`${fontHeading.variable} ${fontBody.variable} h-full antialiased selection:bg-[#CCFBF1] selection:text-[#0D5C56] dark:selection:bg-[#1A3734] dark:selection:text-[#57ADA3]`}
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <Script id="mh-theme-init" strategy="beforeInteractive">
+          {themeScript}
+        </Script>
       </head>
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground transition-colors duration-200">
         <ThemeProvider>

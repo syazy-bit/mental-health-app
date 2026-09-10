@@ -11,6 +11,7 @@ from app.models.counselor import Counselor
 from app.models.counselor_slot import CounselorSlot
 from app.models.booking import Booking
 from app.models.moment import Moment
+from app.models.helpful_mark import HelpfulMark
 
 __all__ = [
     "Base",
@@ -24,4 +25,5 @@ __all__ = [
     "CounselorSlot",
     "Booking",
     "Moment",
+    "HelpfulMark",
 ]

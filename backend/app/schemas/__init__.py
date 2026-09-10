@@ -38,6 +38,11 @@ from app.schemas.moment import (
     MomentResponse,
     MomentSafety,
 )
+from app.schemas.helpful_mark import (
+    HelpfulMarkRequest,
+    HelpfulMarkResponse,
+    HelpfulMarkListResponse,
+)
 
 __all__ = [
     "SessionCreate",
@@ -69,4 +74,7 @@ __all__ = [
     "MomentListResponse",
     "MomentResponse",
     "MomentSafety",
+    "HelpfulMarkRequest",
+    "HelpfulMarkResponse",
+    "HelpfulMarkListResponse",
 ]

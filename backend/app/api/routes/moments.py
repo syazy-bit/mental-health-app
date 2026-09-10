@@ -198,14 +198,16 @@ def _strip_input(obj):
 
 
 async def moments_validation_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
-    """422 handler that never echoes submitted Moment text.
+    """422 handler that never echoes submitted client text.
 
-    Scoped by path: only /api/moments errors are sanitized (Pydantic
-    includes the rejected `input` verbatim by default); every other route
-    delegates to FastAPI's default handler, so no existing error contract
-    changes.
+    Scoped by path: only /api/moments and /api/helpful-marks errors are
+    sanitized (Pydantic includes the rejected `input` verbatim by default);
+    every other route delegates to FastAPI's default handler, so no
+    existing error contract changes. Helpful-mark tool ids are fixed
+    registry values rather than private text, but they get the same
+    no-echo treatment for consistency.
     """
-    if request.url.path.startswith("/api/moments"):
+    if request.url.path.startswith(("/api/moments", "/api/helpful-marks")):
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content=jsonable_encoder({"detail": _strip_input(exc.errors())}),

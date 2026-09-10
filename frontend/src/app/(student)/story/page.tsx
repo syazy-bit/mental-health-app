@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -16,6 +15,7 @@ import { fetchCheckinHistory } from '@/lib/checkins';
 import type { ScreeningHistoryItem } from '@/lib/types';
 import { CheckinHistorySection } from '@/components/checkins/CheckinHistorySection';
 import { MomentsSection } from '@/components/moments/MomentsSection';
+import { WhatHelpedSection } from '@/components/tools/WhatHelpedSection';
 
 type LoadState =
   | { status: 'loading' }
@@ -226,22 +226,7 @@ const StoryContent: React.FC = () => {
 
       <MomentsSection auth={{ status: authStatus, user: authUser }} />
 
-      {/* What helped: future section — copy only, no fake rows, no actions. */}
-      <Card variant="subtle" padding="lg" className="space-y-3">
-        <div className="flex items-center gap-2 flex-wrap">
-          <h2 className="text-base font-bold text-[#19232D] dark:text-[#F1F3EF]">
-            What you said helped
-          </h2>
-          <Badge variant="neutral" size="sm">
-            Coming soon
-          </Badge>
-        </div>
-        <p className="text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1] leading-relaxed max-w-2xl">
-          When you explicitly mark a coping tool as helpful, it will appear here — counted,
-          never ranked, never inferred. There is nothing to show yet, and nothing here
-          sends or saves anything.
-        </p>
-      </Card>
+      <WhatHelpedSection auth={{ status: authStatus, user: authUser }} />
 
       <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#18211F] border border-[#E6E4DD] dark:border-[#283632] text-xs text-slate-600 dark:text-[#AAB6B1] space-y-1.5 shadow-2xs">
         <p className="font-bold text-[#19232D] dark:text-[#F1F3EF]">

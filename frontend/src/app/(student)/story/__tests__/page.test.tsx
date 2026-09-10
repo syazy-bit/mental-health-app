@@ -4,10 +4,12 @@
  * Covers: auth gating (anonymous never fetches, redirects to login with
  * next=%2Fstory), loading skeleton, empty state, PHQ-9/GAD-7 sections via
  * the existing CheckinHistorySection, Moments section integration (composer
- * entry action focuses the composer; What helped shows copy only), error
- * + retry, and 401 login redirect. Bearer-token behavior itself is covered
- * in lib/__tests__/checkins. Moments behavior itself is covered in the
- * MomentsSection suite; the moments client is mocked here.
+ * entry action focuses the composer; What helped renders the production
+ * section), error + retry, and 401 login redirect. Bearer-token behavior
+ * itself is covered in lib/__tests__/checkins. Moments behavior itself is
+ * covered in the MomentsSection suite; the moments client is mocked here.
+ * What Helped behavior is covered in its own suites; the helpful-marks
+ * client is mocked here.
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -31,6 +33,10 @@ const momentsMock = vi.hoisted(() => ({
   remove: vi.fn(),
   restore: vi.fn(),
 }));
+const marksMock = vi.hoisted(() => ({
+  fetch: vi.fn(),
+  remove: vi.fn(),
+}));
 const nav = vi.hoisted(() => ({ replace: vi.fn(), pathname: '/story' }));
 
 vi.mock('@/components/auth/AuthProvider', () => ({
@@ -49,6 +55,15 @@ vi.mock('@/lib/moments', async (importOriginal) => {
     createMoment: (...args: unknown[]) => momentsMock.create(...args),
     deleteMoment: (...args: unknown[]) => momentsMock.remove(...args),
     restoreMoment: (...args: unknown[]) => momentsMock.restore(...args),
+  };
+});
+
+vi.mock('@/lib/helpful_marks', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/helpful_marks')>();
+  return {
+    ...actual,
+    fetchHelpfulMarks: (...args: unknown[]) => marksMock.fetch(...args),
+    removeHelpfulMark: (...args: unknown[]) => marksMock.remove(...args),
   };
 });
 
@@ -101,6 +116,9 @@ beforeEach(() => {
   momentsMock.remove.mockReset();
   momentsMock.restore.mockReset();
   momentsMock.fetch.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
+  marksMock.fetch.mockReset();
+  marksMock.remove.mockReset();
+  marksMock.fetch.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
 });
 
 afterEach(() => {
@@ -164,7 +182,7 @@ describe('history content', () => {
   });
 });
 
-describe('moments integration (composer live, What helped still future)', () => {
+describe('moments integration (composer live, What helped production)', () => {
   it('Write a moment entry action focuses the Moments composer', async () => {
     authed();
     checkinsMock.fn.mockResolvedValue(historyResponse([]));
@@ -183,14 +201,20 @@ describe('moments integration (composer live, What helped still future)', () => 
     expect(nav.replace).not.toHaveBeenCalled();
   });
 
-  it('What helped section shows coming-soon copy only, with no actions', async () => {
+  it('What helped section renders the production section with empty state', async () => {
     authed();
     checkinsMock.fn.mockResolvedValue(historyResponse([]));
     render(<StoryPage />);
     await waitFor(() =>
-      expect(screen.getByText('What you said helped')).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'What helped' })).toBeInTheDocument()
     );
-    expect(screen.getByText('Coming soon')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByText("You haven't marked anything yet.")).toBeInTheDocument()
+    );
+    expect(
+      screen.getByRole('link', { name: 'Explore tools' })
+    ).toHaveAttribute('href', '/resources');
+    expect(screen.queryByText('Coming soon')).toBeNull();
   });
 });
 

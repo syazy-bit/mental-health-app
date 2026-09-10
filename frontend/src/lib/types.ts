@@ -178,6 +178,35 @@ export interface ScreeningHistoryResponse {
   offset: number;
 }
 
+// --- What Helped (owned helpful marks in My Story) ---
+//
+// Mirrors backend helpful_mark schemas. Registry id plus latest mark time
+// only: no counts, scores, ratings, history, or derived data. Tool names
+// and descriptions resolve client-side from the frontend tool registry.
+
+export type HelpfulToolId =
+  | 'box_breathing'
+  | 'sensory_grounding'
+  | 'study_reset'
+  | 'grounding_hunt';
+
+export interface HelpfulMarkItem {
+  tool_id: string;
+  marked_at: string;
+}
+
+export interface HelpfulMarkResponse {
+  tool_id: string;
+  marked_at: string;
+}
+
+export interface HelpfulMarkListResponse {
+  items: HelpfulMarkItem[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
 // --- Moments (owned user-authored notes in My Story) ---
 //
 // Mirrors backend moment schemas. Plaintext body only: no title, mood, tags,

@@ -13,6 +13,7 @@ from app.api.routes import (
     admin_bookings,
     analytics,
     moments,
+    helpful_marks,
 )
 
 __all__ = [
@@ -28,4 +29,5 @@ __all__ = [
     "admin_bookings",
     "analytics",
     "moments",
+    "helpful_marks",
 ]
