@@ -692,6 +692,42 @@ function ResourcesContent({ initialToolId }: { initialToolId: HelpfulToolId | nu
         )}
       </div>
 
+      {/* 3B. SELF-CHECK (Distinct assessment entry, not a coping tool) */}
+      <section aria-labelledby="self-check-heading" className="space-y-4">
+        <div className="space-y-1 max-w-2xl">
+          <p className="text-xs font-bold text-slate-500 dark:text-[#73827D] uppercase tracking-wider">
+            Self-check
+          </p>
+          <h2 id="self-check-heading" className="text-lg font-bold text-[#19232D] dark:text-[#F1F3EF]">
+            Check in with yourself
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1] leading-relaxed">
+            Two short, private check-ins — no account needed. Your responses
+            aren&rsquo;t linked to an account.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link href="/screening/phq9" className="block sm:w-auto w-full">
+            <Button variant="secondary" size="md" fullWidth>
+              <span>PHQ-9 &middot; Mood check-in (~2 min)</span>
+              <span aria-hidden="true">&rarr;</span>
+            </Button>
+          </Link>
+          <Link href="/screening/gad7" className="block sm:w-auto w-full">
+            <Button variant="secondary" size="md" fullWidth>
+              <span>GAD-7 &middot; Anxiety check-in (~2 min)</span>
+              <span aria-hidden="true">&rarr;</span>
+            </Button>
+          </Link>
+        </div>
+        <Link
+          href="/screening"
+          className="inline-block text-xs font-semibold text-slate-500 dark:text-[#AAB6B1] hover:text-slate-800 dark:hover:text-[#F1F3EF] transition-colors focus-accessible"
+        >
+          About these check-ins &rarr;
+        </Link>
+      </section>
+
       {/* 4. LOWER SUPPORT PATHWAYS (Distinct, Accessible, Clean) */}
       <div className="space-y-8 pt-4 border-t border-[#E6E4DD] dark:border-[#283632]">
         {/* 24/7 HELPLINES DIRECTORY */}

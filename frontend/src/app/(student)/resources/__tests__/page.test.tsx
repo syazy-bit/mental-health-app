@@ -223,3 +223,48 @@ describe('?tool= targeting', () => {
     ).toBe('');
   });
 });
+
+describe('self-check section (anonymous assessment discovery)', () => {
+  it('renders for anonymous users with PHQ-9, GAD-7, and about links', async () => {
+    await renderPage();
+    expect(
+      screen.getByRole('heading', { name: 'Check in with yourself' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /PHQ-9.*Mood check-in/ })
+    ).toHaveAttribute('href', '/screening/phq9');
+    expect(
+      screen.getByRole('link', { name: /GAD-7.*Anxiety check-in/ })
+    ).toHaveAttribute('href', '/screening/gad7');
+    expect(
+      screen.getByRole('link', { name: /About these check-ins/ })
+    ).toHaveAttribute('href', '/screening');
+  });
+
+  it('renders identically for authenticated users with no account content', async () => {
+    authState.value = {
+      status: 'authenticated',
+      user: { id: 'u-1', email: 's@example.com', display_name: null, created_at: '2026-01-01' },
+    };
+    await renderPage();
+    expect(
+      screen.getByRole('heading', { name: 'Check in with yourself' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /PHQ-9.*Mood check-in/ })
+    ).toHaveAttribute('href', '/screening/phq9');
+    // No history, scores, severity, or login gates inside the section.
+    const section = screen
+      .getByRole('heading', { name: 'Check in with yourself' })
+      .closest('section');
+    expect(section).not.toBeNull();
+    expect(section!.textContent).not.toMatch(/Minimal|Mild|Moderate|Severe|score|Log in/i);
+  });
+
+  it('states the anonymous privacy guarantee without overclaiming', async () => {
+    await renderPage();
+    expect(
+      screen.getByText(/aren’t linked to an account/i)
+    ).toBeInTheDocument();
+  });
+});
