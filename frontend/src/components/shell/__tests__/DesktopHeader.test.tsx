@@ -108,7 +108,7 @@ describe('DesktopHeader five-destination IA', () => {
       within(bar).getByRole('link', { name: 'My Story' })
     ).toHaveAttribute('aria-current', 'page');
     // Account indicator, auth controls, and Support Now remain alongside.
-    expect(screen.getByRole('link', { name: /MindBridge/ })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: /Mindvya/ })).toHaveAttribute('href', '/');
     expect(screen.getByText(/Signed in/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Log out' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Support Now' })).toHaveAttribute(

@@ -19,7 +19,7 @@ export const InstitutionalFooter: React.FC = () => {
                   M
                 </div>
                 <span className="font-serif font-bold text-[#182C24] dark:text-[#F3F7F5] text-base">
-                  MindBridge
+                  Mindvya
                 </span>
               </Link>
               <p className="text-xs text-[#70847B] dark:text-[#8E9F98] leading-relaxed">
@@ -138,7 +138,7 @@ export const InstitutionalFooter: React.FC = () => {
           {/* Bottom Bar: Copyright & Socials */}
           <div className="pt-8 border-t border-[#E8E2D5] dark:border-[#24342C] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#7A8E85] dark:text-[#7D9188]">
             <p>
-              &copy; {new Date().getFullYear()} MindBridge. All rights reserved.
+              &copy; {new Date().getFullYear()} Mindvya. All rights reserved.
             </p>
 
             {/* Social Icons */}
@@ -194,7 +194,7 @@ export const InstitutionalFooter: React.FC = () => {
           <div className="bg-[#FAF8F5] dark:bg-[#18231F] rounded-3xl p-6 sm:p-8 max-w-md w-full border border-[#E8E2D5] dark:border-[#263730] shadow-xl space-y-4">
             <div className="flex items-center justify-between">
               <h3 id="contact-modal-title" className="font-serif text-lg font-bold text-[#182C24] dark:text-[#F3F7F5]">
-                MindBridge Student Support
+                Mindvya Student Support
               </h3>
               <button
                 type="button"
@@ -212,7 +212,7 @@ export const InstitutionalFooter: React.FC = () => {
             <div className="space-y-2 pt-2">
               <div className="p-3 rounded-2xl bg-white dark:bg-[#141C19] border border-[#ECE5D8] dark:border-[#24332C]">
                 <p className="font-semibold text-xs text-[#182C24] dark:text-[#F3F7F5]">Campus Care Desk</p>
-                <p className="text-[11px] text-[#5C7067] dark:text-[#9FB1A9]">support@mindbridge.edu • Mon–Fri, 9am–6pm</p>
+                <p className="text-[11px] text-[#5C7067] dark:text-[#9FB1A9]">support@mindvya.edu • Mon–Fri, 9am–6pm</p>
               </div>
               <div className="p-3 rounded-2xl bg-[#FFF6EE] dark:bg-[#281810] border border-[#FADCC7] dark:border-[#44281A]">
                 <p className="font-semibold text-xs text-[#9E3E18] dark:text-[#F8B699]">24/7 Tele-MANAS Helpline</p>

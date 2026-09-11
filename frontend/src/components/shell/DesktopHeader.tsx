@@ -100,7 +100,7 @@ export const DesktopHeader: React.FC = () => {
           {/* Brand Titles */}
           <div className="flex flex-col text-left">
             <span className="font-serif font-bold text-[#182C24] dark:text-[#F3F7F5] text-lg tracking-tight leading-tight">
-              MindBridge
+              Mindvya
             </span>
             <span className="text-[11px] font-medium text-[#687C74] dark:text-[#9FB1A9] tracking-normal leading-none mt-0.5">
               Student Well-being

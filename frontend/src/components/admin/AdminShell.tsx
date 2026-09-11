@@ -187,7 +187,7 @@ export const AdminShell: React.FC<{ children: React.ReactNode }> = ({
         <div className="flex items-center justify-between px-4 h-16">
           <div className="flex items-center gap-2 font-bold text-[#0F766E]">
             {brandMark}
-            <span>MindBridge Admin</span>
+            <span>Mindvya Admin</span>
           </div>
           <button
             type="button"
@@ -261,7 +261,7 @@ export const AdminShell: React.FC<{ children: React.ReactNode }> = ({
         <aside className="hidden lg:flex lg:flex-col w-64 shrink-0 bg-white border-r border-slate-200 sticky top-0 h-screen">
           <div className="flex items-center gap-2 px-6 h-16 border-b border-slate-200 font-bold text-[#0F766E]">
             {brandMark}
-            <span>MindBridge Admin</span>
+            <span>Mindvya Admin</span>
           </div>
           <nav
             aria-label="Admin navigation"

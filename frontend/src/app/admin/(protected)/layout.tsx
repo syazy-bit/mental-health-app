@@ -3,7 +3,7 @@ import { AdminSessionProvider } from '@/components/admin/AdminGuard';
 import { AdminShell } from '@/components/admin/AdminShell';
 
 export const metadata: Metadata = {
-  title: 'MindBridge Admin Portal',
+  title: 'Mindvya Admin Portal',
   description:
     'University counseling administration portal. Booking management, counselor profiles, and availability scheduling.',
   robots: { index: false, follow: false },

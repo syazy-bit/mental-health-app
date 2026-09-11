@@ -16,7 +16,7 @@ export default function AboutPage() {
           Built for Student Privacy, Safety, and Trust
         </h1>
         <p className="text-slate-600 dark:text-[#AAB6B1] text-xs sm:text-sm sm:leading-relaxed max-w-2xl">
-          MindBridge was created to provide timely, barrier-free emotional support and self-reflection tools for students, with uncompromising privacy and safety engineering.
+          Mindvya was created to provide timely, barrier-free emotional support and self-reflection tools for students, with uncompromising privacy and safety engineering.
         </p>
       </div>
 

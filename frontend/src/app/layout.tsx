@@ -19,10 +19,10 @@ const fontBody = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'MindBridge — Find Your Calm',
+  title: 'Mindvya — Find Your Calm',
   description:
     'Simple, confidential tools for a balanced mind. Empathetic AI listening, evidence-based PHQ-9 & GAD-7 screenings, verified crisis resources, and licensed counseling booking.',
-  applicationName: 'MindBridge',
+  applicationName: 'Mindvya',
   authors: [{ name: 'University Well-being Service' }],
   keywords: [
     'student mental health',

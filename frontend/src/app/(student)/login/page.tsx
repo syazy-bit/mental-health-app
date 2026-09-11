@@ -115,7 +115,7 @@ function LoginContent() {
           </form>
 
           <p className="mt-6 text-center text-xs sm:text-sm text-slate-600 dark:text-[#AAB6B1]">
-            New to MindBridge?{' '}
+            New to Mindvya?{' '}
             <Link
               href="/register"
               className="text-[#0D5C56] dark:text-[#4FA79D] font-semibold hover:underline focus-accessible rounded"
