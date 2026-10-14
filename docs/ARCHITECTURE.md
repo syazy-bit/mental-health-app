@@ -143,7 +143,7 @@ sequenceDiagram
     R->>R: In-memory sliding-window rate limit<br/>(10 msgs/min per session_id, else 429)
     R->>C: process_message_async(session_id, message, history, current_user)
     C->>D: Load session row
-    C->>C: Ownership gate (anonymous: public;<br/>owned: owner only, else 401/404)
+    C->>C: Ownership gate (anonymous public,<br/>owned: owner only, else 401/404)
     C->>C: Input validation (non-empty, max 2000 chars)<br/>+ history sanitized to last 8 valid turns
     C->>E: evaluate(message)
     E-->>C: RiskAssessment {level, category, matched_patterns}
@@ -156,7 +156,7 @@ sequenceDiagram
         C->>C: Provider-output validation<br/>(empty or >2000 chars → ProviderError → safe fallback)
     end
     C->>O: check(response_text, risk_level)
-    Note over O: HIGH_RISK short-circuits as trusted<br/>(fixed crisis module output);<br/>AI/fallback output is pattern-checked
+    Note over O: HIGH_RISK short-circuits as trusted<br/>(fixed crisis module output).<br/>AI/fallback output is pattern-checked
     alt Output unsafe
         C->>C: Replace with get_safe_fallback(level, language)
     end
