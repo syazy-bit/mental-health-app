@@ -302,7 +302,7 @@ mental-health-app/
 
 ## License
 
-[Specify license — e.g., MIT, Apache 2.0, etc.]
+This project is licensed under the MIT License — see [LICENSE](../LICENSE).
 
 ---
 

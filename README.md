@@ -17,9 +17,11 @@ to the detailed architecture and safety-engine documentation.
 The project description above is the short version. Concretely, it is a
 privacy-first mental-health support pathway for students built as a modular
 monolith: a FastAPI backend (Python) with a Next.js frontend (TypeScript),
-backed by PostgreSQL. Students enter **anonymously** — no accounts — and are
-guided through AI-supported chat, clinical self-screening, verified resources,
-and university counseling booking.
+backed by PostgreSQL. Students enter **anonymously by default** — no account
+required — and are guided through AI-supported chat, clinical self-screening,
+verified resources, and university counseling booking. Optional student
+accounts add owned sessions and personal history (screening history, private
+Moments).
 
 ## Who it is for
 
@@ -30,7 +32,8 @@ and university counseling booking.
 
 ## Major capabilities
 
-- Anonymous, no-account entry (a session is just a UUID).
+- Anonymous-first entry (a session is just a UUID; no account required),
+  with optional student accounts for owned sessions and personal history.
 - Empathetic chat backed by a **deterministic safety engine** that is
   authoritative for crisis classification.
 - **PHQ-9** and **GAD-7** self-screening with severity scoring and a safety
@@ -42,9 +45,10 @@ and university counseling booking.
 ## Current status
 
 Milestones 1–12 are implemented and covered by the backend pytest suite
-(162 test functions). Milestone 13 — this README and the developer onboarding
-documentation — is in progress. See [§17](#17-milestone--development-status)
-for the milestone table and [§14](#14-api--developer-references) for the
+(491 test functions). Milestone 13 — this README and the developer onboarding
+documentation — is in progress. See the milestone table in
+[docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md#current-status)
+and [§14](#14-api--developer-references) for the
 detailed design documents.
 
 # 2. Features
@@ -52,10 +56,15 @@ detailed design documents.
 Every feature below exists in the current codebase. See
 [§14](#14-api--developer-references) for where each lives in the code.
 
-## Anonymous student sessions
+## Student sessions (anonymous-first, optional accounts)
 
-No accounts, no personal data required. A session is a UUID plus a language
-code. `POST /api/sessions` creates one; `GET /api/sessions/{id}` retrieves it.
+No account or personal data is required to start: a session is a UUID plus a
+language code. `POST /api/sessions` creates one; `GET /api/sessions/{id}`
+retrieves it. Students may optionally register and log in
+(`POST /api/auth/register`, `POST /api/auth/login`); sessions created while
+authenticated belong to that account, and owned data (screening history,
+private Moments, helpful marks) requires the owner's token. Anonymous sessions
+remain accessible to whoever holds the UUID.
 
 ## Deterministic safety engine
 
@@ -165,7 +174,8 @@ mental-health-app/
 │   ├── app/
 │   │   ├── main.py           FastAPI app factory (mounts all routers)
 │   │   ├── api/routes/       HTTP routers (health, sessions, chat, screenings,
-│   │   │                     admin/auth, admin, counselors, bookings, analytics)
+│   │   │                     auth, admin/auth, admin, counselors, bookings,
+│   │   │                     admin bookings, analytics, moments, helpful-marks)
 │   │   ├── core/             config.py (pydantic-settings), db.py (SQLAlchemy),
 │   │   │                     languages.py
 │   │   ├── services/         Business logic (chat, safety_evaluations,
@@ -173,19 +183,22 @@ mental-health-app/
 │   │   │                     output_safety, chat_providers, prompts)
 │   │   ├── repositories/     Data access layer
 │   │   ├── models/           SQLAlchemy ORM models (sessions, safety_evaluations,
-│   │   │                     admins, counselors, counselor_slots, bookings)
+│   │   │                     screenings, users, refresh_tokens, admins,
+│   │   │                     counselors, counselor_slots, bookings,
+│   │   │                     moments, helpful_marks)
 │   │   ├── schemas/          Pydantic request/response schemas
 │   │   ├── safety/           Deterministic safety engine + crisis responses
 │   │   └── screening/        PHQ-9 / GAD-7 instruments
-│   ├── migrations/           Alembic migrations (5 revisions)
-│   ├── tests/                pytest suite (162 test functions)
+│   ├── migrations/           Alembic migrations (9 revisions)
+│   ├── tests/                pytest suite (491 test functions)
 │   ├── scripts/              Seed/verification scripts (demo counselors,
 │   │                         migration checks)
 │   ├── requirements.txt
 │   └── .env.example
 ├── frontend/                 Next.js 16 + TypeScript + Tailwind CSS (App Router)
-│   ├── src/app/(student)/    Student pages (chat, screening, booking,
-│   │                         resources, about, support-now)
+│   ├── src/app/(student)/    Student pages (chat, screening, check-ins, booking,
+│   │                         resources, story, about, support-now,
+│   │                         login, register)
 │   ├── src/app/admin/        Admin portal (login + protected pages)
 │   ├── src/components/       Reusable UI + app-shell components
 │   └── src/lib/              API clients (student + admin), auth, types
@@ -352,8 +365,8 @@ PostgreSQL's standard `createdb` tool (same bin directory):
 ## Apply migrations
 
 The schema is defined entirely by Alembic migrations in `backend/migrations/`
-(sessions, safety_evaluations, screenings, admins, counselors,
-counselor_slots, bookings). Apply them with:
+(sessions, safety_evaluations, screenings, users, refresh_tokens, admins,
+counselors, counselor_slots, bookings, moments, helpful_marks). Apply them with:
 
 ```powershell
 cd backend
@@ -474,7 +487,7 @@ cd backend
 pytest
 ```
 
-`backend/tests/` contains 162 test functions. `conftest.py` reads
+`backend/tests/` contains 491 test functions. `conftest.py` reads
 `DATABASE_URL` from `backend/.env`, provisions a dedicated `mental_health_test`
 database, applies all Alembic migrations, and truncates tables between tests.
 A configured `DATABASE_URL` is required for the suite to run.
@@ -505,8 +518,7 @@ Runs a Next.js production build, which also performs TypeScript type-checking.
   screenings, admin/auth, admin, counselors, bookings, admin bookings,
   analytics.
 - **Architecture:** `docs/ARCHITECTURE.md` — technical design and design
-  decisions. Note: it currently documents the Milestone 1 scope; see
-  "Known documentation gaps" at the end of this README.
+  decisions, covering the implemented system end to end.
 - **Safety engine design:** `docs/safety-engine.md` — risk levels, the engine
   design, and the crisis flow.
 - **Backend business logic:** `backend/app/services/`
@@ -558,4 +570,8 @@ Runs a Next.js production build, which also performs TypeScript type-checking.
 | Port already in use | Change the backend port (`uvicorn app.main:app --port 8001`) and update `NEXT_PUBLIC_API_URL` + `CORS_ORIGINS` accordingly; or run the frontend on another port (`npm run dev -- -p 3001`). |
 | Chat returns 429 | Rate limit: 10 messages/minute/session. Wait and retry. |
 | Admin login always fails | No admin row exists yet. Create one (§10). |
+
+# License
+
+This project is licensed under the MIT License — see [LICENSE](LICENSE).
 
